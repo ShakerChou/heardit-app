@@ -1,0 +1,2657 @@
+<!-- heardit_v1.4.23_全端适配_20260708.html | 手机+PC全端响应式适配，含hover态和小屏优化 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="听到鸟">
+<meta name="theme-color" content="#007AFF">
+<link rel="manifest" href="manifest.json">
+<title>听到鸟 / HeardIt</title>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue","PingFang SC",sans-serif;
+  background:#F2F2F7;
+  color:#1C1C1E;
+  font-size:17px;
+  line-height:1.4;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-text-size-adjust:100%;
+}
+.app-container{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  height:100vh;
+  height:100dvh;
+  position:relative;
+  overflow:hidden;
+  background:#F2F2F7;
+}
+@media(min-width:431px){
+  body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .app-container{
+    height:calc(100vh - 40px);
+    min-height:600px;
+    max-height:980px;
+    width:414px;
+    border-radius:40px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.05);
+    overflow:hidden;
+  }
+}
+@media(min-width:1024px){
+  html,body{min-height:100vh;height:100vh;overflow:hidden;}
+  body{display:flex;align-items:center;justify-content:center;background:#E5E5EA;}
+}
+
+/* ===== SCREENS ===== */
+.screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen.active{display:flex;}
+
+/* ===== TYPOGRAPHY ===== */
+.title-large{font-size:34px;font-weight:700;letter-spacing:-0.5px;}
+.title{font-size:28px;font-weight:700;letter-spacing:-0.3px;}
+.headline{font-size:22px;font-weight:600;}
+.body-text{font-size:17px;font-weight:400;}
+.callout{font-size:16px;font-weight:400;}
+.subhead{font-size:15px;font-weight:400;}
+.footnote{font-size:13px;font-weight:400;}
+.caption{font-size:12px;font-weight:400;}
+.text-primary{color:#1C1C1E;}
+.text-secondary{color:#8E8E93;}
+.text-tertiary{color:#AEAEB2;}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:block;width:100%;min-height:50px;padding:14px 24px;
+  border:none;border-radius:14px;font-size:17px;font-weight:600;
+  cursor:pointer;text-align:center;
+  transition:transform 100ms,opacity 100ms;
+  -webkit-appearance:none;appearance:none;
+  letter-spacing:0.3px;
+}
+.btn:active{transform:scale(0.97);opacity:0.85;}
+@media(hover:hover){
+  .btn:hover{opacity:0.9;}
+  .btn-primary:hover{background:#0066D6;}
+  .btn-stop:hover{background:#E0352B;}
+}
+.btn-primary{background:#007AFF;color:#fff;}
+.btn-primary:disabled{background:#C7C7CC;color:#fff;cursor:default;}
+.btn-primary:disabled:active{transform:none;opacity:1;}
+.btn-primary:disabled:hover{background:#C7C7CC;opacity:1;}
+.btn-stop{background:#FF3B30;color:#fff;}
+.btn-large{min-height:150px;font-size:20px;border-radius:20px;padding:24px;}
+
+/* ===== START TEST CIRCLE (Horizon-rise) ===== */
+.start-test-circle{
+  position:absolute;
+  left:50%;bottom:0;
+  z-index:50;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.start-test-circle:active{opacity:0.85;}
+.start-test-circle-inner{
+  width:640px;height:640px;
+  border-radius:50%;
+  background:#007AFF;
+  position:absolute;
+  left:-320px;
+  bottom:-490px;
+  box-shadow:0 -6px 24px rgba(0,122,255,0.25);
+  transition:all 350ms cubic-bezier(0.32,0.72,0,1);
+}
+.start-test-circle:active .start-test-circle-inner{
+  box-shadow:0 -6px 28px rgba(0,122,255,0.35);
+  transform:scale(0.97);
+}
+.start-test-icon{
+  position:absolute;
+  top:30px;left:50%;transform:translateX(-50%);
+}
+.start-test-icon svg{width:32px;height:32px;}
+.start-test-label{
+  position:absolute;
+  top:72px;left:50%;transform:translateX(-50%);
+  font-size:15px;font-weight:600;color:#fff;
+  white-space:nowrap;
+  text-shadow:0 1px 2px rgba(0,0,0,0.1);
+}
+.btn-outline{background:transparent;color:#007AFF;border:1.5px solid #007AFF;}
+.btn-small{min-height:36px;padding:8px 16px;font-size:14px;border-radius:10px;width:auto;display:inline-block;}
+.btn-text{background:transparent;color:#007AFF;border:none;font-size:15px;font-weight:500;padding:8px 16px;min-height:44px;display:flex;align-items:center;justify-content:center;}
+
+/* ===== CARDS ===== */
+.card{
+  background:#fff;border-radius:20px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.card-elevated{box-shadow:0 8px 24px rgba(0,0,0,0.12);}
+
+/* ===== SEGMENTED CONTROL ===== */
+.segmented{
+  display:flex;background:#E5E5EA;border-radius:10px;padding:2px;
+  -webkit-flex:1;flex:1;
+}
+.segmented-btn{
+  flex:1;padding:8px 4px;text-align:center;border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:all 250ms cubic-bezier(0,0,0.2,1);
+  border:none;background:transparent;color:#8E8E93;
+  -webkit-appearance:none;appearance:none;
+  min-height:36px;display:flex;align-items:center;justify-content:center;
+}
+.segmented-btn.active{background:#fff;color:#1C1C1E;box-shadow:0 1px 3px rgba(0,0,0,0.1),0 1px 2px rgba(0,0,0,0.06);}
+@media(hover:hover){
+  .segmented-btn:not(.active):hover{color:#1C1C1E;}
+  .start-test-circle:hover .start-test-circle-inner{filter:brightness(1.05);}
+  .fab-circle:hover{filter:brightness(1.05);}
+  .step-trial-btn:hover{background:rgba(0,122,255,0.08);}
+  .test-tap-area:hover:not(.disabled){filter:brightness(1.05);}
+  .gain-step-btn:hover{background:#007AFF;color:#fff;border-color:#007AFF;}
+  .sheet-nav-close:hover{background:#E5E5EA;}
+  .retest-btn:hover{background:#007AFF;color:#fff;}
+}
+
+/* ===== SAFE AREA ===== */
+.safe-top{height:20px;min-height:20px;}
+@supports(padding-top:env(safe-area-inset-top)){
+  .safe-top{height:env(safe-area-inset-top);min-height:env(safe-area-inset-top);}
+}
+
+/* ===== SCREEN 1: HOME NO DATA ===== */
+#screen-home-no-data{
+  align-items:center;justify-content:center;
+  padding:0 20px;
+  overflow:hidden;
+}
+.home-content{
+  display:flex;flex-direction:column;align-items:center;
+  -webkit-flex:1;flex:1;justify-content:center;width:100%;
+  max-width:min(340px, calc(100vw - 40px));
+}
+.home-logo{margin-bottom:12px;}
+.home-app-name{margin-bottom:4px;text-align:center;}
+.home-subtitle{margin-bottom:8px;text-align:center;}
+.home-tagline{margin-bottom:40px;text-align:center;color:#8E8E93;font-size:17px;}
+.home-buttons{width:100%;display:flex;flex-direction:column;}
+.home-buttons .btn{margin-bottom:12px;}
+.home-buttons .btn:last-child{margin-bottom:0;}
+.disabled-hint{text-align:center;font-size:13px;color:#AEAEB2;margin-top:8px;}
+.home-version{margin-top:auto;padding-bottom:20px;text-align:center;}
+.home-version-float{
+  position:absolute;
+  left:20px;bottom:16px;
+  font-size:12px;color:#AEAEB2;
+  z-index:40;
+  opacity:0;
+  transition:opacity 150ms ease;
+  pointer-events:none;
+}
+.home-brand.compact{padding:8px 0 10px;}
+.home-brand.compact svg{width:28px;height:28px;}
+.home-brand.compact .brand-name{font-size:14px;}
+.home-brand.compact .brand-sub{font-size:11px;}
+.home-no-data-version{font-size:12px;color:#AEAEB2;text-align:center;padding-bottom:4px;}
+
+/* ===== BOTTOM SHEET ===== */
+.sheet-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.4);z-index:100;
+  opacity:0;pointer-events:none;
+  transition:opacity 350ms cubic-bezier(0.32,0.72,0,1);
+}
+.sheet-overlay.active{opacity:1;pointer-events:auto;cursor:pointer;}
+.sheet{
+  position:absolute;bottom:0;left:0;width:100%;
+  max-height:92%;z-index:101;
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -4px 30px rgba(0,0,0,0.15);
+  transform:translateY(100%);
+  transition:transform 350ms cubic-bezier(0.32,0.72,0,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sheet.active{transform:translateY(0);}
+.sheet-nav{
+  display:flex;align-items:center;padding:16px 16px 12px;flex-shrink:0;
+}
+.sheet-nav-title{flex:1;text-align:center;font-size:17px;font-weight:600;}
+.sheet-nav-back,.sheet-nav-close{display:none;}
+.sheet-nav-close{width:28px;height:28px;border-radius:50%;background:#F2F2F7;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform 100ms;}
+.sheet-nav-close:active{transform:scale(0.9);}
+.sheet-nav-close svg{width:14px;height:14px;}
+.sheet-nav.hidden{display:none;}
+.sheet-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 20px 8px;
+}
+.sheet-footer{
+  flex-shrink:0;
+  padding:12px 20px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+  background:#fff;
+  border-top:0.5px solid #E5E5EA;
+}
+
+/* ===== TEST STEPS ===== */
+.test-step{display:none;}
+.test-step.active{display:block;}
+
+/* Step 1: Welcome */
+.step-welcome{display:flex;flex-direction:column;align-items:center;text-align:center;}
+.step-welcome-title{font-size:28px;font-weight:700;margin-bottom:6px;}
+.step-welcome-duration{font-size:14px;color:#8E8E93;margin-bottom:24px;}
+.step-welcome-guide{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;width:100%;max-width:280px;}
+.step-welcome-guide-item{display:flex;align-items:center;gap:12px;font-size:15px;color:#1C1C1E;text-align:left;}
+.step-welcome-guide-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#007AFF;color:#fff;font-size:13px;font-weight:700;flex-shrink:0;}
+.step-trial-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:120px;height:120px;border-radius:50%;
+  background:#F2F2F7;border:2px solid #007AFF;
+  cursor:pointer;margin:0 auto 16px;
+  transition:all 250ms cubic-bezier(0.32,0.72,0,1);
+}
+.step-trial-btn:active{transform:scale(0.95);background:rgba(0,122,255,0.1);}
+.step-trial-btn svg{width:40px;height:40px;}
+.step-trial-label{font-size:15px;font-weight:500;color:#007AFF;margin-bottom:32px;}
+.step-welcome-reqs{
+  width:100%;text-align:left;margin-bottom:32px;
+  background:#F2F2F7;border-radius:16px;padding:16px;
+}
+.step-welcome-reqs li{
+  list-style:none;padding:10px 0;
+  display:flex;align-items:center;
+  font-size:17px;color:#1C1C1E;
+  border-bottom:0.5px solid #E5E5EA;
+}
+.step-welcome-reqs li:last-child{border-bottom:none;}
+.step-welcome-reqs li .req-icon{
+  width:28px;height:28px;margin-right:12px;flex-shrink:0;
+  background:#007AFF;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.step-welcome-reqs li .req-icon svg{width:14px;height:14px;}
+
+/* Step 3: Testing */
+.step-test{text-align:center;padding-top:16px;}
+.test-ear-indicator{display:flex;align-items:center;justify-content:center;}
+.test-progress-bar{
+  width:100%;height:12px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;
+}
+.test-progress-dot{
+  width:8px;height:8px;border-radius:50%;background:#E5E5EA;transition:all 250ms cubic-bezier(0,0,0.2,1);
+}
+.test-progress-dot.active{background:#007AFF;transform:scale(1.2);}
+.test-progress-dot.current{background:#007AFF;transform:scale(1.4);box-shadow:0 0 0 3px rgba(0,122,255,0.2);}
+.test-freq-label{font-size:13px;color:#8E8E93;margin-bottom:4px;}
+.test-freq-value{font-size:34px;font-weight:700;color:#1C1C1E;margin-bottom:32px;}
+.test-tap-area{
+  width:200px;height:200px;border-radius:50%;
+  background:linear-gradient(135deg,#007AFF,#0055D4);
+  margin:0 auto 24px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,122,255,0.3);
+  transition:transform 100ms, opacity 200ms;
+}
+.test-tap-area:active{transform:scale(0.95);}
+.test-tap-area.disabled{
+  opacity:0.5;cursor:not-allowed;pointer-events:none;
+}
+.test-tap-text{color:#fff;font-size:18px;font-weight:600;text-align:center;padding:20px;z-index:2;position:relative;line-height:1.4;}
+.test-tap-ripple{
+  position:absolute;top:50%;left:50%;
+  width:0;height:0;border-radius:50%;
+  background:rgba(255,255,255,0.4);
+  transform:translate(-50%,-50%);
+  opacity:0;
+}
+.test-tap-ripple.animate{
+  animation:ripple 600ms ease-out forwards;
+}
+@keyframes ripple{
+  0%{width:0;height:0;opacity:0.6;}
+  100%{width:280px;height:280px;opacity:0;}
+}
+.test-volume-bar{
+  width:100%;height:6px;background:#E5E5EA;border-radius:3px;
+  margin-bottom:16px;overflow:hidden;
+}
+.test-volume-fill{height:100%;background:#34C759;border-radius:3px;transition:width 300ms;}
+.test-status{font-size:17px;color:#8E8E93;margin-bottom:16px;}
+.test-pause-btn{
+  background:transparent;border:none;color:#007AFF;font-size:15px;
+  font-weight:500;cursor:pointer;padding:8px 16px;min-height:44px;
+  display:inline-flex;align-items:center;
+}
+.test-pause-btn.solid{
+  background:#007AFF;color:#fff;border-radius:10px;
+  padding:10px 24px;font-weight:600;
+}
+
+/* Pulse animation for tap area */
+@keyframes pulse{
+  0%{box-shadow:0 8px 30px rgba(0,122,255,0.3);}
+  50%{box-shadow:0 8px 50px rgba(0,122,255,0.5);}
+  100%{box-shadow:0 8px 30px rgba(0,122,255,0.3);}
+}
+.test-tap-area.pulsing{animation:pulse 2s ease-in-out infinite;}
+
+/* Step 4: Ear Switch */
+.step-switch{text-align:center;}
+.step-switch-icon{margin-bottom:16px;}
+.step-switch-title{font-size:28px;font-weight:700;margin-bottom:8px;}
+.step-switch-desc{font-size:17px;color:#8E8E93;margin-bottom:32px;}
+
+/* Step 5: Results */
+.step-results{text-align:center;padding-top:56px;}
+.step-results-icon{margin-bottom:8px;}
+.step-results-title{font-size:28px;font-weight:700;margin-bottom:20px;}
+.audiogram-container{
+  background:#fff;border-radius:16px;padding:16px;margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.audiogram-title{font-size:15px;font-weight:600;margin-bottom:12px;text-align:left;}
+.audiogram-svg{width:100%;height:auto;}
+.result-summary{
+  display:flex;-webkit-justify-content:space-between;justify-content:space-between;
+  margin-bottom:20px;
+}
+.result-summary-card{
+  width:calc(50% - 8px);border-radius:16px;padding:16px;text-align:center;
+}
+.result-summary-card.normal{background:rgba(52,199,89,0.08);}
+.result-summary-card.mild{background:rgba(255,204,0,0.08);}
+.result-summary-card.moderate{background:rgba(255,149,0,0.08);}
+.result-summary-card.severe{background:rgba(255,59,48,0.08);}
+.result-summary-label{font-size:13px;font-weight:600;margin-bottom:4px;}
+.result-summary-db{font-size:28px;font-weight:700;margin-bottom:2px;}
+.result-summary-cat{font-size:13px;font-weight:500;}
+.result-summary-card.normal .result-summary-db{color:#34C759;}
+.result-summary-card.normal .result-summary-cat{color:#34C759;}
+.result-summary-card.mild .result-summary-db{color:#FFCC00;}
+.result-summary-card.mild .result-summary-cat{color:#FFCC00;}
+.result-summary-card.moderate .result-summary-db{color:#FF9500;}
+.result-summary-card.moderate .result-summary-cat{color:#FF9500;}
+.result-summary-card.severe .result-summary-db{color:#FF3B30;}
+.result-summary-card.severe .result-summary-cat{color:#FF3B30;}
+.classification-table{
+  width:100%;background:#F2F2F7;border-radius:16px;padding:16px;
+  margin-bottom:24px;text-align:left;
+}
+.classification-table .ct-title{font-size:15px;font-weight:600;margin-bottom:12px;}
+.classification-row{
+  display:flex;align-items:center;padding:8px 0;
+  border-bottom:0.5px solid #E5E5EA;
+}
+.classification-row:last-child{border-bottom:none;}
+.classification-dot{
+  width:10px;height:10px;border-radius:50%;margin-right:10px;flex-shrink:0;
+}
+.classification-label{flex:1;font-size:15px;}
+.classification-range{font-size:13px;color:#8E8E93;}
+
+/* ===== SCREEN 3: HOME WITH DATA ===== */
+#screen-home-with-data{
+  overflow:hidden;
+  align-items:center;
+  padding:0;
+}
+.home-data-header{
+  width:100%;
+  padding:0 20px 12px;
+  display:flex;justify-content:flex-end;
+}
+.retest-btn{
+  background:transparent;border:1.5px solid #007AFF;color:#007AFF;
+  border-radius:10px;padding:8px 16px;font-size:14px;font-weight:600;
+  cursor:pointer;min-height:36px;
+  transition:transform 100ms;
+  -webkit-appearance:none;appearance:none;
+}
+.retest-btn:active{transform:scale(0.97);}
+.home-scroll-area{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 20px 180px;
+  width:100%;
+  overscroll-behavior:contain;
+}
+.home-scroll-area::-webkit-scrollbar{display:none;}
+.home-scroll-area{-ms-overflow-style:none;scrollbar-width:none;}
+.hearing-summary-card{
+  width:100%;background:#fff;border-radius:16px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom:16px;
+}
+.hs-title{font-size:13px;font-weight:600;color:#8E8E93;margin-bottom:12px;}
+.hs-bars{display:flex;-webkit-justify-content:space-between;justify-content:space-between;margin-bottom:4px;}
+.hs-bar-group{display:flex;flex-direction:column;align-items:center;-webkit-flex:1;flex:1;}
+.hs-bars-label{font-size:9px;color:#AEAEB2;margin-top:2px;}
+.hs-bar-pair{display:flex;align-items:flex-end;height:30px;}
+.hs-bar-l,.hs-bar-r{width:6px;border-radius:2px;margin:0 1px;}
+.hs-bar-l{background:#007AFF;}
+.hs-bar-r{background:#FF3B30;}
+.hs-result-text{font-size:15px;font-weight:500;color:#1C1C1E;margin-top:12px;display:flex;justify-content:space-between;}
+
+/* ===== FAB (Fan-Shape Quarter Circle) ===== */
+.fab{
+  position:absolute;
+  right:0;bottom:0;
+  z-index:50;
+  pointer-events:auto;
+}
+.fab-circle{
+  width:430px;height:430px;
+  border-radius:50%;
+  background:#007AFF;
+  position:absolute;
+  right:-215px;
+  bottom:-215px;
+  cursor:pointer;
+  box-shadow:-4px -4px 20px rgba(0,122,255,0.3);
+  transition:all 400ms cubic-bezier(0.32,0.72,0,1);
+}
+.fab-circle:active{opacity:0.85;}
+.fab-icon{
+  position:absolute;
+  top:75px;left:72px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.fab-icon svg{width:28px;height:28px;display:block;}
+.fab-label{
+  position:absolute;
+  top:150px;left:62px;
+  font-size:13px;font-weight:600;color:#fff;
+  white-space:nowrap;
+  text-shadow:0 1px 2px rgba(0,0,0,0.1);
+  transition:opacity 300ms;
+}
+.fab.mini .fab-circle{
+  width:144px;height:144px;
+  right:-72px;bottom:-72px;
+  box-shadow:-2px -2px 10px rgba(0,122,255,0.3);
+}
+.fab.mini .fab-icon{top:24px;left:24px;}
+.fab.mini .fab-icon svg{width:22px;height:22px;}
+.fab.mini .fab-label{opacity:0;}
+.fab.active .fab-circle{
+  background:#FF3B30;
+  box-shadow:-4px -4px 20px rgba(255,59,48,0.3);
+  animation:fanPulse 2s ease-in-out infinite;
+}
+@keyframes fanPulse{
+  0%{box-shadow:-4px -4px 20px rgba(255,59,48,0.25);}
+  50%{box-shadow:-4px -4px 30px rgba(255,59,48,0.4);}
+  100%{box-shadow:-4px -4px 20px rgba(255,59,48,0.25);}
+}
+
+/* ===== HEARING AID SETTINGS PANEL ===== */
+.ha-settings{
+  display:none;
+  width:100%;
+}
+.ha-settings.visible{display:block;}
+
+/* ===== DUAL VISUALIZER ===== */
+.dual-viz{display:flex;justify-content:space-between;margin-bottom:12px;}
+.dual-viz-ear{
+  flex:1;border-radius:16px;padding:14px 10px 6px;
+  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  margin:0 6px;
+}
+.dual-viz-ear:first-child{margin-left:0;}
+.dual-viz-ear:last-child{margin-right:0;}
+.dual-viz-label{font-size:14px;font-weight:600;text-align:center;margin-bottom:8px;}
+.dual-viz-label.left-label{color:#1C1C1E;}
+.dual-viz-label.right-label{color:#1C1C1E;}
+.dual-viz-bars{display:flex;justify-content:space-around;align-items:flex-end;height:90px;position:relative;}
+.dual-viz-bar-wrap{display:flex;flex-direction:column;align-items:center;width:14%;height:100%;justify-content:flex-end;}
+.dual-viz-bar{width:100%;border-radius:3px;position:relative;flex-shrink:0;}
+.dual-viz-bar-input{
+  width:100%;border-radius:3px 3px 0 0;
+  position:absolute;bottom:0;
+}
+.dual-viz-bar-input.has-gain{
+  border-radius:0;
+}
+.dual-viz-bar-gain{
+  width:100%;border-radius:3px 3px 0 0;
+  position:absolute;
+}
+.dual-viz-bar.left .dual-viz-bar-input{background:#007AFF;}
+.dual-viz-bar.left .dual-viz-bar-gain{background:#34C759;}
+.dual-viz-bar.right .dual-viz-bar-input{background:#007AFF;}
+.dual-viz-bar.right .dual-viz-bar-gain{background:#34C759;}
+.dual-viz-bar-label{
+  font-size:9px;color:#AEAEB2;margin-top:4px;text-align:center;line-height:1;
+}
+.dual-viz-legend{
+  width:100%;
+  display:flex;justify-content:center;align-items:center;
+  margin-top:8px;margin-bottom:16px;font-size:12px;color:#8E8E93;
+}
+.dual-viz-legend-item{
+  display:flex;align-items:center;margin:0 10px;
+}
+.dual-viz-legend-dot{
+  width:10px;height:10px;border-radius:2px;margin-right:4px;
+}
+
+/* ===== SETTINGS CARD ===== */
+.settings-card{
+  width:100%;
+  background:#fff;border-radius:20px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom:16px;
+}
+.setting-row{
+  padding:12px 0;
+  border-bottom:0.5px solid #F2F2F7;
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:15px;font-weight:600;margin-bottom:8px;}
+.setting-desc{font-size:12px;color:#8E8E93;margin-top:6px;}
+
+/* ===== GAIN SLIDER ===== */
+.gain-card{
+  width:100%;
+  background:#fff;border-radius:20px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom:16px;
+}
+.gain-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.gain-title{font-size:15px;font-weight:600;}
+.gain-stepper{display:flex;align-items:center;gap:8px;}
+.gain-step-btn{
+  width:36px;height:36px;border-radius:50%;border:1.5px solid #C7C7CC;
+  background:#fff;font-size:22px;color:#007AFF;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;font-weight:400;padding:0;flex-shrink:0;
+  transition:all 0.15s;
+}
+.gain-step-btn:active{background:#007AFF;color:#fff;border-color:#007AFF;}
+.gain-slider-wrap{flex:1;min-width:0;}
+input[type=range]{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:6px;border-radius:3px;
+  background:#E5E5EA;outline:none;
+  margin:0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:28px;height:28px;border-radius:50%;
+  background:#fff;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.04);
+  border:none;
+}
+input[type=range]::-moz-range-thumb{
+  width:28px;height:28px;border-radius:50%;
+  background:#fff;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  border:none;
+}
+.gain-stepper-labels{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-top:6px;font-size:12px;color:#8E8E93;}
+.gain-stepper-labels .gain-value{font-size:20px;font-weight:700;color:#007AFF;font-variant-numeric:tabular-nums;}
+
+/* ===== HOWL BANNER (from v1.3.23) ===== */
+.howl-banner{
+  display:none;width:100%;
+  background:#FF3B30;color:#fff;
+  border-radius:10px;padding:10px 12px;
+  font-size:13px;font-weight:600;text-align:center;
+  margin-bottom:16px;
+  animation:howlFlash 0.5s ease-in-out;
+}
+.howl-banner.show{display:block;}
+@keyframes howlFlash{0%{opacity:0;}50%{opacity:1;}100%{opacity:1;}}
+
+/* ===== STATUS & LATENCY (from v1.3.23) ===== */
+.ha-status{
+  width:100%;text-align:center;font-size:14px;color:#8E8E93;
+  margin-bottom:12px;
+}
+.ha-status.on{color:#34C759;font-weight:600;}
+.ha-status.warn{color:#FF3B30;font-weight:600;}
+.latency-card{
+  width:100%;
+  background:#fff;border-radius:20px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom:16px;
+}
+.latency-label{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;}
+.latency-val{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
+.latency-bar{width:100%;height:4px;background:#E5E5EA;border-radius:2px;margin-top:8px;overflow:hidden;}
+.latency-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;}
+.latency-note{font-size:10px;color:#8E8E93;margin-top:4px;text-align:center;}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.fade-in{animation:fadeIn 350ms cubic-bezier(0.32,0.72,0,1) forwards;}
+
+@keyframes scaleIn{
+  from{opacity:0;transform:scale(0.8);}
+  to{opacity:1;transform:scale(1);}
+}
+.scale-in{animation:scaleIn 350ms cubic-bezier(0.32,0.72,0,1) forwards;}
+
+/* ===== SMALL SCREEN ADJUSTMENTS (≤360px) ===== */
+@media(max-width:360px){
+  .start-test-circle-inner{
+    width:500px;height:500px;
+    left:-250px;bottom:-380px;
+  }
+  .fab-circle{
+    width:340px;height:340px;
+    right:-170px;bottom:-170px;
+  }
+  .fab.mini .fab-circle{
+    width:120px;height:120px;
+    right:-60px;bottom:-60px;
+  }
+  .fab.mini .fab-icon{top:20px;left:20px;}
+  .fab.mini .fab-icon svg{width:18px;height:18px;}
+  .test-tap-area{width:170px;height:170px;}
+  .step-trial-btn{width:100px;height:100px;}
+  .title-large{font-size:28px;}
+  .title{font-size:24px;}
+}
+
+/* ===== SCROLLBAR HIDE ===== */
+.sheet-body::-webkit-scrollbar{width:3px;}
+.sheet-body::-webkit-scrollbar-track{background:transparent;}
+.sheet-body::-webkit-scrollbar-thumb{background:rgba(0,122,255,0.3);border-radius:2px;}
+.sheet-body{-ms-overflow-style:none;scrollbar-width:thin;scrollbar-color:rgba(0,122,255,0.3) transparent;}
+</style>
+</head>
+<body>
+
+<div class="app-container" id="app">
+
+  <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
+  <div class="screen active" id="screen-home-no-data">
+    <div class="safe-top"></div>
+    <div class="home-no-data-version">HeardIt v1.4.23</div>
+    <div class="home-content">
+      <div class="home-logo">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="38" fill="rgba(0,122,255,0.08)" stroke="#007AFF" stroke-width="2"/>
+          <path d="M28 30 C28 20 34 14 40 14 C46 14 52 20 52 30 C52 40 46 48 40 52 C34 48 28 40 28 30Z" fill="#007AFF" opacity="0.85"/>
+          <path d="M36 26 C36 26 38 24 40 24 C42 24 44 26 44 26" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="36" cy="30" r="2.5" fill="#fff"/>
+          <circle cx="44" cy="30" r="2.5" fill="#fff"/>
+          <path d="M37 35 Q40 38 43 35" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M24 36 Q18 40 16 48" stroke="#007AFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M56 36 Q62 40 64 48" stroke="#007AFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="home-app-name title-large text-primary">听到鸟</div>
+      <div class="home-subtitle headline text-secondary">HeardIt</div>
+      <div class="home-tagline body-text">让普通耳机成为你的助听工具</div>
+    </div>
+
+    <!-- Start Test: 2/3 circle at bottom -->
+    <div class="start-test-circle" id="start-test-circle" onclick="startHearingTest()">
+      <div class="start-test-circle-inner">
+        <div class="start-test-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <path d="M8 14L14 14L22 6L22 34L14 26L8 26Z" fill="#fff"/>
+            <path d="M26 12C28.5 14.5 30 18 30 22C30 26 28.5 29.5 26 32" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M30 8C34 12 36 17 36 22C36 27 34 32 30 36" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="start-test-label">开始听力测试</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2: HOME WITH DATA ==================== -->
+  <div class="screen" id="screen-home-with-data">
+    <div class="safe-top"></div>
+
+    <div class="home-scroll-area" id="home-scroll-area">
+
+      <!-- App Logo & Name -->
+      <div class="home-brand" id="home-brand" style="display:flex;align-items:center;padding:12px 0 16px;transition:all 350ms cubic-bezier(0.32,0.72,0,1);">
+        <svg width="40" height="40" viewBox="0 0 80 80" fill="none" style="flex-shrink:0;">
+          <circle cx="40" cy="40" r="38" fill="rgba(0,122,255,0.08)" stroke="#007AFF" stroke-width="2"/>
+          <path d="M28 30 C28 20 34 14 40 14 C46 14 52 20 52 30 C52 40 46 48 40 52 C34 48 28 40 28 30Z" fill="#007AFF" opacity="0.85"/>
+          <path d="M36 26 C36 26 38 24 40 24 C42 24 44 26 44 26" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <circle cx="36" cy="30" r="2.5" fill="#fff"/>
+          <circle cx="44" cy="30" r="2.5" fill="#fff"/>
+          <path d="M37 35 Q40 38 43 35" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M24 36 Q18 40 16 48" stroke="#007AFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M56 36 Q62 40 64 48" stroke="#007AFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div style="margin-left:10px;">
+          <div style="font-size:18px;font-weight:700;color:#1C1C1E;line-height:1.2;">听到鸟</div>
+          <div style="font-size:13px;color:#8E8E93;line-height:1.2;">HeardIt</div>
+        </div>
+      </div>
+
+      <div class="hearing-summary-card" id="hearing-summary-card">
+        <div class="hs-top-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div class="hs-title">听力概览</div>
+          <button class="retest-btn" onclick="startHearingTest(true)" style="padding:8px 14px;font-size:14px;border-radius:10px;background:#F2F2F7;color:#007AFF;border:none;font-weight:500;cursor:pointer;">重新测试</button>
+        </div>
+        <div class="hs-bars" id="hs-bars"></div>
+        <div class="hs-result-text" id="hs-result-text"></div>
+      </div>
+
+      <!-- Hearing Aid Settings (hidden by default, shown when ON) -->
+      <div class="ha-settings" id="ha-settings">
+
+        <!-- Howl Banner -->
+        <div class="howl-banner" id="howl-banner">检测到啸叫，已自动静音</div>
+
+        <!-- Status Text -->
+        <div class="ha-status on" id="ha-status">助听运行中</div>
+
+        <!-- Dual Visualizer -->
+        <div class="dual-viz" id="dual-viz">
+          <div class="dual-viz-ear">
+            <div class="dual-viz-label left-label">左耳</div>
+            <div class="dual-viz-bars" id="dual-viz-left"></div>
+          </div>
+          <div class="dual-viz-ear">
+            <div class="dual-viz-label right-label">右耳</div>
+            <div class="dual-viz-bars" id="dual-viz-right"></div>
+          </div>
+        </div>
+        <div class="dual-viz-legend">
+          <div class="dual-viz-legend-item">
+            <div class="dual-viz-legend-dot" style="background:#007AFF"></div>
+            <span>输入</span>
+          </div>
+          <div class="dual-viz-legend-item">
+            <div class="dual-viz-legend-dot" style="background:#34C759"></div>
+            <span>增益</span>
+          </div>
+        </div>
+
+        <!-- Gain Slider -->
+        <div class="gain-card" style="margin-top:16px;">
+          <div class="gain-header">
+            <div class="gain-title">辅助增益</div>
+          </div>
+          <div class="gain-stepper">
+            <button class="gain-step-btn" id="gain-minus" onclick="stepGain(-1)" aria-label="减小增益">−</button>
+            <div class="gain-slider-wrap">
+              <input type="range" id="gain-slider" min="0" max="10" value="5" step="1" oninput="updateGain(this.value)">
+            </div>
+            <button class="gain-step-btn" id="gain-plus" onclick="stepGain(1)" aria-label="增加增益">+</button>
+          </div>
+          <div class="gain-stepper-labels">
+            <span class="gain-value" id="gain-value">5</span>
+            <span id="gain-label">-10dB 适度增益</span>
+          </div>
+        </div>
+
+        <!-- Microphone Selection -->
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-label">麦克风选择</div>
+            <div class="segmented" id="seg-mic">
+              <button class="segmented-btn active" data-val="phone" onclick="onMicChange('phone')">手机麦克风</button>
+              <button class="segmented-btn" data-val="earphone" onclick="onMicChange('earphone')">耳机麦克风</button>
+            </div>
+            <div class="setting-desc" id="mic-desc">手机麦克风啸叫风险更低</div>
+          </div>
+        </div>
+
+        <!-- Howl Suppression -->
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-label">啸叫保护</div>
+            <div class="segmented" id="seg-howl">
+              <button class="segmented-btn" data-val="high" onclick="onHowlChange('high')">高</button>
+              <button class="segmented-btn active" data-val="medium" onclick="onHowlChange('medium')">中</button>
+              <button class="segmented-btn" data-val="low" onclick="onHowlChange('low')">低</button>
+            </div>
+            <div class="setting-desc" id="howl-desc">12dB标准灵敏度 · 默认中</div>
+          </div>
+        </div>
+
+        <!-- AI Noise Reduction -->
+        <div class="settings-card" id="last-settings-card">
+          <div class="setting-row">
+            <div class="setting-label">AI 降噪</div>
+            <div class="segmented" id="seg-noise">
+              <button class="segmented-btn active" data-val="auto" onclick="onNoiseChange('auto')">自动</button>
+              <button class="segmented-btn" data-val="off" onclick="onNoiseChange('off')">关闭</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latency Display -->
+        <div class="latency-card">
+          <div class="latency-label">
+            <span>音频延迟</span>
+            <span class="latency-val" id="latency-val">-- ms</span>
+          </div>
+          <div class="latency-bar">
+            <div class="latency-fill" id="latency-fill" style="width:0%"></div>
+          </div>
+          <div class="latency-note" id="latency-note">开始助听后显示</div>
+        </div>
+
+      </div><!-- end ha-settings -->
+
+    </div><!-- end home-scroll-area -->
+
+    <!-- App name & version: fixed bottom-left -->
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.23</div>
+
+    <!-- FAB (Fan-Shape Quarter Circle) -->
+    <div class="fab" id="fab">
+      <div class="fab-circle" id="fab-circle" onclick="toggleHearingAid()">
+        <div class="fab-icon" id="fab-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#fff"/>
+            <path d="M15.54 8.46C16.48 9.41 17 10.66 17 12C17 13.34 16.48 14.59 15.54 15.54" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M19.07 4.93C20.94 6.8 22 9.34 22 12C22 14.66 20.94 17.2 19.07 19.07" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="fab-label" id="fab-label">开始助听</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== BOTTOM SHEET: HEARING TEST ==================== -->
+  <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheetOnOverlay()"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-nav">
+      <button class="sheet-nav-back" onclick="closeSheet()" id="sheet-back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 19L8 12L15 5" stroke="#007AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="sheet-nav-title" id="sheet-title"></div>
+      <button class="sheet-nav-close" onclick="closeSheet()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15M5 5L15 15" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+
+      <!-- Step 1: Welcome -->
+      <div class="test-step active" id="test-step-1">
+        <div class="step-welcome fade-in">
+          <div class="step-welcome-title">听力测试</div>
+          <div class="step-welcome-duration">约 3 分钟</div>
+          <div class="step-welcome-guide">
+            <div class="step-welcome-guide-item">
+              <span class="step-welcome-guide-num">1</span>
+              <span>请使用有线耳机</span>
+            </div>
+            <div class="step-welcome-guide-item">
+              <span class="step-welcome-guide-num">2</span>
+              <span>手机音量调至 50% 左右</span>
+            </div>
+            <div class="step-welcome-guide-item">
+              <span class="step-welcome-guide-num">3</span>
+              <span>请在安静环境下测试</span>
+            </div>
+            <div class="step-welcome-guide-item">
+              <span class="step-welcome-guide-num">4</span>
+              <span>听到声音就点击按钮</span>
+            </div>
+          </div>
+          <button class="step-trial-btn" id="trial-btn" onclick="playTrialSound()">
+            <svg viewBox="0 0 40 40" fill="none">
+              <path d="M8 14L14 14L22 6L22 34L14 26L8 26Z" fill="#007AFF"/>
+              <path d="M26 12C28.5 14.5 30 18 30 22C30 26 28.5 29.5 26 32" stroke="#007AFF" stroke-width="2" stroke-linecap="round"/>
+              <path d="M30 8C34 12 36 17 36 22C36 27 34 32 30 36" stroke="#007AFF" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="step-trial-label" id="trial-label">点击试听</div>
+          <button class="btn btn-primary" onclick="beginFullTest()">开始测试</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Testing (left/right ear) -->
+      <div class="test-step" id="test-step-3">
+        <div class="step-test fade-in">
+          <div class="test-ear-indicator" id="test-ear-indicator" style="margin-bottom:12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 4 C8 4 5 7 5 11 C5 13 6 15 8 16 C9 17 10 18 10 21 L14 21 C14 18 15 17 16 16 C18 15 19 13 19 11 C19 7 16 4 12 4Z" fill="rgba(0,122,255,0.12)" stroke="#007AFF" stroke-width="1.5"/>
+              <path d="M10 21 L14 21" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span id="test-ear-name" style="font-size:15px;font-weight:600;color:#007AFF;margin-left:6px;">左耳</span>
+          </div>
+          <div class="test-progress-bar" id="test-progress-bar">
+            <div class="test-progress-dot" data-idx="0"></div>
+            <div class="test-progress-dot" data-idx="1"></div>
+            <div class="test-progress-dot" data-idx="2"></div>
+            <div class="test-progress-dot" data-idx="3"></div>
+            <div class="test-progress-dot" data-idx="4"></div>
+            <div class="test-progress-dot" data-idx="5"></div>
+          </div>
+          <div class="test-freq-label" id="test-freq-label">频率 1/6</div>
+          <div class="test-freq-value" id="test-freq-value">250 Hz</div>
+          <div class="test-tap-area pulsing" id="test-tap-area" onclick="tapHeard()">
+            <div class="test-tap-text">听到声音时<br>点击</div>
+            <div class="test-tap-ripple" id="test-tap-ripple"></div>
+          </div>
+          <div class="test-volume-bar">
+            <div class="test-volume-fill" id="test-volume-fill" style="width:30%"></div>
+          </div>
+          <div class="test-status" id="test-status">请仔细聆听...</div>
+          <button class="test-pause-btn" onclick="pauseTest()">暂停测试</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Ear Switch -->
+      <div class="test-step" id="test-step-4">
+        <div class="step-switch scale-in">
+          <div class="step-switch-icon">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" fill="rgba(52,199,89,0.08)" stroke="#34C759" stroke-width="2"/>
+              <path d="M20 32 L28 40 L44 24" stroke="#34C759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="step-switch-title" id="switch-title">左耳测试完成</div>
+          <div class="step-switch-desc" id="switch-desc">接下来测试右耳，请保持佩戴</div>
+          <button class="btn btn-primary" id="btn-switch-ear" onclick="switchEar()">开始测试右耳</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Results -->
+      <div class="test-step" id="test-step-5">
+        <div class="step-results fade-in">
+          <div class="step-results-icon">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" fill="rgba(52,199,89,0.08)" stroke="#34C759" stroke-width="2"/>
+              <path d="M20 32 L28 40 L44 24" stroke="#34C759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="step-results-title">测试完成</div>
+
+          <div class="result-summary">
+            <div class="result-summary-card" id="result-card-left">
+              <div class="result-summary-label">左耳</div>
+              <div class="result-summary-db" id="result-left-db">--</div>
+              <div class="result-summary-cat" id="result-left-cat">--</div>
+            </div>
+            <div class="result-summary-card" id="result-card-right">
+              <div class="result-summary-label">右耳</div>
+              <div class="result-summary-db" id="result-right-db">--</div>
+              <div class="result-summary-cat" id="result-right-cat">--</div>
+            </div>
+          </div>
+
+          <div class="classification-table">
+            <div class="ct-title">听力分级标准</div>
+            <div class="classification-row">
+              <div class="classification-dot" style="background:#34C759"></div>
+              <div class="classification-label">正常</div>
+              <div class="classification-range">&le;25 dB</div>
+            </div>
+            <div class="classification-row">
+              <div class="classification-dot" style="background:#FFCC00"></div>
+              <div class="classification-label">轻度</div>
+              <div class="classification-range">26-40 dB</div>
+            </div>
+            <div class="classification-row">
+              <div class="classification-dot" style="background:#FF9500"></div>
+              <div class="classification-label">中度</div>
+              <div class="classification-range">41-60 dB</div>
+            </div>
+            <div class="classification-row">
+              <div class="classification-dot" style="background:#FF3B30"></div>
+              <div class="classification-label">重度</div>
+              <div class="classification-range">61-80 dB</div>
+            </div>
+          </div>
+
+          <div class="audiogram-container">
+            <div class="audiogram-title">听力图</div>
+            <svg class="audiogram-svg" viewBox="0 0 320 220" id="audiogram-svg"></svg>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="sheet-footer">
+      <button class="btn btn-primary" onclick="finishTest()">返回首页</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/*
+  heardit v1.4.0 - UI焕新
+  heardit_UI.html 前端 + v1.3.23 底层音频技术
+  6-band WDRC + NAL-NL2 + Howl Detection + 啸叫保护
+*/
+
+// ====== VERSION ======
+const VERSION = 'v1.4.23';
+
+// ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
+const DAMAGED_PROFILE = {
+  250:15, 500:22, 1000:32, 2000:42, 4000:52, 8000:60
+};
+const NORMAL_PROFILE = {
+  250:0, 500:0, 1000:0, 2000:0, 4000:0, 8000:0
+};
+
+const FREQS = [250, 500, 1000, 2000, 4000, 8000];
+const FREQ_LABELS = {250:'250',500:'500',1000:'1k',2000:'2k',4000:'4k',8000:'8k'};
+
+const GAIN_LEVELS = [0, -18, -16, -14, -12, -10, -8, -6, -4, -3, -2]; // 0=no gain, 10=max
+const DEFAULT_LEVEL = 5; // -10dB
+
+const SAFETY_HARD_LIMIT = -10;
+const HPFREQ = 400;
+const LPFREQ = 7500;
+const NOTCH_FREQ = 100;
+const POWER_HUM_FREQ = 50;
+
+const NAL_NL2_WEIGHTS = {
+  250:  0.22, 500:  0.30, 1000: 0.38,
+  2000: 0.35, 4000: 0.28, 8000: 0.18
+};
+const EQ_GAIN_MAX = 12;
+const SPEECH_BOOST = 1;
+const MONO_MIXER_GAIN = 0.40;
+
+const BAND_CFG = [
+  { freq:250,  bwQ:1.1, targetDb:-38, maxGain:0.7, minGain:0.2, gateDb:-56, gateAtten:0.10, limiterDb:-12, att:0.5, rel:0.0015 },
+  { freq:500,  bwQ:1.3, targetDb:-36, maxGain:0.75,minGain:0.2, gateDb:-54, gateAtten:0.08, limiterDb:-13, att:0.5, rel:0.0018 },
+  { freq:1000, bwQ:1.4, targetDb:-33, maxGain:0.85,minGain:0.15,gateDb:-52, gateAtten:0.06, limiterDb:-14, att:0.5, rel:0.002  },
+  { freq:2000, bwQ:1.4, targetDb:-32, maxGain:0.9, minGain:0.1, gateDb:-50, gateAtten:0.05, limiterDb:-13, att:0.55,rel:0.0025 },
+  { freq:4000, bwQ:1.5, targetDb:-34, maxGain:0.8, minGain:0.15,gateDb:-54, gateAtten:0.07, limiterDb:-14, att:0.5, rel:0.002  },
+  { freq:8000, bwQ:2.0, targetDb:-36, maxGain:0.7, minGain:0.25,gateDb:-57, gateAtten:0.12, limiterDb:-15, att:0.45,rel:0.003  }
+];
+
+const HOWL_SENSITIVITY = {
+  high:   { energyDb:-42, peakRatio:10, label:'高', desc:'10dB峰值比,啸叫即掐' },
+  medium: { energyDb:-38, peakRatio:12, label:'中', desc:'12dB标准灵敏度' },
+  low:    { energyDb:-34, peakRatio:14, label:'低', desc:'14dB仅强啸叫' }
+};
+const HOWL_DEFAULT_SENSITIVITY = 'medium';
+const HOWL_CHECK_INTERVAL = 10;
+const HOWL_CONFIRM_HITS = 2;
+const HOWL_RECOVER_MS = 1500;
+const HOWL_MAX_COUNT = 3;
+
+// ====== AUDIO HELPERS (from v1.3.23, UNCHANGED) ======
+function dbToLinear(db){ return Math.pow(10, db/20); }
+function linearToDb(lin){ return 20*Math.log10(Math.max(lin, 1e-10)); }
+function calcEqGain(lossDb, freq){
+  if(lossDb <= 0) return 0;
+  const weight = NAL_NL2_WEIGHTS[freq] || 0.40;
+  let g = lossDb * weight;
+  if(freq === 2000) g += SPEECH_BOOST;
+  return Math.min(EQ_GAIN_MAX, Math.max(-6, g));
+}
+function levelToDb(level){
+  const idx = Math.min(10, Math.max(0, parseInt(level)));
+  return GAIN_LEVELS[idx];
+}
+function supportsNoiseSuppression(){
+  const ua = navigator.userAgent.toLowerCase();
+  if(ua.includes('chrome') || ua.includes('edg')) return true;
+  if(ua.includes('firefox')) return true;
+  if(ua.includes('safari') && !ua.includes('chrome')){
+    const versionMatch = ua.match(/version\/(\d+)/);
+    if(versionMatch){
+      const version = parseInt(versionMatch[1]);
+      return version >= 15;
+    }
+    return true;
+  }
+  return false;
+}
+async function getAudioDevices(){
+  try{
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter(d => d.kind === 'audioinput');
+  }catch(e){ return []; }
+}
+
+// ====== AUDIO ENGINE (from v1.3.23, UNCHANGED) ======
+const AudioEngine = {
+  ctx:null, stream:null, source:null,
+  userGain:1, deviceId:null, noiseSupp:'auto', micMode:'phone',
+  howlSensitivity:HOWL_DEFAULT_SENSITIVITY,
+  hpf:null, notch:null, powerNotch:null, lpf:null, transientLimiter:null,
+  bands:[], monoMixer:null,
+  leftEqs:[], rightEqs:[],
+  highShelf:null, masterGain:null, protector:null,
+  outputAnalyser:null, inputAnalyser:null, leftAnalyser:null, rightAnalyser:null,
+  bgOsc:null, bgGain:null,
+  agcInterval:null, latencyInterval:null, fadeInterval:null,
+  howlInterval:null, howlCount:0, howlStartTime:0, howlPeakFreq:0,
+  isMuted:false, isSuppressed:false,
+  isRunning:false, mode:null,
+
+  async start(mode, profile, gainLevel, deviceId, noiseSupp, micMode){
+    await this.stop();
+    this.mode = mode;
+    this.deviceId = deviceId;
+    this.noiseSupp = noiseSupp;
+    this.micMode = micMode || 'phone';
+    this._profile = profile;
+    const gainDb = levelToDb(gainLevel);
+    this.userGain = dbToLinear(gainDb);
+    this.howlCount = 0;
+    this.isMuted = false;
+    this.isSuppressed = false;
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
+
+    const nsEnabled = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser');
+    let constraints = {
+      audio:{
+        echoCancellation: false,
+        noiseSuppression: nsEnabled,
+        noiseSuppressionQuality: nsEnabled ? 4 : 0,
+        autoGainControl: false,
+        latency: 0.001,
+        googNoiseSuppression: nsEnabled,
+        googNoiseSuppression2: nsEnabled,
+        googAutoGainControl: false,
+        googEchoCancellation: false
+      }
+    };
+    if(deviceId) constraints.audio.deviceId = {exact: deviceId};
+
+    try{
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    }catch(e){
+      try{
+        constraints = {audio:{
+          echoCancellation: false,
+          noiseSuppression: nsEnabled,
+          autoGainControl: false,
+          latency: 0.001
+        }};
+        if(deviceId) constraints.audio.deviceId = {exact: deviceId};
+        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      }
+      catch(e2){ this.stop(); return false; }
+    }
+    this.source = this.ctx.createMediaStreamSource(this.stream);
+
+    this.protector = this.ctx.createDynamicsCompressor();
+    this.protector.threshold.value = SAFETY_HARD_LIMIT;
+    this.protector.knee.value = 0;
+    this.protector.ratio.value = 20;
+    this.protector.attack.value = 0.0005;
+    this.protector.release.value = 0.02;
+
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.value = this.userGain;
+
+    this.outputAnalyser = this.ctx.createAnalyser();
+    this.outputAnalyser.fftSize = 512;
+    this.outputAnalyser.smoothingTimeConstant = 0.1;
+
+    this.inputAnalyser = this.ctx.createAnalyser();
+    this.inputAnalyser.fftSize = 512;
+    this.inputAnalyser.smoothingTimeConstant = 0.3;
+
+    this.hpf = this.ctx.createBiquadFilter();
+    this.hpf.type = 'highpass';
+    this.hpf.frequency.value = HPFREQ;
+    this.hpf.Q.value = 0.707;
+
+    this.notch = this.ctx.createBiquadFilter();
+    this.notch.type = 'notch';
+    this.notch.frequency.value = NOTCH_FREQ;
+    this.notch.Q.value = 2.0;
+
+    this.powerNotch = this.ctx.createBiquadFilter();
+    this.powerNotch.type = 'notch';
+    this.powerNotch.frequency.value = POWER_HUM_FREQ;
+    this.powerNotch.Q.value = 5.0;
+
+    this.lpf = this.ctx.createBiquadFilter();
+    this.lpf.type = 'lowpass';
+    this.lpf.frequency.value = LPFREQ;
+    this.lpf.Q.value = 0.7;
+
+    this.transientLimiter = this.ctx.createDynamicsCompressor();
+    this.transientLimiter.threshold.value = -30;
+    this.transientLimiter.knee.value = 6;
+    this.transientLimiter.ratio.value = 10;
+    this.transientLimiter.attack.value = 0.001;
+    this.transientLimiter.release.value = 0.04;
+
+    this.source.connect(this.hpf);
+    this.source.connect(this.inputAnalyser);
+    this.hpf.connect(this.notch);
+    this.notch.connect(this.powerNotch);
+    this.powerNotch.connect(this.lpf);
+    this.lpf.connect(this.transientLimiter);
+
+    this.bands = [];
+    this.monoMixer = this.ctx.createGain();
+    this.monoMixer.gain.value = MONO_MIXER_GAIN;
+
+    BAND_CFG.forEach((cfg, i)=>{
+      const bp = this.ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = cfg.freq;
+      bp.Q.value = cfg.bwQ;
+
+      const agc = this.ctx.createGain();
+      agc.gain.value = 0.35;
+
+      const lim = this.ctx.createDynamicsCompressor();
+      lim.threshold.value = cfg.limiterDb;
+      lim.knee.value = 0;
+      lim.ratio.value = 20;
+      lim.attack.value = 0.002;
+      lim.release.value = 0.03;
+
+      const analyser = this.ctx.createAnalyser();
+      analyser.fftSize = 128;
+
+      this.transientLimiter.connect(bp);
+      bp.connect(agc);
+      agc.connect(lim);
+      lim.connect(analyser);
+      analyser.connect(this.monoMixer);
+
+      this.bands.push({
+        cfg: cfg, bp: bp, agc: agc, limiter: lim, analyser: analyser,
+        smoothRMS: 0, currentGain: 0.35,
+        gateOpen: cfg.gateAtten, isElderly: mode !== 'normal'
+      });
+    });
+
+    const merger = this.ctx.createChannelMerger(2);
+
+    this.leftAnalyser = this.ctx.createAnalyser();
+    this.leftAnalyser.fftSize = 256;
+    this.leftAnalyser.smoothingTimeConstant = 0.1;
+
+    this.rightAnalyser = this.ctx.createAnalyser();
+    this.rightAnalyser.fftSize = 256;
+    this.rightAnalyser.smoothingTimeConstant = 0.1;
+
+    this.leftEqs = [];
+    let lc = null;
+    FREQS.forEach(f=>{
+      const eq = this.ctx.createBiquadFilter();
+      eq.type = 'peaking';
+      eq.frequency.value = f;
+      eq.Q.value = 1.3;
+      eq.gain.value = calcEqGain(profile.left[f]||0, f);
+      if(lc === null) this.monoMixer.connect(eq);
+      else lc.connect(eq);
+      lc = eq;
+      this.leftEqs.push(eq);
+    });
+    lc.connect(this.leftAnalyser);
+    this.leftAnalyser.connect(merger, 0, 0);
+
+    this.rightEqs = [];
+    let rc = null;
+    FREQS.forEach(f=>{
+      const eq = this.ctx.createBiquadFilter();
+      eq.type = 'peaking';
+      eq.frequency.value = f;
+      eq.Q.value = 1.3;
+      eq.gain.value = calcEqGain(profile.right[f]||0, f);
+      if(rc === null) this.monoMixer.connect(eq);
+      else rc.connect(eq);
+      rc = eq;
+      this.rightEqs.push(eq);
+    });
+    rc.connect(this.rightAnalyser);
+    this.rightAnalyser.connect(merger, 0, 1);
+
+    this.highShelf = this.ctx.createBiquadFilter();
+    this.highShelf.type = 'highshelf';
+    this.highShelf.frequency.value = 6000;
+    const hasLoss = Object.values(profile.left).some(v=>v>0) || Object.values(profile.right).some(v=>v>0);
+    this.highShelf.gain.value = hasLoss ? -12 : 0;
+
+    merger.connect(this.highShelf);
+    this.highShelf.connect(this.masterGain);
+    this.masterGain.connect(this.protector);
+    this.protector.connect(this.ctx.destination);
+    this.protector.connect(this.outputAnalyser);
+
+    this.startMultiWdrcLoop();
+    this.startSoftStart();
+    this.startLatencyMonitor();
+    this.startHowlDetector();
+
+    this.bgOsc = this.ctx.createOscillator();
+    this.bgOsc.type = 'sine'; this.bgOsc.frequency.value = 21500;
+    this.bgGain = this.ctx.createGain(); this.bgGain.gain.value = 0.0001;
+    this.bgOsc.connect(this.bgGain);
+    this.bgGain.connect(this.ctx.destination);
+    this.bgOsc.start();
+
+    this.isRunning = true;
+    return true;
+  },
+
+  startSoftStart(){
+    if(!this.bands.length || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.bands.forEach(ch=>{
+      ch.agc.gain.cancelScheduledValues(t);
+      ch.agc.gain.setValueAtTime(0.2, t);
+      ch.agc.gain.linearRampToValueAtTime(0.5, t + 3.0);
+    });
+  },
+
+  startHowlDetector(){
+    if(this.howlInterval) clearInterval(this.howlInterval);
+    const freqData = new Float32Array(this.outputAnalyser.frequencyBinCount);
+    const sampleRate = this.ctx.sampleRate;
+    const nyquist = sampleRate / 2;
+    const binSize = nyquist / freqData.length;
+    const startBin = Math.floor(1000 / binSize);
+    const endBin = Math.floor(5000 / binSize);
+    const sensKey = this.howlSensitivity || HOWL_DEFAULT_SENSITIVITY;
+    const sens = HOWL_SENSITIVITY[sensKey];
+    const energyDb = sens.energyDb;
+    const peakRatio = sens.peakRatio;
+
+    this.howlInterval = setInterval(()=>{
+      if(!this.outputAnalyser || !this.ctx || this.isSuppressed) return;
+      this.outputAnalyser.getFloatFrequencyData(freqData);
+      let peakBin = -1;
+      let peakDb = -Infinity;
+      for(let i = startBin; i < endBin; i++){
+        if(freqData[i] > peakDb){
+          peakDb = freqData[i];
+          peakBin = i;
+        }
+      }
+      if(peakDb < energyDb){
+        this.howlHitCount = 0;
+        return;
+      }
+      const leftDb = peakBin > startBin ? freqData[peakBin - 2] : -Infinity;
+      const rightDb = peakBin < endBin - 1 ? freqData[peakBin + 2] : -Infinity;
+      const avgNeighborDb = (leftDb + rightDb) / 2;
+      const peakDiff = peakDb - avgNeighborDb;
+      if(peakDiff > peakRatio){
+        this.howlHitCount = (this.howlHitCount || 0) + 1;
+        if(this.howlHitCount >= HOWL_CONFIRM_HITS){
+          this.howlHitCount = 0;
+          this.howlPeakFreq = peakBin * binSize;
+          this.triggerHowlProtection();
+        }
+      }else{
+        this.howlHitCount = 0;
+      }
+    }, HOWL_CHECK_INTERVAL);
+  },
+
+  triggerHowlProtection(){
+    if(this.isSuppressed) return;
+    this.isSuppressed = true;
+    this.howlCount++;
+    this.howlStartTime = 0;
+    console.log('啸叫检测! 次数:', this.howlCount, '频率:', Math.round(this.howlPeakFreq) + 'Hz');
+    if(this.masterGain && this.ctx){
+      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+    }
+    // Update UI
+    const banner = document.getElementById('howl-banner');
+    if(banner){
+      banner.classList.add('show');
+      banner.textContent = '检测到啸叫 (' + Math.round(this.howlPeakFreq) + 'Hz)，已自动静音';
+    }
+    const statusEl = document.getElementById('ha-status');
+    if(statusEl){
+      statusEl.textContent = '啸叫保护中...';
+      statusEl.className = 'ha-status warn';
+    }
+    if(this.howlCount >= HOWL_MAX_COUNT){
+      setTimeout(async ()=>{
+        if(this.isRunning){
+          await autoStopHowl();
+        }
+      }, 500);
+      return;
+    }
+    // If howlCount >= 2, stop completely instead of recovering (too unstable)
+    if(this.howlCount >= 2){
+      setTimeout(async ()=>{
+        if(this.isRunning){
+          await autoStopHowl();
+        }
+      }, 300);
+      return;
+    }
+    setTimeout(()=>{
+      if(!this.isRunning || !this.isSuppressed) return;
+      this.recoverFromHowl();
+    }, HOWL_RECOVER_MS);
+  },
+
+  recoverFromHowl(){
+    this.isSuppressed = false;
+    if(this.masterGain && this.ctx){
+      const t = this.ctx.currentTime;
+      this.masterGain.gain.cancelScheduledValues(t);
+      this.masterGain.gain.setValueAtTime(0, t);
+      this.masterGain.gain.linearRampToValueAtTime(this.userGain * 0.6, t + 0.5);
+    }
+    const banner = document.getElementById('howl-banner');
+    if(banner) banner.classList.remove('show');
+    const statusEl = document.getElementById('ha-status');
+    if(statusEl && this.isRunning){
+      statusEl.textContent = '助听运行中';
+      statusEl.className = 'ha-status on';
+    }
+  },
+
+  startSmoothFade(target, duration){
+    if(this.fadeInterval) clearInterval(this.fadeInterval);
+    const steps = 15;
+    const interval = (duration || 300) / steps;
+    const startGain = target === 0 ? this.masterGain.gain.value : 0;
+    let step = 0;
+    this.fadeInterval = setInterval(()=>{
+      step++;
+      const t = step / steps;
+      const eased = target === 0 ? t : (1 - Math.pow(1 - t, 3));
+      const g = startGain + (target - startGain) * eased;
+      if(this.masterGain && this.ctx){
+        this.masterGain.gain.setTargetAtTime(Math.max(0.0001, g), this.ctx.currentTime, 0.01);
+      }
+      if(step >= steps){
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+      }
+    }, interval);
+  },
+
+  startLatencyMonitor(){
+    if(this.latencyInterval) clearInterval(this.latencyInterval);
+    this.latencyInterval = setInterval(()=>{
+      if(!this.ctx) return;
+      let roundTripMs = 0;
+      if(this.ctx.getOutputTimestamp){
+        try{
+          const ts = this.ctx.getOutputTimestamp();
+          if(ts && ts.performanceTime > 0 && ts.contextTime > 0){
+            const contextNow = this.ctx.currentTime;
+            const outputTime = ts.performanceTime + (contextNow - ts.contextTime) * 1000;
+            const outputLatencyMs = outputTime - performance.now();
+            if(outputLatencyMs > 0 && outputLatencyMs < 500){
+              roundTripMs = Math.round(outputLatencyMs * 2);
+            }
+          }
+        }catch(e){}
+      }
+      if(!roundTripMs){
+        const base = this.ctx.baseLatency || 0;
+        const out = this.ctx.outputLatency || 0;
+        roundTripMs = Math.round((base + out) * 1000 * 2);
+      }
+      const el = document.getElementById('latency-val');
+      const fill = document.getElementById('latency-fill');
+      const note = document.getElementById('latency-note');
+      if(el) el.textContent = roundTripMs + ' ms';
+      const pct = Math.min(100, (roundTripMs / 30) * 100);
+      if(fill) fill.style.width = pct + '%';
+      // Color by latency: green ≤25ms, orange 26-35ms, red >35ms
+      var color;
+      if (roundTripMs <= 15) { color = '#34C759'; }
+      else if (roundTripMs <= 25) { color = '#34C759'; }
+      else if (roundTripMs <= 35) { color = '#FF9500'; }
+      else { color = '#FF3B30'; }
+      if(el) el.style.color = color;
+      if(fill) fill.style.background = color;
+      if(note) note.textContent =
+        roundTripMs <= 15 ? '环回延迟极低，专业录音级' :
+        roundTripMs <= 25 ? '环回延迟优秀，实时通话级' :
+        roundTripMs <= 35 ? '环回延迟良好，可接受' : '环回延迟偏高，影响体验';
+    }, 1000);
+  },
+
+  startMultiWdrcLoop(){
+    if(this.agcInterval) clearInterval(this.agcInterval);
+    const timeData = new Float32Array(128);
+    this.agcInterval = setInterval(()=>{
+      if(!this.bands || !this.bands.length || this.isSuppressed) return;
+      this.bands.forEach((ch)=>{
+        const cfg = ch.cfg;
+        if(!ch.analyser || !ch.agc) return;
+        ch.analyser.getFloatTimeDomainData(timeData);
+        let sum = 0;
+        for(let i=0; i<timeData.length; i++) sum += timeData[i]*timeData[i];
+        const rms = Math.sqrt(sum / timeData.length);
+        ch.smoothRMS = ch.smoothRMS * 0.88 + rms * 0.12;
+        const rmsDb = linearToDb(ch.smoothRMS);
+        if(ch.gateOpen > 0.6){
+          if(rmsDb < cfg.gateDb){
+            ch.gateOpen += (cfg.gateAtten - ch.gateOpen) * 0.06;
+          }
+        }else{
+          if(rmsDb > cfg.gateDb + 6){
+            ch.gateOpen += (1 - ch.gateOpen) * 0.01;
+          }else{
+            ch.gateOpen += (cfg.gateAtten - ch.gateOpen) * 0.1;
+          }
+        }
+        const targetLin = dbToLinear(cfg.targetDb);
+        const ratio = targetLin / Math.max(ch.smoothRMS, 0.00001);
+        const clamped = Math.min(cfg.maxGain, Math.max(cfg.minGain, ratio));
+        if(clamped < ch.currentGain){
+          ch.currentGain += (clamped - ch.currentGain) * cfg.att;
+        }else{
+          ch.currentGain += (clamped - ch.currentGain) * cfg.rel;
+        }
+        const finalGain = ch.isElderly
+          ? Math.max(cfg.minGain * 0.7, ch.gateOpen * ch.currentGain)
+          : 1.0;
+        ch.agc.gain.setTargetAtTime(finalGain, this.ctx.currentTime, 0.015);
+      });
+    }, 25);
+  },
+
+  setGain(level){
+    const gainDb = levelToDb(level);
+    this.userGain = dbToLinear(gainDb);
+    if(this.masterGain && this.ctx && !this.isSuppressed){
+      this.masterGain.gain.setTargetAtTime(this.userGain, this.ctx.currentTime, 0.03);
+    }
+    // When gain=0, bypass EQ; otherwise scale by level (level 5 = standard NAL-NL2)
+    if (this.ctx && this._profile) {
+      const t = this.ctx.currentTime;
+      const scale = level === 0 ? 0 : level / 5; // 0.2x to 2.0x, level 5 = 1.0x standard
+      this.leftEqs.forEach((eq, i) => {
+        if (eq) {
+          const g = level === 0 ? 0 : calcEqGain(this._profile.left[FREQS[i]]||0, FREQS[i]) * scale;
+          eq.gain.setTargetAtTime(g, t, 0.03);
+        }
+      });
+      this.rightEqs.forEach((eq, i) => {
+        if (eq) {
+          const g = level === 0 ? 0 : calcEqGain(this._profile.right[FREQS[i]]||0, FREQS[i]) * scale;
+          eq.gain.setTargetAtTime(g, t, 0.03);
+        }
+      });
+    }
+  },
+
+  stopAgcLoop(){
+    if(this.agcInterval){ clearInterval(this.agcInterval); this.agcInterval = null; }
+    if(this.latencyInterval){ clearInterval(this.latencyInterval); this.latencyInterval = null; }
+    if(this.fadeInterval){ clearInterval(this.fadeInterval); this.fadeInterval = null; }
+    if(this.howlInterval){ clearInterval(this.howlInterval); this.howlInterval = null; }
+    const el = document.getElementById('latency-val');
+    const fill = document.getElementById('latency-fill');
+    const note = document.getElementById('latency-note');
+    if(el) el.textContent = '-- ms';
+    if(fill) fill.style.width = '0%';
+    if(note) note.textContent = '开始助听后显示';
+    const banner = document.getElementById('howl-banner');
+    if(banner) banner.classList.remove('show');
+  },
+
+  async stop(){
+    this.isRunning = false;
+    this.isSuppressed = false;
+    this.stopAgcLoop();
+    try{ if(this.bgOsc){ this.bgOsc.stop(); this.bgOsc.disconnect(); } }catch(e){} this.bgOsc = null;
+    try{ if(this.bgGain) this.bgGain.disconnect(); }catch(e){} this.bgGain = null;
+    if(this.stream){ this.stream.getTracks().forEach(t=>t.stop()); this.stream = null; }
+    const nodes = [this.source, this.hpf, this.notch, this.powerNotch, this.lpf, this.transientLimiter,
+      this.monoMixer, this.highShelf, this.masterGain, this.protector, this.outputAnalyser, this.inputAnalyser,
+      this.leftAnalyser, this.rightAnalyser];
+    if(this.bands) this.bands.forEach(ch=>{
+      nodes.push(ch.bp, ch.agc, ch.limiter, ch.analyser);
+    });
+    [this.leftEqs, this.rightEqs].forEach(arr=>{
+      arr.forEach(f=>nodes.push(f));
+    });
+    nodes.forEach(n=>{ try{ if(n) n.disconnect(); }catch(e){} });
+    this.bands = [];
+    this.leftEqs = []; this.rightEqs = [];
+    this.source = this.hpf = this.notch = this.powerNotch = this.lpf = this.transientLimiter = null;
+    this.monoMixer = this.highShelf = this.masterGain = this.protector = this.outputAnalyser = this.inputAnalyser = this.leftAnalyser = this.rightAnalyser = null;
+    if(this.ctx){ try{ await this.ctx.close(); }catch(e){} this.ctx = null; }
+  }
+};
+
+// ====== APP STATE (UI) ======
+var AppState = {
+  currentScreen: 'home-no-data',
+  hasHearingData: false,
+  hearingData: { left: [], right: [] },
+  testState: {
+    ear: 'left',
+    freqIndex: 0,
+    results: {},
+    isPlaying: false,
+    isPaused: false,
+    playInterval: null
+  }
+};
+
+// ====== HEARING AID STATE ======
+var haState = {
+  micMode: 'phone',
+  phoneDeviceId: null,
+  earphoneDeviceId: null,
+  noiseSupp: 'auto',
+  howlSensitivity: HOWL_DEFAULT_SENSITIVITY,
+  gainLevel: DEFAULT_LEVEL,
+  isRunning: false
+};
+
+// ====== HEARING TEST DATA ======
+var FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
+var FREQ_TEST_LABELS = ['250', '500', '1k', '2k', '4k', '8k'];
+var FAKE_LEFT = [15, 22, 32, 42, 52, 60];
+var FAKE_RIGHT = [10, 18, 28, 38, 48, 55];
+var trialAudioCtx = null;
+
+// ====== TEST AUDIO STATE ======
+var testAudioCtx = null;
+var testOsc = null;
+var testGain = null;
+var testPanner = null;
+var testVolumeInterval = null;
+var testCurrentDb = -90; // Starting dBFS level
+var testVolumeStep = 5; // dB per step
+var testStepInterval = 1000; // ms between volume steps
+
+// ====== DUAL VISUALIZER ======
+var dualVizAnimId = null;
+var dualVizBarsLeft = [];
+var dualVizBarsRight = [];
+var isHearingAidOn = false;
+
+// ====== FAB SCROLL DETECTION ======
+var fabScrollTimer = null;
+
+var fabScrollRaf = null;
+function initFabScrollDetection() {
+  var scrollArea = document.querySelector('.home-scroll-area');
+  if (!scrollArea) return;
+  scrollArea.addEventListener('touchstart', function() {
+    setFabMini(true);
+  }, {passive: true});
+  scrollArea.addEventListener('touchend', function() {
+    clearTimeout(fabScrollTimer);
+    fabScrollTimer = setTimeout(function() { setFabMini(false); }, 2000);
+  }, {passive: true});
+  scrollArea.addEventListener('scroll', function() {
+    setFabMini(true);
+    clearTimeout(fabScrollTimer);
+    fabScrollTimer = setTimeout(function() { setFabMini(false); }, 2000);
+    if (fabScrollRaf) cancelAnimationFrame(fabScrollRaf);
+    fabScrollRaf = requestAnimationFrame(updateVersionVisibility);
+  }, {passive: true});
+  scrollArea.addEventListener('mousedown', function() { setFabMini(true); });
+  scrollArea.addEventListener('mouseup', function() {
+    clearTimeout(fabScrollTimer);
+    fabScrollTimer = setTimeout(function() { setFabMini(false); }, 2000);
+  });
+  updateVersionVisibility();
+}
+
+function updateVersionVisibility() {
+  var versionEl = document.getElementById('home-version-float');
+  if (!versionEl) return;
+  var scrollArea = document.querySelector('.home-scroll-area');
+  if (!scrollArea) { versionEl.style.opacity = 1; return; }
+  // Find visible cards only (ignore hidden ones like the summary card when HA is on)
+  var allCards = scrollArea.querySelectorAll('.settings-card, .gain-card, .latency-card');
+  var visibleCards = [];
+  for (var i = 0; i < allCards.length; i++) {
+    var c = allCards[i];
+    if (c.offsetParent !== null && c.style.display !== 'none') {
+      visibleCards.push(c);
+    }
+  }
+  var lastCard = visibleCards.length > 0 ? visibleCards[visibleCards.length - 1] : null;
+  if (!lastCard) { versionEl.style.opacity = 0; return; }
+  var cardRect = lastCard.getBoundingClientRect();
+  var areaRect = scrollArea.getBoundingClientRect();
+  var viewBottom = areaRect.bottom;
+  var versionHeight = 20;
+  var overlapZone = versionHeight + 24;
+  var spaceBelowCard = viewBottom - cardRect.bottom;
+  // Progressive opacity: fully visible when far, fades as it gets close
+  if (spaceBelowCard >= overlapZone + 20) {
+    versionEl.style.opacity = 1;
+  } else if (spaceBelowCard >= overlapZone) {
+    versionEl.style.opacity = (spaceBelowCard - overlapZone) / 20;
+  } else {
+    versionEl.style.opacity = 0;
+  }
+}
+
+function setFabMini(mini) {
+  var fab = document.getElementById('fab');
+  if (!fab) return;
+  if (!isHearingAidOn) return;
+  if (mini) { fab.classList.add('mini'); }
+  else { fab.classList.remove('mini'); }
+}
+
+// ====== SCREEN MANAGEMENT ======
+function showScreen(name) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) {
+    screens[i].classList.remove('active');
+  }
+  var target = document.getElementById('screen-' + name);
+  if (target) { target.classList.add('active'); }
+  AppState.currentScreen = name;
+  if (name === 'home-with-data') {
+    initFabScrollDetection();
+  }
+}
+
+// ====== BOTTOM SHEET ======
+function openSheet(showClose) {
+  document.getElementById('sheet-overlay').classList.add('active');
+  document.getElementById('sheet').classList.add('active');
+  var closeBtn = document.querySelector('.sheet-nav-close');
+  if (closeBtn) {
+    closeBtn.style.display = showClose ? 'flex' : 'none';
+  }
+  resetTestSteps();
+  showTestStep(1);
+}
+
+function closeSheet() {
+  stopTestTone();
+  if (AppState.testState.playInterval) {
+    clearInterval(AppState.testState.playInterval);
+    AppState.testState.playInterval = null;
+  }
+  AppState.testState.isPlaying = false;
+  document.getElementById('sheet-overlay').classList.remove('active');
+  document.getElementById('sheet').classList.remove('active');
+}
+
+function closeSheetOnOverlay() {
+  // Steps 3(testing), 4(ear switch), 5(results) should not close on overlay click
+  if (AppState.testState && AppState.testState.step >= 3) return;
+  closeSheet();
+}
+
+// ====== TRIAL SOUND (Apple-style: 1kHz, stereo, comfortable volume) ======
+function playTrialSound() {
+  var label = document.getElementById('trial-label');
+  label.textContent = '正在播放...';
+  try {
+    if (!trialAudioCtx) {
+      trialAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var osc = trialAudioCtx.createOscillator();
+    var gain = trialAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 1000;
+    osc.connect(gain);
+    gain.connect(trialAudioCtx.destination);
+    var t = trialAudioCtx.currentTime;
+    osc.start(t);
+    // 3 beeps, gradually increasing volume (weak → medium → strong)
+    // Beep 1: -42dB (very faint)
+    gain.gain.setValueAtTime(dbToLinear(-42), t);
+    gain.gain.setValueAtTime(0, t + 0.3);
+    // Beep 2: -34dB (medium)
+    gain.gain.setValueAtTime(dbToLinear(-34), t + 0.5);
+    gain.gain.setValueAtTime(0, t + 0.8);
+    // Beep 3: -26dB (strong, clearly audible)
+    gain.gain.setValueAtTime(dbToLinear(-26), t + 1.0);
+    gain.gain.setValueAtTime(0, t + 1.4);
+    setTimeout(function() {
+      try { osc.stop(); } catch(e) {}
+      label.textContent = '点击试听';
+    }, 1600);
+  } catch(e) { label.textContent = '点击试听'; }
+}
+
+// ====== TEST AUDIO HELPERS ======
+function stopTestTone() {
+  if (testVolumeInterval) { clearInterval(testVolumeInterval); testVolumeInterval = null; }
+  try { if (testOsc) { testOsc.stop(); testOsc.disconnect(); } } catch(e) {}
+  try { if (testGain) testGain.disconnect(); } catch(e) {}
+  try { if (testPanner) testPanner.disconnect(); } catch(e) {}
+  testOsc = null;
+  testGain = null;
+  testPanner = null;
+}
+
+function dbToLinearSafe(db) {
+  return Math.pow(10, Math.max(-100, db) / 20);
+}
+
+function mapDbToHL(dbFS) {
+  var clamped = Math.max(-90, Math.min(-5, dbFS));
+  return Math.round(((clamped + 90) / 85) * 80);
+}
+
+// ====== HEARING TEST ======
+function startHearingTest(isRetest) { openSheet(isRetest); }
+
+function resetTestSteps() {
+  AppState.testState = {
+    ear: 'left', freqIndex: 0, results: {},
+    isPlaying: false, isPaused: false, playInterval: null
+  };
+  var steps = document.querySelectorAll('.test-step');
+  for (var i = 0; i < steps.length; i++) { steps[i].classList.remove('active'); }
+}
+
+function showTestStep(num) {
+  AppState.testState.step = num;
+  var steps = document.querySelectorAll('.test-step');
+  for (var i = 0; i < steps.length; i++) { steps[i].classList.remove('active'); }
+  var step = document.getElementById('test-step-' + num);
+  if (step) step.classList.add('active');
+  var nav = document.querySelector('.sheet-nav');
+  if (nav) {
+    if (num === 3 || num === 5) { nav.classList.add('hidden'); }
+    else { nav.classList.remove('hidden'); }
+  }
+  var footer = document.querySelector('.sheet-footer');
+  if (footer) {
+    if (num === 5) { footer.style.display = ''; }
+    else { footer.style.display = 'none'; }
+  }
+}
+
+function beginFullTest() {
+  AppState.testState.ear = 'left';
+  AppState.testState.freqIndex = 0;
+  AppState.testState.results = { left: [], right: [] };
+  startEarTest();
+}
+
+function startEarTest() {
+  var ear = AppState.testState.ear;
+  AppState.testState.freqIndex = 0;
+  AppState.testState.isPlaying = false;
+  AppState.testState.isPaused = false;
+  var indicator = document.getElementById('test-ear-indicator');
+  var earName = document.getElementById('test-ear-name');
+  var earColor = ear === 'left' ? '#007AFF' : '#FF3B30';
+  var earBg = ear === 'left' ? 'rgba(0,122,255,0.12)' : 'rgba(255,59,48,0.12)';
+  earName.textContent = ear === 'left' ? '左耳' : '右耳';
+  earName.style.color = earColor;
+  indicator.querySelector('svg path:first-child').setAttribute('fill', earBg);
+  indicator.querySelector('svg path:first-child').setAttribute('stroke', earColor);
+  indicator.querySelector('svg path:last-child').setAttribute('stroke', earColor);
+  showTestStep(3);
+  updateTestUI();
+  startRealTestTone();
+}
+
+function updateTestUI() {
+  var idx = AppState.testState.freqIndex;
+  var total = FREQUENCIES.length;
+  var dots = document.querySelectorAll('.test-progress-dot');
+  for (var i = 0; i < dots.length; i++) {
+    dots[i].classList.remove('active', 'current');
+    if (i < idx) dots[i].classList.add('active');
+    if (i === idx) dots[i].classList.add('current');
+  }
+  document.getElementById('test-freq-label').textContent = '频率 ' + (idx + 1) + '/' + total;
+  document.getElementById('test-freq-value').textContent = formatFreq(FREQUENCIES[idx]) + ' Hz';
+  document.getElementById('test-status').textContent = '请仔细聆听...';
+  document.getElementById('test-volume-fill').style.width = '0%';
+  document.getElementById('test-tap-area').classList.add('pulsing');
+}
+
+function formatFreq(f) {
+  if (f >= 1000) return (f / 1000) + 'k';
+  return f;
+}
+
+// ====== REAL AUDIO TEST (Apple-style ascending tone) ======
+function startRealTestTone() {
+  stopTestTone();
+  var freq = FREQUENCIES[AppState.testState.freqIndex];
+  var ear = AppState.testState.ear;
+
+  if (!testAudioCtx) {
+    testAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  testCurrentDb = -90; // Start very quiet
+  testOsc = testAudioCtx.createOscillator();
+  testGain = testAudioCtx.createGain();
+  var panner = testAudioCtx.createStereoPanner();
+  // Left ear = -1 (left only), Right ear = 1 (right only)
+  panner.pan.value = ear === 'left' ? -1 : 1;
+  testOsc.type = 'sine';
+  testOsc.frequency.value = freq;
+  testGain.gain.value = dbToLinearSafe(testCurrentDb);
+  testOsc.connect(testGain);
+  testGain.connect(panner);
+  panner.connect(testAudioCtx.destination);
+  testOsc.start();
+  testPanner = panner;
+
+  AppState.testState.isPlaying = true;
+  document.getElementById('test-status').textContent = '正在播放...';
+  document.getElementById('test-volume-fill').style.width = '0%';
+  document.getElementById('test-tap-area').classList.add('pulsing');
+
+  // Gradually increase volume
+  testVolumeInterval = setInterval(function() {
+    if (AppState.testState.isPaused) return;
+    testCurrentDb += testVolumeStep;
+    var pct = Math.min(100, ((testCurrentDb + 90) / 85) * 100);
+    document.getElementById('test-volume-fill').style.width = pct + '%';
+
+    var newGain = dbToLinearSafe(testCurrentDb);
+    if (testGain && testAudioCtx) {
+      testGain.gain.setTargetAtTime(newGain, testAudioCtx.currentTime, 0.08);
+    }
+
+    if (testCurrentDb >= -5) {
+      // Max volume reached — record as not heard (max threshold)
+      stopTestTone();
+      var ear = AppState.testState.ear;
+      var maxHL = mapDbToHL(-5);
+      AppState.testState.results[ear].push(maxHL > 70 ? 70 : maxHL);
+      document.getElementById('test-status').textContent = '未听到 (最大音量)';
+      document.getElementById('test-tap-area').classList.remove('pulsing');
+      AppState.testState.isPlaying = false;
+      setTimeout(function() { advanceToNextFreq(); }, 1000);
+    }
+  }, testStepInterval);
+}
+
+function tapHeard() {
+  if (!AppState.testState.isPlaying) return;
+  var ear = AppState.testState.ear;
+
+  // Stop the tone immediately
+  stopTestTone();
+  AppState.testState.isPlaying = false;
+
+  // Record the current dB level as threshold
+  var hl = mapDbToHL(testCurrentDb);
+  AppState.testState.results[ear].push(hl);
+
+  var ripple = document.getElementById('test-tap-ripple');
+  ripple.classList.remove('animate');
+  void ripple.offsetWidth;
+  ripple.classList.add('animate');
+  document.getElementById('test-tap-area').classList.remove('pulsing');
+  document.getElementById('test-status').textContent = '已记录 (~' + hl + ' dB HL)';
+
+  setTimeout(function() { advanceToNextFreq(); }, 800);
+}
+
+function advanceToNextFreq() {
+  AppState.testState.freqIndex++;
+  if (AppState.testState.freqIndex >= FREQUENCIES.length) {
+    finishEarTest();
+  } else {
+    updateTestUI();
+    setTimeout(function() { startRealTestTone(); }, 500);
+  }
+}
+
+function pauseTest() {
+  var btn = document.querySelector('.test-pause-btn');
+  var tapArea = document.getElementById('test-tap-area');
+  if (AppState.testState.isPlaying) {
+    AppState.testState.isPaused = true;
+    AppState.testState.isPlaying = false;
+    stopTestTone();
+    if (btn) { btn.textContent = '继续测试'; btn.classList.add('solid'); }
+    document.getElementById('test-status').textContent = '已暂停 - 点击继续';
+    tapArea.classList.remove('pulsing');
+    tapArea.classList.add('disabled');
+  } else if (AppState.testState.isPaused) {
+    AppState.testState.isPaused = false;
+    if (btn) { btn.textContent = '暂停测试'; btn.classList.remove('solid'); }
+    document.getElementById('test-status').textContent = '继续测试...';
+    tapArea.classList.remove('disabled');
+    startRealTestTone();
+  }
+}
+
+function finishEarTest() {
+  var ear = AppState.testState.ear;
+  if (ear === 'left') {
+    document.getElementById('switch-title').textContent = '左耳测试完成';
+    document.getElementById('switch-desc').textContent = '接下来测试右耳，请保持佩戴';
+    document.getElementById('btn-switch-ear').textContent = '开始测试右耳';
+    showTestStep(4);
+  } else {
+    showResults();
+  }
+}
+
+function switchEar() {
+  AppState.testState.ear = 'right';
+  startEarTest();
+}
+
+function showResults() {
+  AppState.hearingData.left = (AppState.testState.results.left && AppState.testState.results.left.length) ? AppState.testState.results.left : FAKE_LEFT;
+  AppState.hearingData.right = (AppState.testState.results.right && AppState.testState.results.right.length) ? AppState.testState.results.right : FAKE_RIGHT;
+  AppState.hasHearingData = true;
+  drawAudiogram();
+  updateResultSummary();
+  showTestStep(5);
+}
+
+function drawAudiogram() {
+  var svg = document.getElementById('audiogram-svg');
+  var leftData = AppState.hearingData.left;
+  var rightData = AppState.hearingData.right;
+  var w = 320, h = 220;
+  var padL = 40, padR = 20, padT = 10, padB = 30;
+  var plotW = w - padL - padR;
+  var plotH = h - padT - padB;
+  var minDb = -10, maxDb = 80;
+  var dbRange = maxDb - minDb;
+  function dbToY(db) { return padT + ((db - minDb) / dbRange) * plotH; }
+  function freqToX(i) { return padL + (i / (FREQUENCIES.length - 1)) * plotW; }
+
+  var leftAvg = average(leftData);
+  var rightAvg = average(rightData);
+  var leftColor = getHearingColor(leftAvg);
+  var rightColor = getHearingColor(rightAvg);
+
+  var html = '';
+  var bands = [
+    { min: -10, max: 25, color: 'rgba(52,199,89,0.08)' },
+    { min: 25, max: 40, color: 'rgba(255,204,0,0.08)' },
+    { min: 40, max: 60, color: 'rgba(255,149,0,0.08)' },
+    { min: 60, max: 80, color: 'rgba(255,59,48,0.08)' }
+  ];
+  for (var b = 0; b < bands.length; b++) {
+    var band = bands[b];
+    var y1 = dbToY(band.min);
+    var y2 = dbToY(band.max);
+    html += '<rect x="' + padL + '" y="' + y1 + '" width="' + plotW + '" height="' + (y2 - y1) + '" fill="' + band.color + '"/>';
+  }
+  for (var db = 0; db <= 80; db += 10) {
+    var y = dbToY(db);
+    html += '<line x1="' + padL + '" y1="' + y + '" x2="' + (w - padR) + '" y2="' + y + '" stroke="#E5E5EA" stroke-width="0.5"/>';
+    html += '<text x="' + (padL - 6) + '" y="' + (y + 4) + '" font-size="9" fill="#8E8E93" text-anchor="end" font-family="-apple-system,sans-serif">' + db + '</text>';
+  }
+  for (var f = 0; f < FREQ_TEST_LABELS.length; f++) {
+    var x = freqToX(f);
+    html += '<line x1="' + x + '" y1="' + padT + '" x2="' + x + '" y2="' + (h - padB) + '" stroke="#E5E5EA" stroke-width="0.5"/>';
+    html += '<text x="' + x + '" y="' + (h - padB + 16) + '" font-size="10" fill="#8E8E93" text-anchor="middle" font-family="-apple-system,sans-serif">' + FREQ_TEST_LABELS[f] + '</text>';
+  }
+  html += '<text x="' + (w / 2) + '" y="' + (h - 2) + '" font-size="9" fill="#AEAEB2" text-anchor="middle" font-family="-apple-system,sans-serif">频率 (Hz)</text>';
+  var leftPoints = [];
+  for (var i = 0; i < leftData.length; i++) { leftPoints.push(freqToX(i) + ',' + dbToY(leftData[i])); }
+  if (leftPoints.length > 1) { html += '<polyline points="' + leftPoints.join(' ') + '" fill="none" stroke="' + leftColor + '" stroke-width="2" stroke-linejoin="round"/>'; }
+  for (var i = 0; i < leftData.length; i++) {
+    var cx = freqToX(i), cy = dbToY(leftData[i]);
+    html += '<line x1="' + (cx - 4) + '" y1="' + (cy - 4) + '" x2="' + (cx + 4) + '" y2="' + (cy + 4) + '" stroke="' + leftColor + '" stroke-width="2"/>';
+    html += '<line x1="' + (cx + 4) + '" y1="' + (cy - 4) + '" x2="' + (cx - 4) + '" y2="' + (cy + 4) + '" stroke="' + leftColor + '" stroke-width="2"/>';
+  }
+  var rightPoints = [];
+  for (var i = 0; i < rightData.length; i++) { rightPoints.push(freqToX(i) + ',' + dbToY(rightData[i])); }
+  if (rightPoints.length > 1) { html += '<polyline points="' + rightPoints.join(' ') + '" fill="none" stroke="' + rightColor + '" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6,3"/>'; }
+  for (var i = 0; i < rightData.length; i++) {
+    var cx = freqToX(i), cy = dbToY(rightData[i]);
+    html += '<circle cx="' + cx + '" cy="' + cy + '" r="5" fill="none" stroke="' + rightColor + '" stroke-width="2"/>';
+  }
+  html += '<line x1="' + (w - padR - 70) + '" y1="' + (padT + 8) + '" x2="' + (w - padR - 55) + '" y2="' + (padT + 8) + '" stroke="' + leftColor + '" stroke-width="2"/>';
+  html += '<text x="' + (w - padR - 52) + '" y="' + (padT + 12) + '" font-size="9" fill="' + leftColor + '" font-family="-apple-system,sans-serif">左耳</text>';
+  html += '<line x1="' + (w - padR - 30) + '" y1="' + (padT + 8) + '" x2="' + (w - padR - 15) + '" y2="' + (padT + 8) + '" stroke="' + rightColor + '" stroke-width="2" stroke-dasharray="4,2"/>';
+  html += '<text x="' + (w - padR - 12) + '" y="' + (padT + 12) + '" font-size="9" fill="' + rightColor + '" font-family="-apple-system,sans-serif">右耳</text>';
+  html += '<text x="8" y="' + (padT + plotH / 2) + '" font-size="9" fill="#AEAEB2" text-anchor="middle" font-family="-apple-system,sans-serif" transform="rotate(-90,8,' + (padT + plotH / 2) + ')">dB HL</text>';
+  svg.innerHTML = html;
+}
+
+function updateResultSummary() {
+  var leftAvg = average(AppState.hearingData.left);
+  var rightAvg = average(AppState.hearingData.right);
+  document.getElementById('result-left-db').textContent = leftAvg + ' dB';
+  document.getElementById('result-left-cat').textContent = classifyHearing(leftAvg);
+  document.getElementById('result-right-db').textContent = rightAvg + ' dB';
+  document.getElementById('result-right-cat').textContent = classifyHearing(rightAvg);
+  var leftCard = document.getElementById('result-card-left');
+  var rightCard = document.getElementById('result-card-right');
+  leftCard.className = 'result-summary-card ' + getHearingClass(leftAvg);
+  rightCard.className = 'result-summary-card ' + getHearingClass(rightAvg);
+}
+
+function getHearingClass(db) {
+  if (db <= 25) return 'normal';
+  if (db <= 40) return 'mild';
+  if (db <= 60) return 'moderate';
+  return 'severe';
+}
+
+function average(arr) {
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) sum += arr[i];
+  return Math.round(sum / arr.length);
+}
+
+function classifyHearing(db) {
+  if (db <= 25) return '正常';
+  if (db <= 40) return '轻度';
+  if (db <= 60) return '中度';
+  return '重度';
+}
+
+function finishTest() {
+  closeSheet();
+  buildHomeSummary();
+  showScreen('home-with-data');
+}
+
+function buildHomeSummary() {
+  var barsContainer = document.getElementById('hs-bars');
+  var resultText = document.getElementById('hs-result-text');
+  var leftAvg = average(AppState.hearingData.left);
+  var rightAvg = average(AppState.hearingData.right);
+  var leftColor = getHearingColor(leftAvg);
+  var rightColor = getHearingColor(rightAvg);
+  var html = '';
+  for (var i = 0; i < FREQUENCIES.length; i++) {
+    var leftH = Math.max(4, Math.min(28, (AppState.hearingData.left[i] / 80) * 28));
+    var rightH = Math.max(4, Math.min(28, (AppState.hearingData.right[i] / 80) * 28));
+    html += '<div class="hs-bar-group">';
+    html += '<div class="hs-bar-pair">';
+    html += '<div class="hs-bar-l" style="height:' + leftH + 'px;background:' + leftColor + '"></div>';
+    html += '<div class="hs-bar-r" style="height:' + rightH + 'px;background:' + rightColor + '"></div>';
+    html += '</div>';
+    html += '<div class="hs-bars-label">' + FREQ_TEST_LABELS[i] + '</div>';
+    html += '</div>';
+  }
+  barsContainer.innerHTML = html;
+  resultText.innerHTML = '<span style="text-align:left;color:' + leftColor + ';">左耳: ' + classifyHearing(leftAvg) + '</span><span style="text-align:right;color:' + rightColor + ';">右耳: ' + classifyHearing(rightAvg) + '</span>';
+}
+
+function getHearingColor(db) {
+  if (db <= 25) return '#34C759';
+  if (db <= 40) return '#FFCC00';
+  if (db <= 60) return '#FF9500';
+  return '#FF3B30';
+}
+
+// ====== CONVERT HEARING TEST DATA TO ENGINE PROFILE ======
+function buildProfileFromData() {
+  var leftProfile = {};
+  var rightProfile = {};
+  for (var i = 0; i < FREQUENCIES.length; i++) {
+    var f = FREQUENCIES[i];
+    leftProfile[f] = AppState.hearingData.left[i] || 0;
+    rightProfile[f] = AppState.hearingData.right[i] || 0;
+  }
+  return { left: leftProfile, right: rightProfile };
+}
+
+// ====== MIC AUTO-DETECT ======
+async function autoDetectMics() {
+  try {
+    var tmp = await navigator.mediaDevices.getUserMedia({audio:true});
+    tmp.getTracks().forEach(function(t) { t.stop(); });
+    var devs = await getAudioDevices();
+    if (devs.length >= 2) {
+      haState.phoneDeviceId = devs[0].deviceId;
+      haState.earphoneDeviceId = devs[1].deviceId;
+    } else if (devs.length === 1) {
+      haState.phoneDeviceId = devs[0].deviceId;
+      haState.earphoneDeviceId = devs[0].deviceId;
+    } else {
+      haState.phoneDeviceId = undefined;
+      haState.earphoneDeviceId = undefined;
+    }
+  } catch(e) {
+    haState.phoneDeviceId = undefined;
+    haState.earphoneDeviceId = undefined;
+  }
+}
+
+// ====== HEARING AID TOGGLE (FAB) ======
+async function toggleHearingAid() {
+  if (isHearingAidOn) {
+    // Stop
+    await stopHearingAid();
+  } else {
+    // Start
+    await startHearingAid();
+  }
+}
+
+async function startHearingAid() {
+  await autoDetectMics();
+  var profile = buildProfileFromData();
+  var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+  AudioEngine.howlSensitivity = haState.howlSensitivity;
+  var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
+  if (!ok) {
+    alert('麦克风权限被拒绝，请检查浏览器设置');
+    return;
+  }
+  isHearingAidOn = true;
+  haState.isRunning = true;
+  updateFabUI(true);
+  // Show settings
+  var settings = document.getElementById('ha-settings');
+  if (settings) settings.classList.add('visible');
+  var summary = document.getElementById('hearing-summary-card');
+  if (summary) summary.style.display = 'none';
+  var retestBtns = document.querySelectorAll('.retest-btn');
+  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = 'none'; }
+  var brand = document.getElementById('home-brand');
+  if (brand) brand.classList.add('compact');
+  var statusEl = document.getElementById('ha-status');
+  if (statusEl) { statusEl.textContent = '助听运行中'; statusEl.className = 'ha-status on'; }
+  updateVersionVisibility();
+  initDualVisualizer();
+  startDualVizAnimation();
+}
+
+async function stopHearingAid() {
+  AudioEngine.startSmoothFade(0, 200);
+  await new Promise(function(r) { setTimeout(r, 250); });
+  await AudioEngine.stop();
+  isHearingAidOn = false;
+  haState.isRunning = false;
+  setFabMini(false);
+  updateFabUI(false);
+  var settings = document.getElementById('ha-settings');
+  if (settings) settings.classList.remove('visible');
+  var summary = document.getElementById('hearing-summary-card');
+  if (summary) summary.style.display = '';
+  var retestBtns = document.querySelectorAll('.retest-btn');
+  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
+  var brand = document.getElementById('home-brand');
+  if (brand) brand.classList.remove('compact');
+  var statusEl = document.getElementById('ha-status');
+  if (statusEl) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
+  stopDualVizAnimation();
+  // Reset latency
+  var el = document.getElementById('latency-val');
+  var fill = document.getElementById('latency-fill');
+  var note = document.getElementById('latency-note');
+  if (el) el.textContent = '-- ms';
+  if (fill) fill.style.width = '0%';
+  if (note) note.textContent = '开始助听后显示';
+  var banner = document.getElementById('howl-banner');
+  if (banner) banner.classList.remove('show');
+}
+
+async function autoStopHowl() {
+  await AudioEngine.stop();
+  isHearingAidOn = false;
+  haState.isRunning = false;
+  setFabMini(false);
+  updateFabUI(false);
+  var settings = document.getElementById('ha-settings');
+  if (settings) settings.classList.remove('visible');
+  var summary = document.getElementById('hearing-summary-card');
+  if (summary) summary.style.display = '';
+  var retestBtns = document.querySelectorAll('.retest-btn');
+  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
+  var brand = document.getElementById('home-brand');
+  if (brand) brand.classList.remove('compact');
+  var statusEl = document.getElementById('ha-status');
+  if (statusEl) { statusEl.textContent = '啸叫频繁，已自动关闭'; statusEl.className = 'ha-status warn'; }
+  var banner = document.getElementById('howl-banner');
+  if (banner) { banner.textContent = '啸叫频繁，请降低音量或使用手机麦克风'; }
+  stopDualVizAnimation();
+}
+
+function updateFabUI(isOn) {
+  var fab = document.getElementById('fab');
+  var fabIcon = document.getElementById('fab-icon');
+  var fabLabel = document.getElementById('fab-label');
+  if (isOn) {
+    fab.classList.add('active');
+    fabIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="2" fill="#fff"/></svg>';
+    fabLabel.textContent = '停止助听';
+  } else {
+    fab.classList.remove('active');
+    fabIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#fff"/><path d="M15.54 8.46C16.48 9.41 17 10.66 17 12C17 13.34 16.48 14.59 15.54 15.54" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M19.07 4.93C20.94 6.8 22 9.34 22 12C22 14.66 20.94 17.2 19.07 19.07" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    fabLabel.textContent = '开始助听';
+  }
+}
+
+// ====== GAIN SLIDER ======
+function updateGain(val) {
+  val = parseInt(val);
+  haState.gainLevel = val;
+  if (haState.isRunning) AudioEngine.setGain(val);
+  document.getElementById('gain-value').textContent = val;
+  var slider = document.getElementById('gain-slider');
+  if (slider && parseInt(slider.value) !== val) slider.value = val;
+  // Fill track color on the left side of the thumb
+  if (slider) {
+    var pct = (val / 10) * 100;
+    slider.style.background = 'linear-gradient(to right, #007AFF ' + pct + '%, #E5E5EA ' + pct + '%)';
+  }
+  var db = GAIN_LEVELS[val];
+  var label = document.getElementById('gain-label');
+  if (label) {
+    if (val === 0) label.textContent = '无增益';
+    else if (val <= 4) label.textContent = '轻度增益';
+    else if (val <= 8) label.textContent = '适度增益';
+    else label.textContent = '强增益';
+  }
+}
+
+function stepGain(dir) {
+  var newVal = haState.gainLevel + dir;
+  if (newVal < 0) newVal = 0;
+  if (newVal > 10) newVal = 10;
+  updateGain(newVal);
+}
+
+// ====== MIC CHANGE ======
+async function onMicChange(mode) {
+  haState.micMode = mode;
+  var btns = document.querySelectorAll('#seg-mic .segmented-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === mode);
+  }
+  var desc = document.getElementById('mic-desc');
+  if (mode === 'phone') {
+    desc.textContent = '手机麦克风啸叫风险更低';
+  } else {
+    desc.textContent = '耳机麦克风 · 啸叫风险较高，建议调低音量';
+  }
+  if (haState.isRunning) {
+    await autoDetectMics();
+    var deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    if (!deviceId) {
+      alert('未检测到' + (mode === 'phone' ? '手机' : '耳机') + '麦克风，请检查设备连接');
+      haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
+      }
+      return;
+    }
+    // Keep old stream alive while switching - no manual fade-out gap
+    var profile = buildProfileFromData();
+    AudioEngine.howlSensitivity = haState.howlSensitivity;
+    var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, mode);
+    if (!ok) {
+      alert('切换麦克风失败，请重试');
+      haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
+      }
+      return;
+    }
+  }
+}
+
+// ====== HOWL SENSITIVITY CHANGE ======
+function onHowlChange(sens) {
+  haState.howlSensitivity = sens;
+  var btns = document.querySelectorAll('#seg-howl .segmented-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === sens);
+  }
+  var desc = document.getElementById('howl-desc');
+  var sensData = HOWL_SENSITIVITY[sens];
+  if (desc) desc.textContent = sensData.desc + ' · ' + (sens === 'low' ? '默认低灵敏度' : '');
+  AudioEngine.howlSensitivity = sens;
+  if (haState.isRunning) {
+    AudioEngine.startHowlDetector();
+  }
+}
+
+// ====== NOISE SUPPRESSION CHANGE ======
+async function onNoiseChange(supp) {
+  haState.noiseSupp = supp;
+  var btns = document.querySelectorAll('#seg-noise .segmented-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === supp);
+  }
+  var statusEl = document.getElementById('ha-status');
+  if (haState.isRunning) {
+    if (statusEl) { statusEl.textContent = '切换中...'; statusEl.className = 'ha-status'; }
+    // 干脆切换：直接静音->重启->恢复，不做淡入淡出
+    if (AudioEngine.masterGain && AudioEngine.ctx) {
+      AudioEngine.masterGain.gain.setValueAtTime(0, AudioEngine.ctx.currentTime);
+    }
+    var profile = buildProfileFromData();
+    var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    AudioEngine.howlSensitivity = haState.howlSensitivity;
+    await AudioEngine.start('both', profile, haState.gainLevel, deviceId, supp, haState.micMode);
+    // 直接设置到目标音量，跳过软启动爬升
+    if (AudioEngine.masterGain && AudioEngine.ctx) {
+      AudioEngine.masterGain.gain.setValueAtTime(AudioEngine.userGain, AudioEngine.ctx.currentTime);
+    }
+    if (AudioEngine.bands && AudioEngine.ctx) {
+      var t = AudioEngine.ctx.currentTime;
+      AudioEngine.bands.forEach(function(ch) {
+        if (ch.agc) {
+          ch.agc.gain.cancelScheduledValues(t);
+          ch.agc.gain.setValueAtTime(0.5, t);
+        }
+      });
+    }
+    if (statusEl) { statusEl.textContent = '助听运行中'; statusEl.className = 'ha-status on'; }
+  } else {
+    if (statusEl) { statusEl.textContent = supp === 'auto' ? 'AI降噪: 自动 (下次开启生效)' : 'AI降噪: 关闭 (下次开启生效)'; statusEl.className = 'ha-status'; }
+    setTimeout(function() {
+      if (statusEl && !haState.isRunning) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
+    }, 2000);
+  }
+}
+
+// ====== DUAL VISUALIZER (Real audio data from analysers) ======
+var VIZ_FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
+
+function getBinIndexForFreq(freq, fftSize, sampleRate) {
+  var nyquist = sampleRate / 2;
+  return Math.round((freq / nyquist) * (fftSize / 2));
+}
+
+function initDualVisualizer() {
+  var leftContainer = document.getElementById('dual-viz-left');
+  var rightContainer = document.getElementById('dual-viz-right');
+  leftContainer.innerHTML = '';
+  rightContainer.innerHTML = '';
+  dualVizBarsLeft = [];
+  dualVizBarsRight = [];
+  var numBars = VIZ_FREQUENCIES.length;
+  for (var i = 0; i < numBars; i++) {
+    var freq = VIZ_FREQUENCIES[i];
+    var freqLabel = freq >= 1000 ? (freq / 1000) + 'k' : freq;
+
+    // Left ear bar
+    var leftWrap = document.createElement('div');
+    leftWrap.className = 'dual-viz-bar-wrap';
+    var leftBar = document.createElement('div');
+    leftBar.className = 'dual-viz-bar left';
+    leftBar.style.height = '0px';
+    var leftInput = document.createElement('div');
+    leftInput.className = 'dual-viz-bar-input';
+    leftInput.style.height = '0px';
+    var leftGain = document.createElement('div');
+    leftGain.className = 'dual-viz-bar-gain';
+    leftGain.style.height = '0px';
+    leftGain.style.bottom = '0px';
+    leftBar.appendChild(leftInput);
+    leftBar.appendChild(leftGain);
+    leftWrap.appendChild(leftBar);
+    var leftLabel = document.createElement('div');
+    leftLabel.className = 'dual-viz-bar-label';
+    leftLabel.textContent = freqLabel;
+    leftWrap.appendChild(leftLabel);
+    leftContainer.appendChild(leftWrap);
+    dualVizBarsLeft.push({ input: leftInput, gain: leftGain, bar: leftBar });
+
+    // Right ear bar
+    var rightWrap = document.createElement('div');
+    rightWrap.className = 'dual-viz-bar-wrap';
+    var rightBar = document.createElement('div');
+    rightBar.className = 'dual-viz-bar right';
+    rightBar.style.height = '0px';
+    var rightInput = document.createElement('div');
+    rightInput.className = 'dual-viz-bar-input';
+    rightInput.style.height = '0px';
+    var rightGain = document.createElement('div');
+    rightGain.className = 'dual-viz-bar-gain';
+    rightGain.style.height = '0px';
+    rightGain.style.bottom = '0px';
+    rightBar.appendChild(rightInput);
+    rightBar.appendChild(rightGain);
+    rightWrap.appendChild(rightBar);
+    var rightLabel = document.createElement('div');
+    rightLabel.className = 'dual-viz-bar-label';
+    rightLabel.textContent = freqLabel;
+    rightWrap.appendChild(rightLabel);
+    rightContainer.appendChild(rightWrap);
+    dualVizBarsRight.push({ input: rightInput, gain: rightGain, bar: rightBar });
+  }
+}
+
+function startDualVizAnimation() {
+  if (dualVizAnimId) cancelAnimationFrame(dualVizAnimId);
+
+  var inputData = new Uint8Array(256);
+  var leftOutputData = new Uint8Array(256);
+  var rightOutputData = new Uint8Array(256);
+
+  function animate() {
+    var hasInput = AudioEngine.inputAnalyser && AudioEngine.ctx;
+    var hasLeftOutput = AudioEngine.leftAnalyser && AudioEngine.ctx;
+    var hasRightOutput = AudioEngine.rightAnalyser && AudioEngine.ctx;
+    var sampleRate = AudioEngine.ctx ? AudioEngine.ctx.sampleRate : 48000;
+    var fftSize = 256;
+
+    if (hasInput) {
+      AudioEngine.inputAnalyser.getByteFrequencyData(inputData);
+    }
+    if (hasLeftOutput) {
+      AudioEngine.leftAnalyser.getByteFrequencyData(leftOutputData);
+    }
+    if (hasRightOutput) {
+      AudioEngine.rightAnalyser.getByteFrequencyData(rightOutputData);
+    }
+
+    var numBars = VIZ_FREQUENCIES.length;
+
+    for (var i = 0; i < numBars; i++) {
+      var freq = VIZ_FREQUENCIES[i];
+      var binIdx = getBinIndexForFreq(freq, fftSize, sampleRate);
+      var startBin = Math.max(0, binIdx - 1);
+      var endBin = Math.min(fftSize / 2 - 1, binIdx + 1);
+
+      var inputVal = 0;
+      if (hasInput) {
+        for (var j = startBin; j <= endBin; j++) {
+          inputVal = Math.max(inputVal, inputData[j]);
+        }
+      }
+      var inputH = Math.max(2, (inputVal / 255) * 70);
+
+      // Left ear output
+      var leftOutputVal = 0;
+      if (hasLeftOutput) {
+        for (var j = startBin; j <= endBin; j++) {
+          leftOutputVal = Math.max(leftOutputVal, leftOutputData[j]);
+        }
+      }
+      var leftOutputH = Math.max(2, (leftOutputVal / 255) * 70);
+      var leftGainH = Math.max(0, leftOutputH - inputH);
+
+      // Right ear output
+      var rightOutputVal = 0;
+      if (hasRightOutput) {
+        for (var j = startBin; j <= endBin; j++) {
+          rightOutputVal = Math.max(rightOutputVal, rightOutputData[j]);
+        }
+      }
+      var rightOutputH = Math.max(2, (rightOutputVal / 255) * 70);
+      var rightGainH = Math.max(0, rightOutputH - inputH);
+
+      // When gain is 0, don't show green gain bars
+      if (haState.gainLevel === 0) {
+        leftGainH = 0;
+        rightGainH = 0;
+      }
+
+      // Left ear: input (blue bottom) + gain (green top)
+      dualVizBarsLeft[i].input.style.height = inputH + 'px';
+      dualVizBarsLeft[i].gain.style.height = leftGainH + 'px';
+      dualVizBarsLeft[i].gain.style.bottom = inputH + 'px';
+      dualVizBarsLeft[i].bar.style.height = (inputH + leftGainH) + 'px';
+      if (leftGainH > 1) {
+        dualVizBarsLeft[i].input.classList.add('has-gain');
+      } else {
+        dualVizBarsLeft[i].input.classList.remove('has-gain');
+      }
+
+      // Right ear: input (blue bottom) + gain (red top)
+      dualVizBarsRight[i].input.style.height = inputH + 'px';
+      dualVizBarsRight[i].gain.style.height = rightGainH + 'px';
+      dualVizBarsRight[i].gain.style.bottom = inputH + 'px';
+      dualVizBarsRight[i].bar.style.height = (inputH + rightGainH) + 'px';
+      if (rightGainH > 1) {
+        dualVizBarsRight[i].input.classList.add('has-gain');
+      } else {
+        dualVizBarsRight[i].input.classList.remove('has-gain');
+      }
+    }
+    dualVizAnimId = requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function stopDualVizAnimation() {
+  if (dualVizAnimId) {
+    cancelAnimationFrame(dualVizAnimId);
+    dualVizAnimId = null;
+  }
+  for (var i = 0; i < dualVizBarsLeft.length; i++) {
+    dualVizBarsLeft[i].input.style.height = '2px';
+    dualVizBarsLeft[i].gain.style.height = '0px';
+    dualVizBarsLeft[i].gain.style.bottom = '2px';
+    dualVizBarsLeft[i].bar.style.height = '2px';
+    dualVizBarsRight[i].input.style.height = '2px';
+    dualVizBarsRight[i].gain.style.height = '0px';
+    dualVizBarsRight[i].gain.style.bottom = '2px';
+    dualVizBarsRight[i].bar.style.height = '2px';
+  }
+}
+
+// ====== INIT ======
+(function init() {
+  try { localStorage.removeItem('heardit_data'); } catch (e) {}
+  showScreen('home-no-data');
+  // Initialize slider track color
+  updateGain(5);
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>

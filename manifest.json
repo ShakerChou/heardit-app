@@ -1,0 +1,24 @@
+{
+  "name": "听到鸟 HeardIt",
+  "short_name": "听到鸟",
+  "description": "移动端助听应用",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#007AFF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23007AFF'/%3E%3Cpath d='M70 90 C70 60 85 45 96 45 C107 45 122 60 122 90 C122 120 106 135 96 148 C86 135 70 120 70 90Z' fill='white' opacity='0.25'/%3E%3Cpath d='M80 95 C80 72 88 60 96 60 C104 60 112 72 112 95' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M88 95 L88 115' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M104 95 L104 115' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M96 80 L96 120' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='85' fill='%23007AFF'/%3E%3Cpath d='M187 240 C187 160 227 120 256 120 C285 120 325 160 325 240 C325 320 283 360 256 395 C229 360 187 320 187 240Z' fill='white' opacity='0.25'/%3E%3Cpath d='M213 253 C213 192 235 160 256 160 C277 160 299 192 299 253' stroke='white' stroke-width='10' fill='none' stroke-linecap='round'/%3E%3Cpath d='M235 253 L235 307' stroke='white' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M277 253 L277 307' stroke='white' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M256 213 L256 320' stroke='white' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
