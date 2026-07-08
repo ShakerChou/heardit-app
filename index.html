@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.24_移动端优化_20260709.html | 移动端降噪修复+熄屏唤醒+数据持久化 -->
+<!-- heardit_v1.4.25_移动端修复_20260709.html | 降噪修复+耳机麦增强+卡顿优化+熄屏保活 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -683,7 +683,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.24</div>
+    <div class="home-no-data-version">HeardIt v1.4.25</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -852,7 +852,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.24</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.25</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1042,7 +1042,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.24';
+const VERSION = 'v1.4.25';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1179,6 +1179,7 @@ const AudioEngine = {
           noiseSuppression: true,
           autoGainControl: false,
           latency: 0.001,
+          noiseSuppressionQuality: 4,
           googNoiseSuppression: true,
           googNoiseSuppression2: true,
           googAutoGainControl: false,
@@ -1279,7 +1280,8 @@ const AudioEngine = {
 
     this.bands = [];
     this.monoMixer = this.ctx.createGain();
-    this.monoMixer.gain.value = MONO_MIXER_GAIN;
+    // Earphone mic is typically much quieter than phone mic, boost accordingly
+    this.monoMixer.gain.value = this.micMode === 'earphone' ? MONO_MIXER_GAIN * 2.5 : MONO_MIXER_GAIN;
 
     BAND_CFG.forEach((cfg, i)=>{
       const bp = this.ctx.createBiquadFilter();
@@ -2320,18 +2322,122 @@ async function autoDetectMics() {
   }
 }
 
-// ====== HEARING AID TOGGLE (FAB) ======
-async function toggleHearingAid() {
-  if (isHearingAidOn) {
-    // Stop
-    await stopHearingAid();
-  } else {
-    // Start
-    await startHearingAid();
+// ====== AUDIO CONTEXT KEEP-ALIVE (prevent iOS sleep) ======
+var acKeepAliveTimer = null;
+function setupAudioContextKeepAlive() {
+  // Clear any existing keep-alive
+  teardownAudioContextKeepAlive();
+  
+  // 1. MediaSession: declare as media app to prevent iOS audio suspension
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: '听到鸟助听',
+        artist: 'HeardIt',
+        album: '助听运行中'
+      });
+      navigator.mediaSession.playbackState = 'playing';
+    } catch(e) {}
+  }
+  
+  // 2. AudioContext state change: auto-resume when suspended
+  if (AudioEngine.ctx) {
+    AudioEngine.ctx.onstatechange = function() {
+      if (AudioEngine.ctx && AudioEngine.ctx.state === 'suspended' && AudioEngine.isRunning) {
+        AudioEngine.ctx.resume().catch(function(){});
+      }
+    };
+  }
+  
+  // 3. Visibility change: resume audio when page becomes visible
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  
+  // 4. Periodic keep-alive: gently ping the audio context
+  acKeepAliveTimer = setInterval(function() {
+    if (AudioEngine.ctx && AudioEngine.isRunning) {
+      if (AudioEngine.ctx.state === 'suspended') {
+        AudioEngine.ctx.resume().catch(function(){});
+      }
+      // Keep bgOsc alive
+      if (AudioEngine.bgGain) {
+        AudioEngine.bgGain.gain.setTargetAtTime(0.0001, AudioEngine.ctx.currentTime, 0.1);
+      }
+    }
+  }, 5000);
+}
+
+function teardownAudioContextKeepAlive() {
+  if (acKeepAliveTimer) {
+    clearInterval(acKeepAliveTimer);
+    acKeepAliveTimer = null;
+  }
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+  if (AudioEngine.ctx) {
+    AudioEngine.ctx.onstatechange = null;
+  }
+  if ('mediaSession' in navigator) {
+    try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
   }
 }
 
-async function startHearingAid() {
+function onVisibilityChange() {
+  if (document.visibilityState === 'visible' && AudioEngine.ctx && AudioEngine.isRunning) {
+    if (AudioEngine.ctx.state === 'suspended') {
+      AudioEngine.ctx.resume().catch(function(){});
+    }
+  }
+}
+async function toggleHearingAid() {
+  if (isHearingAidOn) {
+    // Stop: update UI immediately, do audio work in background
+    isHearingAidOn = false;
+    haState.isRunning = false;
+    setFabMini(false);
+    releaseWakeLock();
+    updateFabUI(false);
+    var settings = document.getElementById('ha-settings');
+    if (settings) settings.classList.remove('visible');
+    var summary = document.getElementById('hearing-summary-card');
+    if (summary) summary.style.display = '';
+    var retestBtns = document.querySelectorAll('.retest-btn');
+    for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
+    var brand = document.getElementById('home-brand');
+    if (brand) brand.classList.remove('compact');
+    var statusEl = document.getElementById('ha-status');
+    if (statusEl) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
+    stopDualVizAnimation();
+    var el = document.getElementById('latency-val');
+    var fill = document.getElementById('latency-fill');
+    var note = document.getElementById('latency-note');
+    if (el) el.textContent = '-- ms';
+    if (fill) fill.style.width = '0%';
+    if (note) note.textContent = '开始助听后显示';
+    var banner = document.getElementById('howl-banner');
+    if (banner) banner.classList.remove('show');
+    // Audio fade-out in background (non-blocking)
+    teardownAudioContextKeepAlive();
+    AudioEngine.startSmoothFade(0, 100);
+    setTimeout(function(){ AudioEngine.stop(); }, 120);
+  } else {
+    // Start: update UI immediately, do audio setup in background
+    updateFabUI(true);
+    var s = document.getElementById('ha-settings');
+    if (s) s.classList.add('visible');
+    var sm = document.getElementById('hearing-summary-card');
+    if (sm) sm.style.display = 'none';
+    var rb = document.querySelectorAll('.retest-btn');
+    for (var i = 0; i < rb.length; i++) { rb[i].style.display = 'none'; }
+    var br = document.getElementById('home-brand');
+    if (br) br.classList.add('compact');
+    var st = document.getElementById('ha-status');
+    if (st) { st.textContent = '启动中...'; st.className = 'ha-status on'; }
+    updateVersionVisibility();
+    // Audio setup in background
+    startHearingAidAsync();
+  }
+}
+
+async function startHearingAidAsync() {
   await autoDetectMics();
   var profile = buildProfileFromData();
   var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
@@ -2339,61 +2445,26 @@ async function startHearingAid() {
   var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
   if (!ok) {
     alert('麦克风权限被拒绝，请检查浏览器设置');
+    // Revert UI
+    isHearingAidOn = false;
+    haState.isRunning = false;
+    updateFabUI(false);
+    var s = document.getElementById('ha-settings');
+    if (s) s.classList.remove('visible');
     return;
   }
   isHearingAidOn = true;
   haState.isRunning = true;
-  updateFabUI(true);
-  // Request screen wake lock to prevent sleep during hearing aid
   requestWakeLock();
-  // Show settings
-  var settings = document.getElementById('ha-settings');
-  if (settings) settings.classList.add('visible');
-  var summary = document.getElementById('hearing-summary-card');
-  if (summary) summary.style.display = 'none';
-  var retestBtns = document.querySelectorAll('.retest-btn');
-  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = 'none'; }
-  var brand = document.getElementById('home-brand');
-  if (brand) brand.classList.add('compact');
-  var statusEl = document.getElementById('ha-status');
-  if (statusEl) { statusEl.textContent = '助听运行中'; statusEl.className = 'ha-status on'; }
-  updateVersionVisibility();
+  setupAudioContextKeepAlive();
+  var st = document.getElementById('ha-status');
+  if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
   initDualVisualizer();
   startDualVizAnimation();
 }
 
-async function stopHearingAid() {
-  AudioEngine.startSmoothFade(0, 200);
-  await new Promise(function(r) { setTimeout(r, 250); });
-  await AudioEngine.stop();
-  isHearingAidOn = false;
-  haState.isRunning = false;
-  setFabMini(false);
-  releaseWakeLock();
-  updateFabUI(false);
-  var settings = document.getElementById('ha-settings');
-  if (settings) settings.classList.remove('visible');
-  var summary = document.getElementById('hearing-summary-card');
-  if (summary) summary.style.display = '';
-  var retestBtns = document.querySelectorAll('.retest-btn');
-  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
-  var brand = document.getElementById('home-brand');
-  if (brand) brand.classList.remove('compact');
-  var statusEl = document.getElementById('ha-status');
-  if (statusEl) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
-  stopDualVizAnimation();
-  // Reset latency
-  var el = document.getElementById('latency-val');
-  var fill = document.getElementById('latency-fill');
-  var note = document.getElementById('latency-note');
-  if (el) el.textContent = '-- ms';
-  if (fill) fill.style.width = '0%';
-  if (note) note.textContent = '开始助听后显示';
-  var banner = document.getElementById('howl-banner');
-  if (banner) banner.classList.remove('show');
-}
-
 async function autoStopHowl() {
+  teardownAudioContextKeepAlive();
   await AudioEngine.stop();
   isHearingAidOn = false;
   haState.isRunning = false;
