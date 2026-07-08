@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.23_全端适配_20260708.html | 手机+PC全端响应式适配，含hover态和小屏优化 -->
+<!-- heardit_v1.4.24_移动端优化_20260709.html | 移动端降噪修复+熄屏唤醒+数据持久化 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -683,7 +683,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.23</div>
+    <div class="home-no-data-version">HeardIt v1.4.24</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -852,7 +852,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.23</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.24</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1042,7 +1042,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.23';
+const VERSION = 'v1.4.24';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1108,17 +1108,26 @@ function levelToDb(level){
 }
 function supportsNoiseSuppression(){
   const ua = navigator.userAgent.toLowerCase();
-  if(ua.includes('chrome') || ua.includes('edg')) return true;
-  if(ua.includes('firefox')) return true;
-  if(ua.includes('safari') && !ua.includes('chrome')){
-    const versionMatch = ua.match(/version\/(\d+)/);
-    if(versionMatch){
-      const version = parseInt(versionMatch[1]);
-      return version >= 15;
-    }
-    return true;
+  // iOS WebKit: all browsers on iOS use WebKit engine
+  // googNoiseSuppression is Chrome-only, not supported on WebKit
+  if(ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')){
+    // iOS: standard noiseSuppression only, no goog-specific constraints
+    return 'ios';
   }
-  return false;
+  if(ua.includes('chrome') || ua.includes('edg')) return 'chrome';
+  if(ua.includes('firefox')) return 'firefox';
+  if(ua.includes('safari') && !ua.includes('chrome')){
+    return 'safari';
+  }
+  return 'basic';
+}
+function isIOS(){
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod');
+}
+function isChromeDesktop(){
+  const ua = navigator.userAgent.toLowerCase();
+  return (ua.includes('chrome') || ua.includes('edg')) && !ua.includes('iphone') && !ua.includes('ipad') && !ua.includes('android');
 }
 async function getAudioDevices(){
   try{
@@ -1159,20 +1168,44 @@ const AudioEngine = {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
 
-    const nsEnabled = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser');
-    let constraints = {
-      audio:{
-        echoCancellation: false,
-        noiseSuppression: nsEnabled,
-        noiseSuppressionQuality: nsEnabled ? 4 : 0,
-        autoGainControl: false,
-        latency: 0.001,
-        googNoiseSuppression: nsEnabled,
-        googNoiseSuppression2: nsEnabled,
-        googAutoGainControl: false,
-        googEchoCancellation: false
-      }
-    };
+    const nsMode = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser' ? 'basic' : 'off');
+    const nsEnabled = nsMode !== 'off';
+    let constraints;
+    if (nsMode === 'chrome') {
+      // Chrome desktop: use goog-specific high-quality noise suppression
+      constraints = {
+        audio:{
+          echoCancellation: false,
+          noiseSuppression: true,
+          autoGainControl: false,
+          latency: 0.001,
+          googNoiseSuppression: true,
+          googNoiseSuppression2: true,
+          googAutoGainControl: false,
+          googEchoCancellation: false
+        }
+      };
+    } else if (nsMode === 'ios') {
+      // iOS: only standard constraints, goog-specific ones cause errors
+      constraints = {
+        audio:{
+          echoCancellation: false,
+          noiseSuppression: nsEnabled,
+          autoGainControl: false,
+          latency: 0.001
+        }
+      };
+    } else {
+      // Other browsers: standard constraints only
+      constraints = {
+        audio:{
+          echoCancellation: false,
+          noiseSuppression: nsEnabled,
+          autoGainControl: false,
+          latency: 0.001
+        }
+      };
+    }
     if(deviceId) constraints.audio.deviceId = {exact: deviceId};
 
     try{
@@ -1689,6 +1722,34 @@ var isHearingAidOn = false;
 // ====== FAB SCROLL DETECTION ======
 var fabScrollTimer = null;
 
+// ====== SCREEN WAKE LOCK ======
+var wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', function() {
+        // Wake lock was released (e.g. user switched apps)
+        // Keep it null so we know it's gone
+        wakeLock = null;
+      });
+    }
+  } catch(e) {
+    // Wake Lock not supported or permission denied
+    wakeLock = null;
+  }
+}
+async function releaseWakeLock() {
+  try {
+    if (wakeLock) {
+      await wakeLock.release();
+      wakeLock = null;
+    }
+  } catch(e) {
+    wakeLock = null;
+  }
+}
+
 var fabScrollRaf = null;
 function initFabScrollDetection() {
   var scrollArea = document.querySelector('.home-scroll-area');
@@ -2057,6 +2118,8 @@ function showResults() {
   AppState.hearingData.left = (AppState.testState.results.left && AppState.testState.results.left.length) ? AppState.testState.results.left : FAKE_LEFT;
   AppState.hearingData.right = (AppState.testState.results.right && AppState.testState.results.right.length) ? AppState.testState.results.right : FAKE_RIGHT;
   AppState.hasHearingData = true;
+  // Save to localStorage for persistence
+  saveHearingData();
   drawAudiogram();
   updateResultSummary();
   showTestStep(5);
@@ -2166,6 +2229,33 @@ function finishTest() {
   showScreen('home-with-data');
 }
 
+// ====== LOCAL STORAGE PERSISTENCE ======
+function saveHearingData() {
+  try {
+    var data = {
+      left: AppState.hearingData.left,
+      right: AppState.hearingData.right,
+      hasData: true
+    };
+    localStorage.setItem('heardit_hearing', JSON.stringify(data));
+  } catch(e) {}
+}
+function loadHearingData() {
+  try {
+    var raw = localStorage.getItem('heardit_hearing');
+    if (raw) {
+      var data = JSON.parse(raw);
+      if (data && data.hasData && data.left && data.right) {
+        AppState.hearingData.left = data.left;
+        AppState.hearingData.right = data.right;
+        AppState.hasHearingData = true;
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
 function buildHomeSummary() {
   var barsContainer = document.getElementById('hs-bars');
   var resultText = document.getElementById('hs-result-text');
@@ -2254,6 +2344,8 @@ async function startHearingAid() {
   isHearingAidOn = true;
   haState.isRunning = true;
   updateFabUI(true);
+  // Request screen wake lock to prevent sleep during hearing aid
+  requestWakeLock();
   // Show settings
   var settings = document.getElementById('ha-settings');
   if (settings) settings.classList.add('visible');
@@ -2277,6 +2369,7 @@ async function stopHearingAid() {
   isHearingAidOn = false;
   haState.isRunning = false;
   setFabMini(false);
+  releaseWakeLock();
   updateFabUI(false);
   var settings = document.getElementById('ha-settings');
   if (settings) settings.classList.remove('visible');
@@ -2305,6 +2398,7 @@ async function autoStopHowl() {
   isHearingAidOn = false;
   haState.isRunning = false;
   setFabMini(false);
+  releaseWakeLock();
   updateFabUI(false);
   var settings = document.getElementById('ha-settings');
   if (settings) settings.classList.remove('visible');
@@ -2641,8 +2735,13 @@ function stopDualVizAnimation() {
 
 // ====== INIT ======
 (function init() {
-  try { localStorage.removeItem('heardit_data'); } catch (e) {}
-  showScreen('home-no-data');
+  // Load saved hearing data from localStorage
+  if (loadHearingData()) {
+    buildHomeSummary();
+    showScreen('home-with-data');
+  } else {
+    showScreen('home-no-data');
+  }
   // Initialize slider track color
   updateGain(5);
 })();
