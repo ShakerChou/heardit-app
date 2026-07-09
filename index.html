@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.37_麦克风降级修复_20260710.html -->
+<!-- heardit_v1.4.38_webkitGetUserMedia降级_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -715,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.37</div>
+    <div class="home-no-data-version">HeardIt v1.4.38</div>
 
     <!-- PWA Install Guide -->
     <div class="pwa-guide" id="pwa-guide" style="display:none;">
@@ -896,7 +896,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.37</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.38</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1086,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.37';
+const VERSION = 'v1.4.38';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1185,7 +1185,9 @@ function isChromeDesktop(){
 }
 function checkBrowserCapabilities() {
   // Returns null if OK, or an error message string if browser is too old
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  var hasGetUserMedia = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
+                        navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  if (!hasGetUserMedia) {
     return '您的浏览器版本过低，不支持麦克风功能。请使用 Chrome 或 Safari 浏览器。';
   }
   var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1193,6 +1195,24 @@ function checkBrowserCapabilities() {
     return '您的浏览器不支持音频处理。请使用 Chrome 或 Safari 浏览器。';
   }
   return null;
+}
+function getUserMediaPolyfill(constraints) {
+  // Modern Promise-based API
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }
+  // Legacy callback-based API (Chromium 21-44, old Firefox)
+  var gum = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  if (gum) {
+    return new Promise(function(resolve, reject) {
+      try {
+        gum.call(navigator, constraints, resolve, reject);
+      } catch(e) {
+        reject(e);
+      }
+    });
+  }
+  return Promise.reject(new Error('getUserMedia not supported'));
 }
 function withTimeout(promise, ms) {
   return new Promise(function(resolve, reject) {
@@ -1293,7 +1313,7 @@ const AudioEngine = {
     if(deviceId) constraints.audio.deviceId = {exact: deviceId};
 
     try{
-      this.stream = await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 5000);
+      this.stream = await withTimeout(getUserMediaPolyfill(constraints), 5000);
     }catch(e){
       try{
         // Fallback 1: simpler constraints without latency/goog
@@ -1303,11 +1323,11 @@ const AudioEngine = {
           autoGainControl: false
         }};
         if(deviceId) constraints.audio.deviceId = {exact: deviceId};
-        this.stream = await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 5000);
+        this.stream = await withTimeout(getUserMediaPolyfill(constraints), 5000);
       }catch(e2){
         try{
           // Fallback 2: bare minimum, no deviceId (old browsers may not support it)
-          this.stream = await withTimeout(navigator.mediaDevices.getUserMedia({audio: true}), 5000);
+          this.stream = await withTimeout(getUserMediaPolyfill({audio: true}), 5000);
         }catch(e3){
           this.stop(); return false;
         }
@@ -2408,7 +2428,7 @@ function buildProfileFromData() {
 // ====== MIC AUTO-DETECT ======
 async function autoDetectMics() {
   try {
-    var tmp = await withTimeout(navigator.mediaDevices.getUserMedia({audio:true}), 5000);
+    var tmp = await withTimeout(getUserMediaPolyfill({audio:true}), 5000);
     tmp.getTracks().forEach(function(t) { t.stop(); });
     var devs = await getAudioDevices();
     if (devs.length === 0) {
