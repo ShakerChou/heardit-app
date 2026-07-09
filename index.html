@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.38_webkitGetUserMedia降级_20260710.html -->
+<!-- heardit_v1.4.39_权限预检+精准提示_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -715,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.38</div>
+    <div class="home-no-data-version">HeardIt v1.4.39</div>
 
     <!-- PWA Install Guide -->
     <div class="pwa-guide" id="pwa-guide" style="display:none;">
@@ -896,7 +896,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.38</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.39</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1086,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.38';
+const VERSION = 'v1.4.39';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1329,6 +1329,7 @@ const AudioEngine = {
           // Fallback 2: bare minimum, no deviceId (old browsers may not support it)
           this.stream = await withTimeout(getUserMediaPolyfill({audio: true}), 5000);
         }catch(e3){
+          this._lastGumError = e3;
           this.stop(); return false;
         }
       }
@@ -2556,13 +2557,31 @@ async function startHearingAidAsync() {
       revertHearingAidUI();
       return;
     }
+    // Pre-check microphone permission
+    if (navigator.permissions) {
+      try {
+        var micPerm = await navigator.permissions.query({name: 'microphone'});
+        if (micPerm.state === 'denied') {
+          alert('麦克风权限已被系统拒绝。\n请在 设置 → 应用管理 → 浏览器 → 权限管理 → 录音 中开启麦克风权限。');
+          revertHearingAidUI();
+          return;
+        }
+      } catch(e) { /* permissions API not supported, skip */ }
+    }
     await autoDetectMics();
     var profile = buildProfileFromData();
     var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
     AudioEngine.howlSensitivity = haState.howlSensitivity;
     var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
     if (!ok) {
-      alert('无法启动助听，请检查麦克风权限或更换浏览器');
+      var err = AudioEngine._lastGumError;
+      if (err && err.name === 'NotAllowedError') {
+        alert('麦克风权限被拒绝。\n请在 设置 → 应用管理 → 浏览器 → 权限管理 → 录音 中开启麦克风权限。');
+      } else if (err && err.name === 'NotFoundError') {
+        alert('未检测到麦克风设备。请确认设备有麦克风，或尝试插入耳机。');
+      } else {
+        alert('无法启动助听，请检查麦克风权限或更换浏览器。');
+      }
       revertHearingAidUI();
       return;
     }
