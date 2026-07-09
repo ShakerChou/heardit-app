@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.26_移动端修复2_20260709.html | 降噪诊断+熄屏恢复+手机麦优化+PWA数据互通 -->
+<!-- heardit_v1.4.27_麦修_20260709.html | 麦克风识别修复+熄屏自动重启+清理PWA方案 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -626,14 +626,6 @@ input[type=range]::-moz-range-thumb{
   font-size:12px;color:#8E8E93;text-align:center;margin-top:-8px;margin-bottom:4px;
   min-height:16px;line-height:16px;
 }
-.audio-suspended-banner{
-  display:none;position:fixed;top:0;left:0;right:0;background:#FF3B30;color:#fff;
-  padding:12px 20px;text-align:center;font-size:16px;font-weight:600;z-index:9999;
-  cursor:pointer;align-items:center;justify-content:center;gap:12px;
-  animation:slideDown 0.3s ease;
-}
-.audio-suspended-banner.show{display:flex;}
-@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
 .latency-card{
   width:100%;
   background:#fff;border-radius:20px;padding:16px;
@@ -695,7 +687,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.26</div>
+    <div class="home-no-data-version">HeardIt v1.4.27</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -771,11 +763,6 @@ input[type=range]::-moz-range-thumb{
         <!-- Status Text -->
         <div class="ha-status on" id="ha-status">助听运行中</div>
         <div class="ha-ns-info" id="ha-ns-info"></div>
-
-        <!-- Audio Suspended Banner -->
-        <div class="audio-suspended-banner" id="audio-suspended-banner" onclick="resumeAudioContext()">
-          <span>助听已暂停</span><span style="font-size:14px;opacity:0.8">点击屏幕恢复</span>
-        </div>
 
         <!-- Dual Visualizer -->
         <div class="dual-viz" id="dual-viz">
@@ -870,7 +857,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.26</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.27</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1046,10 +1033,6 @@ input[type=range]::-moz-range-thumb{
 
     </div>
     <div class="sheet-footer">
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <button class="btn" style="flex:1;background:#F2F2F7;color:#007AFF;" onclick="exportHearingData()">复制数据</button>
-        <button class="btn" style="flex:1;background:#F2F2F7;color:#007AFF;" onclick="importHearingData()">粘贴数据</button>
-      </div>
       <button class="btn btn-primary" onclick="finishTest()">返回首页</button>
     </div>
   </div>
@@ -1064,7 +1047,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.26';
+const VERSION = 'v1.4.27';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2284,36 +2267,6 @@ function loadHearingData() {
   } catch(e) {}
   return false;
 }
-function exportHearingData() {
-  try {
-    var data = { left: AppState.hearingData.left, right: AppState.hearingData.right, v: 1 };
-    var code = btoa(JSON.stringify(data));
-    navigator.clipboard.writeText(code).then(function() {
-      alert('数据已复制到剪贴板\n\n在桌面App中打开，点击"粘贴数据"即可恢复');
-    }).catch(function() {
-      prompt('请手动复制以下数据:', code);
-    });
-  } catch(e) { alert('导出失败'); }
-}
-function importHearingData() {
-  try {
-    var code = prompt('请粘贴之前复制的数据：');
-    if (!code) return;
-    var data = JSON.parse(atob(code));
-    if (data && data.v && data.left && data.right) {
-      AppState.hearingData.left = data.left;
-      AppState.hearingData.right = data.right;
-      AppState.hasHearingData = true;
-      saveHearingData();
-      buildHomeSummary();
-      closeSheet();
-      showScreen('home-with-data');
-      alert('数据已恢复！');
-    } else {
-      alert('数据格式无效');
-    }
-  } catch(e) { alert('数据格式无效'); }
-}
 
 function buildHomeSummary() {
   var barsContainer = document.getElementById('hs-bars');
@@ -2363,115 +2316,67 @@ async function autoDetectMics() {
     var tmp = await navigator.mediaDevices.getUserMedia({audio:true});
     tmp.getTracks().forEach(function(t) { t.stop(); });
     var devs = await getAudioDevices();
-    if (devs.length >= 2) {
-      haState.phoneDeviceId = devs[0].deviceId;
-      haState.earphoneDeviceId = devs[1].deviceId;
-    } else if (devs.length === 1) {
-      haState.phoneDeviceId = devs[0].deviceId;
-      haState.earphoneDeviceId = devs[0].deviceId;
-    } else {
+    if (devs.length === 0) {
       haState.phoneDeviceId = undefined;
       haState.earphoneDeviceId = undefined;
+      return;
     }
+    // Identify devices by label, not by array order
+    var phoneDev = null, earphoneDev = null;
+    for (var i = 0; i < devs.length; i++) {
+      var label = (devs[i].label || '').toLowerCase();
+      // Earphone/headset mic: contains headset, earphone, 耳机, 有线, earbud
+      if (label.includes('headset') || label.includes('earphone') || label.includes('earbud') ||
+          label.includes('耳机') || label.includes('有线') || label.includes('外接')) {
+        earphoneDev = devs[i];
+      } else {
+        // Phone/built-in mic: default, communications, or contains iPhone/内置
+        phoneDev = devs[i];
+      }
+    }
+    // If only one device, it's the phone mic
+    if (!phoneDev && !earphoneDev) {
+      phoneDev = devs[0];
+    }
+    haState.phoneDeviceId = phoneDev ? phoneDev.deviceId : (devs[0] ? devs[0].deviceId : undefined);
+    haState.earphoneDeviceId = earphoneDev ? earphoneDev.deviceId : haState.phoneDeviceId;
+    console.log('Mic detect: phone=' + (phoneDev ? phoneDev.label : 'none') + ', earphone=' + (earphoneDev ? earphoneDev.label : 'none'));
   } catch(e) {
     haState.phoneDeviceId = undefined;
     haState.earphoneDeviceId = undefined;
   }
 }
 
-// ====== AUDIO CONTEXT KEEP-ALIVE (prevent iOS sleep) ======
-var acKeepAliveTimer = null;
-var acSuspendedBannerTimer = null;
-function setupAudioContextKeepAlive() {
-  teardownAudioContextKeepAlive();
-  
-  // 1. MediaSession: declare as media app to prevent iOS audio suspension
-  if ('mediaSession' in navigator) {
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: '听到鸟助听',
-        artist: 'HeardIt',
-        album: '助听运行中'
-      });
-      navigator.mediaSession.playbackState = 'playing';
-    } catch(e) {}
-  }
-  
-  // 2. AudioContext state change: auto-resume when suspended
-  if (AudioEngine.ctx) {
-    AudioEngine.ctx.onstatechange = function() {
-      if (AudioEngine.ctx && AudioEngine.isRunning) {
-        if (AudioEngine.ctx.state === 'suspended') {
-          showSuspendedBanner();
-          AudioEngine.ctx.resume().then(function() {
-            hideSuspendedBanner();
-          }).catch(function(){});
-        } else if (AudioEngine.ctx.state === 'running') {
-          hideSuspendedBanner();
-        }
-      }
-    };
-  }
-  
-  // 3. Multiple event listeners for resume
+// ====== AUDIO CONTEXT KEEP-ALIVE (iOS screen lock recovery) ======
+// iOS unavoidably suspends AudioContext when screen locks.
+// Strategy: auto-restart hearing aid when user unlocks screen.
+var wasRunningBeforeSleep = false;
+function setupAudioKeepAlive() {
   document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('pageshow', onVisibilityChange);
   window.addEventListener('focus', onVisibilityChange);
-  
-  // 4. Aggressive keep-alive: higher bgOsc gain + periodic resume
-  acKeepAliveTimer = setInterval(function() {
-    if (AudioEngine.ctx && AudioEngine.isRunning) {
-      if (AudioEngine.ctx.state === 'suspended') {
-        showSuspendedBanner();
-        AudioEngine.ctx.resume().catch(function(){});
-      } else if (AudioEngine.ctx.state === 'running') {
-        hideSuspendedBanner();
-      }
-      // Keep bgOsc alive with higher gain for iOS
-      if (AudioEngine.bgGain) {
-        AudioEngine.bgGain.gain.setTargetAtTime(0.0005, AudioEngine.ctx.currentTime, 0.1);
-      }
-    }
-  }, 3000);
 }
-
-function showSuspendedBanner() {
-  var banner = document.getElementById('audio-suspended-banner');
-  if (banner) banner.classList.add('show');
-  if (acSuspendedBannerTimer) clearTimeout(acSuspendedBannerTimer);
-  acSuspendedBannerTimer = null;
-}
-function hideSuspendedBanner() {
-  var banner = document.getElementById('audio-suspended-banner');
-  if (banner) banner.classList.remove('show');
-}
-function resumeAudioContext() {
-  if (AudioEngine.ctx && AudioEngine.isRunning && AudioEngine.ctx.state === 'suspended') {
-    AudioEngine.ctx.resume().then(function() {
-      hideSuspendedBanner();
-    }).catch(function(){});
-  }
-}
-
-function teardownAudioContextKeepAlive() {
-  if (acKeepAliveTimer) { clearInterval(acKeepAliveTimer); acKeepAliveTimer = null; }
-  if (acSuspendedBannerTimer) { clearTimeout(acSuspendedBannerTimer); acSuspendedBannerTimer = null; }
+function teardownAudioKeepAlive() {
   document.removeEventListener('visibilitychange', onVisibilityChange);
   window.removeEventListener('pageshow', onVisibilityChange);
   window.removeEventListener('focus', onVisibilityChange);
-  hideSuspendedBanner();
-  if (AudioEngine.ctx) { AudioEngine.ctx.onstatechange = null; }
-  if ('mediaSession' in navigator) {
-    try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
-  }
+  wasRunningBeforeSleep = false;
 }
-
 function onVisibilityChange() {
-  if (document.visibilityState === 'visible' && AudioEngine.ctx && AudioEngine.isRunning) {
-    if (AudioEngine.ctx.state === 'suspended') {
-      AudioEngine.ctx.resume().then(function() {
-        hideSuspendedBanner();
-      }).catch(function(){});
+  if (document.visibilityState === 'visible') {
+    if (wasRunningBeforeSleep && haState.isRunning) {
+      // Screen unlocked, restart hearing aid
+      var st = document.getElementById('ha-status');
+      if (st) { st.textContent = '恢复中...'; st.className = 'ha-status on'; }
+      AudioEngine.stop().then(function() {
+        startHearingAidAsync();
+      });
+    }
+    wasRunningBeforeSleep = false;
+  } else {
+    // Screen locked
+    if (haState.isRunning) {
+      wasRunningBeforeSleep = true;
     }
   }
 }
@@ -2503,7 +2408,7 @@ async function toggleHearingAid() {
     var banner = document.getElementById('howl-banner');
     if (banner) banner.classList.remove('show');
     // Audio fade-out in background (non-blocking)
-    teardownAudioContextKeepAlive();
+    teardownAudioKeepAlive();
     AudioEngine.startSmoothFade(0, 100);
     setTimeout(function(){ AudioEngine.stop(); }, 120);
   } else {
@@ -2544,7 +2449,7 @@ async function startHearingAidAsync() {
   isHearingAidOn = true;
   haState.isRunning = true;
   requestWakeLock();
-  setupAudioContextKeepAlive();
+  setupAudioKeepAlive();
   updateNsInfo();
   var st = document.getElementById('ha-status');
   if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
@@ -2553,7 +2458,7 @@ async function startHearingAidAsync() {
 }
 
 async function autoStopHowl() {
-  teardownAudioContextKeepAlive();
+  teardownAudioKeepAlive();
   await AudioEngine.stop();
   isHearingAidOn = false;
   haState.isRunning = false;
@@ -2629,9 +2534,9 @@ async function onMicChange(mode) {
   }
   var desc = document.getElementById('mic-desc');
   if (mode === 'phone') {
-    desc.textContent = '手机麦克风 · 可能有混响，建议用耳机麦';
+    desc.textContent = '手机麦克风 · 远离耳机喇叭，啸叫风险低';
   } else {
-    desc.textContent = '耳机麦克风 · 音质更清晰';
+    desc.textContent = '耳机麦克风 · 靠近耳机喇叭，易啸叫，建议降低音量';
   }
   if (haState.isRunning) {
     await autoDetectMics();
