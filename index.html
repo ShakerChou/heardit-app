@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.36_红米降噪策略修复_20260710.html -->
+<!-- heardit_v1.4.37_麦克风降级修复_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -715,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.36</div>
+    <div class="home-no-data-version">HeardIt v1.4.37</div>
 
     <!-- PWA Install Guide -->
     <div class="pwa-guide" id="pwa-guide" style="display:none;">
@@ -896,7 +896,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.36</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.37</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1086,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.36';
+const VERSION = 'v1.4.37';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1296,21 +1296,18 @@ const AudioEngine = {
       this.stream = await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 5000);
     }catch(e){
       try{
-        // Fallback 1: standard constraints without goog-specific
+        // Fallback 1: simpler constraints without latency/goog
         constraints = {audio:{
           echoCancellation: false,
           noiseSuppression: nsEnabled,
-          autoGainControl: false,
-          latency: 0.001
+          autoGainControl: false
         }};
         if(deviceId) constraints.audio.deviceId = {exact: deviceId};
         this.stream = await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 5000);
       }catch(e2){
         try{
-          // Fallback 2: minimal constraints for old browsers
-          constraints = {audio: true};
-          if(deviceId) constraints.audio = {deviceId: {exact: deviceId}};
-          this.stream = await withTimeout(navigator.mediaDevices.getUserMedia(constraints), 5000);
+          // Fallback 2: bare minimum, no deviceId (old browsers may not support it)
+          this.stream = await withTimeout(navigator.mediaDevices.getUserMedia({audio: true}), 5000);
         }catch(e3){
           this.stop(); return false;
         }
