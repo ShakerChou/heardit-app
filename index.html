@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.32_PWA引导修正+归档_20260709.html -->
+<!-- heardit_v1.4.33_PWA引导文案简化_20260709.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -715,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.32</div>
+    <div class="home-no-data-version">HeardIt v1.4.33</div>
 
     <!-- PWA Install Guide -->
     <div class="pwa-guide" id="pwa-guide" style="display:none;">
@@ -896,7 +896,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.32</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.33</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1086,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.32';
+const VERSION = 'v1.4.33';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2972,32 +2972,30 @@ function showPwaGuide() {
   if (isIOS) {
     if (isSafari) {
       stepsHtml = '<span class="step-num">1</span>点击分享按钮（方框 ↑ 箭头）<br>' +
-                  '<span class="step-num">2</span>找到「<b>添加到主屏幕</b>」<br>' +
-                  '<span class="step-num">3</span>点击「<b>添加</b>」，即可离线使用';
+                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
     } else if (isChrome) {
       stepsHtml = '<span class="step-num">1</span>点击分享按钮<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加到主屏幕</b>」';
+                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
     } else {
       stepsHtml = '<span class="step-num">1</span>点击分享按钮<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加到主屏幕</b>」';
+                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
     }
   } else if (isAndroid) {
     if (isChrome) {
       stepsHtml = '<span class="step-num">1</span>点击「<b>⋮</b>」菜单<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加到主屏幕</b>」<br>' +
-                  '<span class="step-num">3</span>点击「<b>安装</b>」，即可离线使用';
+                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
     } else if (isSamsung) {
       stepsHtml = '<span class="step-num">1</span>点击「<b>☰</b>」菜单<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加页面到</b>」→「<b>主屏幕</b>」';
+                  '<span class="step-num">2</span>点击「<b>添加页面到</b>」→「<b>主屏幕</b>」';
     } else if (isEdge) {
       stepsHtml = '<span class="step-num">1</span>点击「<b>⋯</b>」菜单<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加到手机</b>」';
+                  '<span class="step-num">2</span>点击「<b>添加到手机</b>」';
     } else if (isFirefox) {
       stepsHtml = '<span class="step-num">1</span>点击「<b>⋮</b>」菜单<br>' +
-                  '<span class="step-num">2</span>选择「<b>安装</b>」';
+                  '<span class="step-num">2</span>点击「<b>安装</b>」';
     } else if (isOpera) {
       stepsHtml = '<span class="step-num">1</span>点击 Opera 图标<br>' +
-                  '<span class="step-num">2</span>选择「<b>添加到主屏幕</b>」';
+                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」';
     } else {
       stepsHtml = '您的浏览器不支持添加到桌面。<br>请安装 <b>Chrome 浏览器</b> 后重新打开此页面。';
     }
