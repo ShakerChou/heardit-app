@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.30_全量健壮性修复_20260709.html -->
+<!-- heardit_v1.4.31_UI修复+PWA移位_20260709.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -208,7 +208,7 @@ body{
   width:100%;max-width:min(340px, calc(100vw - 40px));
   background:#fff;border-radius:16px;padding:14px 16px;
   box-shadow:0 2px 8px rgba(0,0,0,0.06);
-  margin-top:auto;margin-bottom:8px;
+  margin-top:20px;margin-bottom:0;
   text-align:left;
   animation:fadeIn 500ms 300ms cubic-bezier(0.32,0.72,0,1) forwards;
   opacity:0;
@@ -653,10 +653,7 @@ input[type=range]::-moz-range-thumb{
 }
 .ha-status.on{color:#34C759;font-weight:600;}
 .ha-status.warn{color:#FF3B30;font-weight:600;}
-.ha-ns-info{
-  font-size:12px;color:#8E8E93;text-align:center;margin-top:-8px;margin-bottom:4px;
-  min-height:16px;line-height:16px;
-}
+.ha-ns-info{font-size:12px;color:#8E8E93;margin-top:6px;min-height:16px;line-height:16px;}
 .latency-card{
   width:100%;
   background:#fff;border-radius:20px;padding:16px;
@@ -718,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.30</div>
+    <div class="home-no-data-version">HeardIt v1.4.31</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -803,7 +800,6 @@ input[type=range]::-moz-range-thumb{
 
         <!-- Status Text -->
         <div class="ha-status on" id="ha-status">助听运行中</div>
-        <div class="ha-ns-info" id="ha-ns-info"></div>
 
         <!-- Dual Visualizer -->
         <div class="dual-viz" id="dual-viz">
@@ -878,6 +874,7 @@ input[type=range]::-moz-range-thumb{
               <button class="segmented-btn active" data-val="auto" onclick="onNoiseChange('auto')">自动</button>
               <button class="segmented-btn" data-val="off" onclick="onNoiseChange('off')">关闭</button>
             </div>
+            <div class="ha-ns-info" id="ha-ns-info"></div>
           </div>
         </div>
 
@@ -898,7 +895,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.30</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.31</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1088,7 +1085,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.30';
+const VERSION = 'v1.4.31';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2485,6 +2482,8 @@ async function toggleHearingAid() {
     if (note) note.textContent = '开始助听后显示';
     var banner = document.getElementById('howl-banner');
     if (banner) banner.classList.remove('show');
+    var nsInfo = document.getElementById('ha-ns-info');
+    if (nsInfo) nsInfo.textContent = '';
     // Audio fade-out in background (non-blocking)
     teardownAudioKeepAlive();
     AudioEngine.startSmoothFade(0, 100);
@@ -2568,6 +2567,8 @@ function revertHearingAidUI() {
   if (note) note.textContent = '开始助听后显示';
   var banner = document.getElementById('howl-banner');
   if (banner) banner.classList.remove('show');
+  var nsInfo = document.getElementById('ha-ns-info');
+  if (nsInfo) nsInfo.textContent = '';
 }
 
 async function autoStopHowl() {
