@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.25_移动端修复_20260709.html | 降噪修复+耳机麦增强+卡顿优化+熄屏保活 -->
+<!-- heardit_v1.4.26_移动端修复2_20260709.html | 降噪诊断+熄屏恢复+手机麦优化+PWA数据互通 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -622,6 +622,18 @@ input[type=range]::-moz-range-thumb{
 }
 .ha-status.on{color:#34C759;font-weight:600;}
 .ha-status.warn{color:#FF3B30;font-weight:600;}
+.ha-ns-info{
+  font-size:12px;color:#8E8E93;text-align:center;margin-top:-8px;margin-bottom:4px;
+  min-height:16px;line-height:16px;
+}
+.audio-suspended-banner{
+  display:none;position:fixed;top:0;left:0;right:0;background:#FF3B30;color:#fff;
+  padding:12px 20px;text-align:center;font-size:16px;font-weight:600;z-index:9999;
+  cursor:pointer;align-items:center;justify-content:center;gap:12px;
+  animation:slideDown 0.3s ease;
+}
+.audio-suspended-banner.show{display:flex;}
+@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
 .latency-card{
   width:100%;
   background:#fff;border-radius:20px;padding:16px;
@@ -683,7 +695,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.25</div>
+    <div class="home-no-data-version">HeardIt v1.4.26</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -758,6 +770,12 @@ input[type=range]::-moz-range-thumb{
 
         <!-- Status Text -->
         <div class="ha-status on" id="ha-status">助听运行中</div>
+        <div class="ha-ns-info" id="ha-ns-info"></div>
+
+        <!-- Audio Suspended Banner -->
+        <div class="audio-suspended-banner" id="audio-suspended-banner" onclick="resumeAudioContext()">
+          <span>助听已暂停</span><span style="font-size:14px;opacity:0.8">点击屏幕恢复</span>
+        </div>
 
         <!-- Dual Visualizer -->
         <div class="dual-viz" id="dual-viz">
@@ -852,7 +870,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.25</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.26</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1028,6 +1046,10 @@ input[type=range]::-moz-range-thumb{
 
     </div>
     <div class="sheet-footer">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="btn" style="flex:1;background:#F2F2F7;color:#007AFF;" onclick="exportHearingData()">复制数据</button>
+        <button class="btn" style="flex:1;background:#F2F2F7;color:#007AFF;" onclick="importHearingData()">粘贴数据</button>
+      </div>
       <button class="btn btn-primary" onclick="finishTest()">返回首页</button>
     </div>
   </div>
@@ -1042,7 +1064,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.25';
+const VERSION = 'v1.4.26';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1281,7 +1303,12 @@ const AudioEngine = {
     this.bands = [];
     this.monoMixer = this.ctx.createGain();
     // Earphone mic is typically much quieter than phone mic, boost accordingly
-    this.monoMixer.gain.value = this.micMode === 'earphone' ? MONO_MIXER_GAIN * 2.5 : MONO_MIXER_GAIN;
+    // Phone mic: lower gain to prevent feedback loop (speaker → mic → speaker)
+    if (this.micMode === 'earphone') {
+      this.monoMixer.gain.value = MONO_MIXER_GAIN * 2.5;
+    } else {
+      this.monoMixer.gain.value = MONO_MIXER_GAIN * 0.45;
+    }
 
     BAND_CFG.forEach((cfg, i)=>{
       const bp = this.ctx.createBiquadFilter();
@@ -2257,6 +2284,36 @@ function loadHearingData() {
   } catch(e) {}
   return false;
 }
+function exportHearingData() {
+  try {
+    var data = { left: AppState.hearingData.left, right: AppState.hearingData.right, v: 1 };
+    var code = btoa(JSON.stringify(data));
+    navigator.clipboard.writeText(code).then(function() {
+      alert('数据已复制到剪贴板\n\n在桌面App中打开，点击"粘贴数据"即可恢复');
+    }).catch(function() {
+      prompt('请手动复制以下数据:', code);
+    });
+  } catch(e) { alert('导出失败'); }
+}
+function importHearingData() {
+  try {
+    var code = prompt('请粘贴之前复制的数据：');
+    if (!code) return;
+    var data = JSON.parse(atob(code));
+    if (data && data.v && data.left && data.right) {
+      AppState.hearingData.left = data.left;
+      AppState.hearingData.right = data.right;
+      AppState.hasHearingData = true;
+      saveHearingData();
+      buildHomeSummary();
+      closeSheet();
+      showScreen('home-with-data');
+      alert('数据已恢复！');
+    } else {
+      alert('数据格式无效');
+    }
+  } catch(e) { alert('数据格式无效'); }
+}
 
 function buildHomeSummary() {
   var barsContainer = document.getElementById('hs-bars');
@@ -2324,8 +2381,8 @@ async function autoDetectMics() {
 
 // ====== AUDIO CONTEXT KEEP-ALIVE (prevent iOS sleep) ======
 var acKeepAliveTimer = null;
+var acSuspendedBannerTimer = null;
 function setupAudioContextKeepAlive() {
-  // Clear any existing keep-alive
   teardownAudioContextKeepAlive();
   
   // 1. MediaSession: declare as media app to prevent iOS audio suspension
@@ -2343,38 +2400,67 @@ function setupAudioContextKeepAlive() {
   // 2. AudioContext state change: auto-resume when suspended
   if (AudioEngine.ctx) {
     AudioEngine.ctx.onstatechange = function() {
-      if (AudioEngine.ctx && AudioEngine.ctx.state === 'suspended' && AudioEngine.isRunning) {
-        AudioEngine.ctx.resume().catch(function(){});
+      if (AudioEngine.ctx && AudioEngine.isRunning) {
+        if (AudioEngine.ctx.state === 'suspended') {
+          showSuspendedBanner();
+          AudioEngine.ctx.resume().then(function() {
+            hideSuspendedBanner();
+          }).catch(function(){});
+        } else if (AudioEngine.ctx.state === 'running') {
+          hideSuspendedBanner();
+        }
       }
     };
   }
   
-  // 3. Visibility change: resume audio when page becomes visible
+  // 3. Multiple event listeners for resume
   document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('pageshow', onVisibilityChange);
+  window.addEventListener('focus', onVisibilityChange);
   
-  // 4. Periodic keep-alive: gently ping the audio context
+  // 4. Aggressive keep-alive: higher bgOsc gain + periodic resume
   acKeepAliveTimer = setInterval(function() {
     if (AudioEngine.ctx && AudioEngine.isRunning) {
       if (AudioEngine.ctx.state === 'suspended') {
+        showSuspendedBanner();
         AudioEngine.ctx.resume().catch(function(){});
+      } else if (AudioEngine.ctx.state === 'running') {
+        hideSuspendedBanner();
       }
-      // Keep bgOsc alive
+      // Keep bgOsc alive with higher gain for iOS
       if (AudioEngine.bgGain) {
-        AudioEngine.bgGain.gain.setTargetAtTime(0.0001, AudioEngine.ctx.currentTime, 0.1);
+        AudioEngine.bgGain.gain.setTargetAtTime(0.0005, AudioEngine.ctx.currentTime, 0.1);
       }
     }
-  }, 5000);
+  }, 3000);
+}
+
+function showSuspendedBanner() {
+  var banner = document.getElementById('audio-suspended-banner');
+  if (banner) banner.classList.add('show');
+  if (acSuspendedBannerTimer) clearTimeout(acSuspendedBannerTimer);
+  acSuspendedBannerTimer = null;
+}
+function hideSuspendedBanner() {
+  var banner = document.getElementById('audio-suspended-banner');
+  if (banner) banner.classList.remove('show');
+}
+function resumeAudioContext() {
+  if (AudioEngine.ctx && AudioEngine.isRunning && AudioEngine.ctx.state === 'suspended') {
+    AudioEngine.ctx.resume().then(function() {
+      hideSuspendedBanner();
+    }).catch(function(){});
+  }
 }
 
 function teardownAudioContextKeepAlive() {
-  if (acKeepAliveTimer) {
-    clearInterval(acKeepAliveTimer);
-    acKeepAliveTimer = null;
-  }
+  if (acKeepAliveTimer) { clearInterval(acKeepAliveTimer); acKeepAliveTimer = null; }
+  if (acSuspendedBannerTimer) { clearTimeout(acSuspendedBannerTimer); acSuspendedBannerTimer = null; }
   document.removeEventListener('visibilitychange', onVisibilityChange);
-  if (AudioEngine.ctx) {
-    AudioEngine.ctx.onstatechange = null;
-  }
+  window.removeEventListener('pageshow', onVisibilityChange);
+  window.removeEventListener('focus', onVisibilityChange);
+  hideSuspendedBanner();
+  if (AudioEngine.ctx) { AudioEngine.ctx.onstatechange = null; }
   if ('mediaSession' in navigator) {
     try { navigator.mediaSession.playbackState = 'none'; } catch(e) {}
   }
@@ -2383,7 +2469,9 @@ function teardownAudioContextKeepAlive() {
 function onVisibilityChange() {
   if (document.visibilityState === 'visible' && AudioEngine.ctx && AudioEngine.isRunning) {
     if (AudioEngine.ctx.state === 'suspended') {
-      AudioEngine.ctx.resume().catch(function(){});
+      AudioEngine.ctx.resume().then(function() {
+        hideSuspendedBanner();
+      }).catch(function(){});
     }
   }
 }
@@ -2457,6 +2545,7 @@ async function startHearingAidAsync() {
   haState.isRunning = true;
   requestWakeLock();
   setupAudioContextKeepAlive();
+  updateNsInfo();
   var st = document.getElementById('ha-status');
   if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
   initDualVisualizer();
@@ -2540,9 +2629,9 @@ async function onMicChange(mode) {
   }
   var desc = document.getElementById('mic-desc');
   if (mode === 'phone') {
-    desc.textContent = '手机麦克风啸叫风险更低';
+    desc.textContent = '手机麦克风 · 可能有混响，建议用耳机麦';
   } else {
-    desc.textContent = '耳机麦克风 · 啸叫风险较高，建议调低音量';
+    desc.textContent = '耳机麦克风 · 音质更清晰';
   }
   if (haState.isRunning) {
     await autoDetectMics();
@@ -2593,6 +2682,7 @@ async function onNoiseChange(supp) {
   for (var i = 0; i < btns.length; i++) {
     btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === supp);
   }
+  updateNsInfo();
   var statusEl = document.getElementById('ha-status');
   if (haState.isRunning) {
     if (statusEl) { statusEl.textContent = '切换中...'; statusEl.className = 'ha-status'; }
@@ -2624,6 +2714,24 @@ async function onNoiseChange(supp) {
       if (statusEl && !haState.isRunning) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
     }, 2000);
   }
+}
+
+function updateNsInfo() {
+  var el = document.getElementById('ha-ns-info');
+  if (!el) return;
+  if (haState.noiseSupp === 'off' || !haState.isRunning) {
+    el.textContent = '';
+    return;
+  }
+  var platform = supportsNoiseSuppression();
+  var platformLabel = {
+    'chrome': 'Chrome ML 降噪',
+    'ios': 'iOS 基础降噪',
+    'firefox': 'Firefox 降噪',
+    'safari': 'Safari 降噪',
+    'basic': '标准降噪'
+  }[platform] || '标准降噪';
+  el.textContent = platformLabel;
 }
 
 // ====== DUAL VISUALIZER (Real audio data from analysers) ======
