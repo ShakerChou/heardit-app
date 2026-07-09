@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.40_双API降级+精准诊断_20260710.html -->
+<!-- heardit_v1.4.41_双API竞速修复_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -715,7 +715,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.40</div>
+    <div class="home-no-data-version">HeardIt v1.4.41</div>
 
     <!-- PWA Install Guide -->
     <div class="pwa-guide" id="pwa-guide" style="display:none;">
@@ -896,7 +896,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.40</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.41</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1086,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.40';
+const VERSION = 'v1.4.41';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1197,29 +1197,46 @@ function checkBrowserCapabilities() {
   return null;
 }
 function getUserMediaPolyfill(constraints) {
-  // Try modern Promise-based API first
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    return navigator.mediaDevices.getUserMedia(constraints).catch(function(err) {
-      // Modern API failed, try legacy callback-based API
+  return new Promise(function(resolve, reject) {
+    var done = false;
+    function settle(stream) {
+      if (done) return;
+      done = true;
+      resolve(stream);
+    }
+    function fail(err) {
+      if (done) return;
+      done = true;
+      reject(err);
+    }
+    function tryLegacy() {
+      if (done) return;
       var gum = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
       if (gum) {
-        return new Promise(function(resolve, reject) {
-          try { gum.call(navigator, constraints, resolve, reject); }
-          catch(e) { reject(e); }
-        });
+        try {
+          gum.call(navigator, constraints, settle, fail);
+        } catch(e) {
+          fail(e);
+        }
+      } else {
+        fail(new Error('getUserMedia not supported'));
       }
-      throw err;
-    });
-  }
-  // Legacy callback-based API only (Chromium 21-44, old Firefox)
-  var gum = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  if (gum) {
-    return new Promise(function(resolve, reject) {
-      try { gum.call(navigator, constraints, resolve, reject); }
-      catch(e) { reject(e); }
-    });
-  }
-  return Promise.reject(new Error('getUserMedia not supported'));
+    }
+    // Try modern Promise-based API
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia(constraints).then(settle, function() {
+        // Modern API rejected, immediately try legacy
+        tryLegacy();
+      });
+      // If modern API hangs, also try legacy after 2s (race)
+      setTimeout(function() {
+        if (!done) tryLegacy();
+      }, 2000);
+      return;
+    }
+    // Legacy API only
+    tryLegacy();
+  });
 }
 function withTimeout(promise, ms) {
   return new Promise(function(resolve, reject) {
@@ -1320,7 +1337,7 @@ const AudioEngine = {
     if(deviceId) constraints.audio.deviceId = {exact: deviceId};
 
     try{
-      this.stream = await withTimeout(getUserMediaPolyfill(constraints), 3000);
+      this.stream = await withTimeout(getUserMediaPolyfill(constraints), 8000);
     }catch(e){
       this._lastGumError = e;
       try{
@@ -1331,12 +1348,12 @@ const AudioEngine = {
           autoGainControl: false
         }};
         if(deviceId) constraints.audio.deviceId = {exact: deviceId};
-        this.stream = await withTimeout(getUserMediaPolyfill(constraints), 3000);
+        this.stream = await withTimeout(getUserMediaPolyfill(constraints), 8000);
       }catch(e2){
         this._lastGumError = e2;
         try{
           // Fallback 2: bare minimum, no deviceId (old browsers may not support it)
-          this.stream = await withTimeout(getUserMediaPolyfill({audio: true}), 3000);
+          this.stream = await withTimeout(getUserMediaPolyfill({audio: true}), 8000);
         }catch(e3){
           this._lastGumError = e3;
           this.stop(); return false;
@@ -2438,7 +2455,7 @@ function buildProfileFromData() {
 // ====== MIC AUTO-DETECT ======
 async function autoDetectMics() {
   try {
-    var tmp = await withTimeout(getUserMediaPolyfill({audio:true}), 5000);
+    var tmp = await withTimeout(getUserMediaPolyfill({audio:true}), 8000);
     tmp.getTracks().forEach(function(t) { t.stop(); });
     var devs = await getAudioDevices();
     if (devs.length === 0) {
