@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.47_啸叫保护按钮文字调整_20260710.html -->
+<!-- heardit_v1.4.48_跳过听力测试_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -450,6 +450,24 @@ body{
 .hs-bar-r{background:#FF3B30;}
 .hs-result-text{font-size:15px;font-weight:500;color:#1C1C1E;margin-top:12px;display:flex;justify-content:space-between;}
 
+/* ===== SKIP TEST BUTTON ===== */
+.skip-test-btn{
+  position:absolute;
+  left:20px;
+  bottom:100px;
+  z-index:51;
+  background:rgba(0,0,0,0.08);
+  color:#1C1C1E;
+  border:none;
+  border-radius:16px;
+  padding:10px 16px;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.skip-test-btn:active{opacity:0.7;}
+
 /* ===== FAB (Fan-Shape Quarter Circle) ===== */
 .fab{
   position:absolute;
@@ -721,6 +739,7 @@ input[type=range]::-moz-range-thumb{
         <div class="start-test-label">开始听力测试</div>
       </div>
     </div>
+    <button class="skip-test-btn" id="skip-test-btn" onclick="skipHearingTest()">跳过听力测试</button>
   </div>
 
   <!-- ==================== SCREEN 2: HOME WITH DATA ==================== -->
@@ -750,10 +769,13 @@ input[type=range]::-moz-range-thumb{
       <div class="hearing-summary-card" id="hearing-summary-card">
         <div class="hs-top-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div class="hs-title">听力概览</div>
-          <button class="retest-btn" onclick="startHearingTest(true)" style="padding:8px 14px;font-size:14px;border-radius:10px;background:#F2F2F7;color:#007AFF;border:none;font-weight:500;cursor:pointer;">重新测试</button>
+          <button class="retest-btn" onclick="startHearingTest(true)" style="padding:8px 14px;font-size:14px;border-radius:10px;background:#F2F2F7;color:#007AFF;border:none;font-weight:500;cursor:pointer;">听力测试</button>
         </div>
         <div class="hs-bars" id="hs-bars"></div>
         <div class="hs-result-text" id="hs-result-text"></div>
+        <div class="hs-note" id="hs-sim-note" style="margin-top:12px;padding:8px 12px;background:rgba(255,159,0,0.1);border-radius:8px;font-size:13px;color:#FF9500;line-height:1.4;display:none;">
+          以上为模拟数据，为了更好的针对您的左右耳分别进行不同频率的听力补偿，请进行听力测试。
+        </div>
       </div>
 
       <!-- Hearing Aid Settings (hidden by default, shown when ON) -->
@@ -1049,7 +1071,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.47';
+const VERSION = 'v1.4.48';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1689,6 +1711,7 @@ const AudioEngine = {
 var AppState = {
   currentScreen: 'home-no-data',
   hasHearingData: false,
+  isSimulatedData: false,
   hearingData: { left: [], right: [] },
   testState: {
     ear: 'left',
@@ -1931,6 +1954,18 @@ function mapDbToHL(dbFS) {
 // ====== HEARING TEST ======
 function startHearingTest(isRetest) { openSheet(isRetest); }
 
+function skipHearingTest() {
+  AppState.hearingData.left = FAKE_LEFT.slice();
+  AppState.hearingData.right = FAKE_RIGHT.slice();
+  AppState.hasHearingData = true;
+  AppState.isSimulatedData = true;
+  buildHomeSummary();
+  showScreen('home-with-data');
+  // Show simulated data hint
+  var simNote = document.getElementById('hs-sim-note');
+  if (simNote) simNote.style.display = 'block';
+}
+
 function resetTestSteps() {
   AppState.testState = {
     ear: 'left', freqIndex: 0, results: {},
@@ -2135,6 +2170,7 @@ function showResults() {
   AppState.hearingData.left = (AppState.testState.results.left && AppState.testState.results.left.length) ? AppState.testState.results.left : FAKE_LEFT;
   AppState.hearingData.right = (AppState.testState.results.right && AppState.testState.results.right.length) ? AppState.testState.results.right : FAKE_RIGHT;
   AppState.hasHearingData = true;
+  AppState.isSimulatedData = false;
   // Save to localStorage for persistence
   saveHearingData();
   drawAudiogram();
@@ -2252,7 +2288,8 @@ function saveHearingData() {
     var data = {
       left: AppState.hearingData.left,
       right: AppState.hearingData.right,
-      hasData: true
+      hasData: true,
+      isSimulated: AppState.isSimulatedData || false
     };
     localStorage.setItem('heardit_hearing', JSON.stringify(data));
   } catch(e) {}
@@ -2266,6 +2303,7 @@ function loadHearingData() {
         AppState.hearingData.left = data.left;
         AppState.hearingData.right = data.right;
         AppState.hasHearingData = true;
+        AppState.isSimulatedData = data.isSimulated || false;
         return true;
       }
     }
@@ -2276,6 +2314,7 @@ function loadHearingData() {
 function buildHomeSummary() {
   var barsContainer = document.getElementById('hs-bars');
   var resultText = document.getElementById('hs-result-text');
+  var simNote = document.getElementById('hs-sim-note');
   var leftAvg = average(AppState.hearingData.left);
   var rightAvg = average(AppState.hearingData.right);
   var leftColor = getHearingColor(leftAvg);
@@ -2294,6 +2333,8 @@ function buildHomeSummary() {
   }
   barsContainer.innerHTML = html;
   resultText.innerHTML = '<span style="text-align:left;color:' + leftColor + ';">左耳: ' + classifyHearing(leftAvg) + '</span><span style="text-align:right;color:' + rightColor + ';">右耳: ' + classifyHearing(rightAvg) + '</span>';
+  // Show/hide simulated data hint
+  if (simNote) simNote.style.display = AppState.isSimulatedData ? 'block' : 'none';
 }
 
 function getHearingColor(db) {
