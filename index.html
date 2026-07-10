@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.42_稳定版还原_20260710.html -->
+<!-- heardit_v1.4.27_麦修_20260709.html | 麦克风识别修复+熄屏自动重启+清理PWA方案 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -202,35 +202,6 @@ body{
 .home-brand.compact .brand-name{font-size:14px;}
 .home-brand.compact .brand-sub{font-size:11px;}
 .home-no-data-version{font-size:12px;color:#AEAEB2;text-align:center;padding-bottom:4px;}
-
-/* ===== PWA INSTALL GUIDE ===== */
-.pwa-guide{
-  width:100%;max-width:min(340px, calc(100vw - 40px));
-  background:#fff;border-radius:16px;padding:14px 16px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
-  margin:12px auto 0;
-  text-align:left;
-  animation:fadeIn 500ms 300ms cubic-bezier(0.32,0.72,0,1) forwards;
-  opacity:0;
-}
-.pwa-guide-title{
-  font-size:14px;font-weight:600;color:#1C1C1E;
-  margin-bottom:8px;display:flex;align-items:center;gap:6px;
-}
-.pwa-guide-steps{
-  font-size:13px;color:#8E8E93;line-height:1.6;
-}
-.pwa-guide-steps .step-num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:18px;height:18px;border-radius:50%;
-  background:#007AFF;color:#fff;font-size:11px;font-weight:700;
-  margin-right:6px;flex-shrink:0;vertical-align:middle;
-}
-.pwa-guide-dismiss{
-  font-size:12px;color:#007AFF;background:none;border:none;
-  cursor:pointer;padding:4px 0;margin-top:8px;
-  -webkit-appearance:none;appearance:none;
-}
 
 /* ===== BOTTOM SHEET ===== */
 .sheet-overlay{
@@ -598,7 +569,6 @@ body{
   background:#fff;border-radius:20px;padding:16px;
   box-shadow:0 2px 8px rgba(0,0,0,0.08);
   margin-bottom:16px;
-  touch-action:manipulation;
 }
 .gain-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .gain-title{font-size:15px;font-weight:600;}
@@ -609,7 +579,6 @@ body{
   display:flex;align-items:center;justify-content:center;
   line-height:1;font-weight:400;padding:0;flex-shrink:0;
   transition:all 0.15s;
-  touch-action:manipulation;
 }
 .gain-step-btn:active{background:#007AFF;color:#fff;border-color:#007AFF;}
 .gain-slider-wrap{flex:1;min-width:0;}
@@ -653,7 +622,10 @@ input[type=range]::-moz-range-thumb{
 }
 .ha-status.on{color:#34C759;font-weight:600;}
 .ha-status.warn{color:#FF3B30;font-weight:600;}
-.ha-ns-info{font-size:12px;color:#8E8E93;margin-top:6px;min-height:16px;line-height:16px;}
+.ha-ns-info{
+  font-size:12px;color:#8E8E93;text-align:center;margin-top:-8px;margin-bottom:4px;
+  min-height:16px;line-height:16px;
+}
 .latency-card{
   width:100%;
   background:#fff;border-radius:20px;padding:16px;
@@ -715,18 +687,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.42</div>
-
-    <!-- PWA Install Guide -->
-    <div class="pwa-guide" id="pwa-guide" style="display:none;">
-      <div class="pwa-guide-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="2" width="16" height="20" rx="3" stroke="#007AFF" stroke-width="2"/><line x1="9" y1="18" x2="15" y2="18" stroke="#007AFF" stroke-width="2" stroke-linecap="round"/></svg>
-        添加到主屏幕，获得完整体验
-      </div>
-      <div class="pwa-guide-steps" id="pwa-guide-steps"></div>
-      <button class="pwa-guide-dismiss" onclick="dismissPwaGuide()">知道了</button>
-    </div>
-
+    <div class="home-no-data-version">HeardIt v1.4.27</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -801,6 +762,7 @@ input[type=range]::-moz-range-thumb{
 
         <!-- Status Text -->
         <div class="ha-status on" id="ha-status">助听运行中</div>
+        <div class="ha-ns-info" id="ha-ns-info"></div>
 
         <!-- Dual Visualizer -->
         <div class="dual-viz" id="dual-viz">
@@ -875,7 +837,6 @@ input[type=range]::-moz-range-thumb{
               <button class="segmented-btn active" data-val="auto" onclick="onNoiseChange('auto')">自动</button>
               <button class="segmented-btn" data-val="off" onclick="onNoiseChange('off')">关闭</button>
             </div>
-            <div class="ha-ns-info" id="ha-ns-info"></div>
           </div>
         </div>
 
@@ -896,7 +857,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.42</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.27</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1086,7 +1047,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.42';
+const VERSION = 'v1.4.27';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1152,21 +1113,11 @@ function levelToDb(level){
 }
 function supportsNoiseSuppression(){
   const ua = navigator.userAgent.toLowerCase();
-  const isAndroid = ua.includes('android');
   // iOS WebKit: all browsers on iOS use WebKit engine
   // googNoiseSuppression is Chrome-only, not supported on WebKit
   if(ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')){
+    // iOS: standard noiseSuppression only, no goog-specific constraints
     return 'ios';
-  }
-  // Android: Chromium-based browsers support googNoiseSuppression2 ML降噪
-  if(isAndroid){
-    if(ua.includes('firefox')) return 'firefox';
-    // googNoiseSuppression2 requires Chrome 55+, old versions must use basic
-    var chromeMatch = ua.match(/chrome\/(\d+)/);
-    if(chromeMatch && parseInt(chromeMatch[1], 10) < 55){
-      return 'basic';
-    }
-    return 'chrome';
   }
   if(ua.includes('chrome') || ua.includes('edg')) return 'chrome';
   if(ua.includes('firefox')) return 'firefox';
@@ -1181,41 +1132,7 @@ function isIOS(){
 }
 function isChromeDesktop(){
   const ua = navigator.userAgent.toLowerCase();
-  return (ua.includes('chrome') || ua.includes('edg')) && !ua.includes('iphone') && !ua.includes('ipad');
-}
-function checkBrowserCapabilities() {
-  // Returns null if OK, or an error message string if browser is too old
-  var hasGetUserMedia = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
-                        navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  if (!hasGetUserMedia) {
-    return '您的浏览器版本过低，不支持麦克风功能。请使用 Chrome 或 Safari 浏览器。';
-  }
-  var AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) {
-    return '您的浏览器不支持音频处理。请使用 Chrome 或 Safari 浏览器。';
-  }
-  return null;
-}
-function getUserMediaPolyfill(constraints) {
-  // Modern Promise-based API
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    return navigator.mediaDevices.getUserMedia(constraints);
-  }
-  // Legacy callback-based API (Chromium 21-44)
-  var gum = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-  if (gum) {
-    return new Promise(function(resolve, reject) {
-      try { gum.call(navigator, constraints, resolve, reject); }
-      catch(e) { reject(e); }
-    });
-  }
-  return Promise.reject(new Error('getUserMedia not supported'));
-}
-function withTimeout(promise, ms) {
-  return new Promise(function(resolve, reject) {
-    var timer = setTimeout(function() { reject(new Error('timeout')); }, ms);
-    promise.then(function(v) { clearTimeout(timer); resolve(v); }, function(e) { clearTimeout(timer); reject(e); });
-  });
+  return (ua.includes('chrome') || ua.includes('edg')) && !ua.includes('iphone') && !ua.includes('ipad') && !ua.includes('android');
 }
 async function getAudioDevices(){
   try{
@@ -1254,19 +1171,7 @@ const AudioEngine = {
     this.isSuppressed = false;
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    // Try without options first (old browsers), then with options
-    try {
-      this.ctx = new AudioCtx();
-    } catch(e) {
-      try {
-        this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
-      } catch(e2) {
-        throw new Error('AudioContext 创建失败');
-      }
-    }
-    if (this.ctx.state && this.ctx.state === 'suspended' && this.ctx.resume) {
-      await this.ctx.resume();
-    }
+    this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
 
     const nsMode = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser' ? 'basic' : 'off');
     const nsEnabled = nsMode !== 'off';
@@ -1310,28 +1215,19 @@ const AudioEngine = {
     if(deviceId) constraints.audio.deviceId = {exact: deviceId};
 
     try{
-      this.stream = await withTimeout(getUserMediaPolyfill(constraints), 5000);
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
     }catch(e){
-      this._lastGumError = e;
       try{
-        // Fallback 1: simpler constraints without latency/goog
         constraints = {audio:{
           echoCancellation: false,
           noiseSuppression: nsEnabled,
-          autoGainControl: false
+          autoGainControl: false,
+          latency: 0.001
         }};
         if(deviceId) constraints.audio.deviceId = {exact: deviceId};
-        this.stream = await withTimeout(getUserMediaPolyfill(constraints), 5000);
-      }catch(e2){
-        this._lastGumError = e2;
-        try{
-          // Fallback 2: bare minimum, no deviceId (old browsers may not support it)
-          this.stream = await withTimeout(getUserMediaPolyfill({audio: true}), 5000);
-        }catch(e3){
-          this._lastGumError = e3;
-          this.stop(); return false;
-        }
+        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       }
+      catch(e2){ this.stop(); return false; }
     }
     this.source = this.ctx.createMediaStreamSource(this.stream);
 
@@ -1394,7 +1290,7 @@ const AudioEngine = {
     if (this.micMode === 'earphone') {
       this.monoMixer.gain.value = MONO_MIXER_GAIN * 2.5;
     } else {
-      this.monoMixer.gain.value = MONO_MIXER_GAIN * 0.70;
+      this.monoMixer.gain.value = MONO_MIXER_GAIN * 0.45;
     }
 
     BAND_CFG.forEach((cfg, i)=>{
@@ -1474,9 +1370,7 @@ const AudioEngine = {
     this.highShelf = this.ctx.createBiquadFilter();
     this.highShelf.type = 'highshelf';
     this.highShelf.frequency.value = 6000;
-    var hasLoss = false;
-    for (var k in profile.left) { if (profile.left[k] > 0) { hasLoss = true; break; } }
-    if (!hasLoss) { for (var k in profile.right) { if (profile.right[k] > 0) { hasLoss = true; break; } } }
+    const hasLoss = Object.values(profile.left).some(v=>v>0) || Object.values(profile.right).some(v=>v>0);
     this.highShelf.gain.value = hasLoss ? -12 : 0;
 
     merger.connect(this.highShelf);
@@ -1619,7 +1513,6 @@ const AudioEngine = {
 
   startSmoothFade(target, duration){
     if(this.fadeInterval) clearInterval(this.fadeInterval);
-    if(!this.masterGain || !this.ctx) return;
     const steps = 15;
     const interval = (duration || 300) / steps;
     const startGain = target === 0 ? this.masterGain.gain.value : 0;
@@ -2110,66 +2003,58 @@ function formatFreq(f) {
 
 // ====== REAL AUDIO TEST (Apple-style ascending tone) ======
 function startRealTestTone() {
-  try {
-    stopTestTone();
-    var freq = FREQUENCIES[AppState.testState.freqIndex];
-    var ear = AppState.testState.ear;
+  stopTestTone();
+  var freq = FREQUENCIES[AppState.testState.freqIndex];
+  var ear = AppState.testState.ear;
 
-    if (!testAudioCtx) {
-      testAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!testAudioCtx) {
+    testAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  testCurrentDb = -90; // Start very quiet
+  testOsc = testAudioCtx.createOscillator();
+  testGain = testAudioCtx.createGain();
+  var panner = testAudioCtx.createStereoPanner();
+  // Left ear = -1 (left only), Right ear = 1 (right only)
+  panner.pan.value = ear === 'left' ? -1 : 1;
+  testOsc.type = 'sine';
+  testOsc.frequency.value = freq;
+  testGain.gain.value = dbToLinearSafe(testCurrentDb);
+  testOsc.connect(testGain);
+  testGain.connect(panner);
+  panner.connect(testAudioCtx.destination);
+  testOsc.start();
+  testPanner = panner;
+
+  AppState.testState.isPlaying = true;
+  document.getElementById('test-status').textContent = '正在播放...';
+  document.getElementById('test-volume-fill').style.width = '0%';
+  document.getElementById('test-tap-area').classList.add('pulsing');
+
+  // Gradually increase volume
+  testVolumeInterval = setInterval(function() {
+    if (AppState.testState.isPaused) return;
+    testCurrentDb += testVolumeStep;
+    var pct = Math.min(100, ((testCurrentDb + 90) / 85) * 100);
+    document.getElementById('test-volume-fill').style.width = pct + '%';
+
+    var newGain = dbToLinearSafe(testCurrentDb);
+    if (testGain && testAudioCtx) {
+      testGain.gain.setTargetAtTime(newGain, testAudioCtx.currentTime, 0.08);
     }
 
-    testCurrentDb = -90; // Start very quiet
-    testOsc = testAudioCtx.createOscillator();
-    testGain = testAudioCtx.createGain();
-    var panner = testAudioCtx.createStereoPanner();
-    // Left ear = -1 (left only), Right ear = 1 (right only)
-    panner.pan.value = ear === 'left' ? -1 : 1;
-    testOsc.type = 'sine';
-    testOsc.frequency.value = freq;
-    testGain.gain.value = dbToLinearSafe(testCurrentDb);
-    testOsc.connect(testGain);
-    testGain.connect(panner);
-    panner.connect(testAudioCtx.destination);
-    testOsc.start();
-    testPanner = panner;
-
-    AppState.testState.isPlaying = true;
-    document.getElementById('test-status').textContent = '正在播放...';
-    document.getElementById('test-volume-fill').style.width = '0%';
-    document.getElementById('test-tap-area').classList.add('pulsing');
-
-    // Gradually increase volume
-    testVolumeInterval = setInterval(function() {
-      if (AppState.testState.isPaused) return;
-      testCurrentDb += testVolumeStep;
-      var pct = Math.min(100, ((testCurrentDb + 90) / 85) * 100);
-      document.getElementById('test-volume-fill').style.width = pct + '%';
-
-      var newGain = dbToLinearSafe(testCurrentDb);
-      if (testGain && testAudioCtx) {
-        testGain.gain.setTargetAtTime(newGain, testAudioCtx.currentTime, 0.08);
-      }
-
-      if (testCurrentDb >= -5) {
-        // Max volume reached — record as not heard (max threshold)
-        stopTestTone();
-        var ear = AppState.testState.ear;
-        var maxHL = mapDbToHL(-5);
-        AppState.testState.results[ear].push(maxHL > 70 ? 70 : maxHL);
-        document.getElementById('test-status').textContent = '未听到 (最大音量)';
-        document.getElementById('test-tap-area').classList.remove('pulsing');
-        AppState.testState.isPlaying = false;
-        setTimeout(function() { advanceToNextFreq(); }, 1000);
-      }
-    }, testStepInterval);
-  } catch(e) {
-    console.error('Test tone failed:', e);
-    stopTestTone();
-    AppState.testState.isPlaying = false;
-    document.getElementById('test-status').textContent = '播放失败，请重试';
-    document.getElementById('test-tap-area').classList.remove('pulsing');
-  }
+    if (testCurrentDb >= -5) {
+      // Max volume reached — record as not heard (max threshold)
+      stopTestTone();
+      var ear = AppState.testState.ear;
+      var maxHL = mapDbToHL(-5);
+      AppState.testState.results[ear].push(maxHL > 70 ? 70 : maxHL);
+      document.getElementById('test-status').textContent = '未听到 (最大音量)';
+      document.getElementById('test-tap-area').classList.remove('pulsing');
+      AppState.testState.isPlaying = false;
+      setTimeout(function() { advanceToNextFreq(); }, 1000);
+    }
+  }, testStepInterval);
 }
 
 function tapHeard() {
@@ -2428,7 +2313,7 @@ function buildProfileFromData() {
 // ====== MIC AUTO-DETECT ======
 async function autoDetectMics() {
   try {
-    var tmp = await withTimeout(getUserMediaPolyfill({audio:true}), 5000);
+    var tmp = await navigator.mediaDevices.getUserMedia({audio:true});
     tmp.getTracks().forEach(function(t) { t.stop(); });
     var devs = await getAudioDevices();
     if (devs.length === 0) {
@@ -2522,8 +2407,6 @@ async function toggleHearingAid() {
     if (note) note.textContent = '开始助听后显示';
     var banner = document.getElementById('howl-banner');
     if (banner) banner.classList.remove('show');
-    var nsInfo = document.getElementById('ha-ns-info');
-    if (nsInfo) nsInfo.textContent = '';
     // Audio fade-out in background (non-blocking)
     teardownAudioKeepAlive();
     AudioEngine.startSmoothFade(0, 100);
@@ -2548,74 +2431,30 @@ async function toggleHearingAid() {
 }
 
 async function startHearingAidAsync() {
-  try {
-    // Check browser capabilities first
-    var capErr = checkBrowserCapabilities();
-    if (capErr) {
-      alert(capErr);
-      revertHearingAidUI();
-      return;
-    }
-    await autoDetectMics();
-    var profile = buildProfileFromData();
-    var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
-    AudioEngine.howlSensitivity = haState.howlSensitivity;
-    var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
-    if (!ok) {
-      var err = AudioEngine._lastGumError;
-      if (err && err.name === 'NotAllowedError') {
-        alert('麦克风权限被拒绝。\n请在系统设置中开启浏览器的麦克风权限。');
-      } else if (err && err.name === 'NotFoundError') {
-        alert('未检测到麦克风设备。请确认设备有麦克风，或尝试插入耳机。');
-      } else {
-        alert('无法启动助听，请检查麦克风权限或更换浏览器。');
-      }
-      revertHearingAidUI();
-      return;
-    }
-    isHearingAidOn = true;
-    haState.isRunning = true;
-    requestWakeLock();
-    setupAudioKeepAlive();
-    updateNsInfo();
-    var st = document.getElementById('ha-status');
-    if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
-    initDualVisualizer();
-    startDualVizAnimation();
-  } catch(e) {
-    console.error('Hearing aid start failed:', e);
-    alert('启动失败：' + (e.message || '未知错误') + '。请尝试使用 Chrome 浏览器。');
-    revertHearingAidUI();
+  await autoDetectMics();
+  var profile = buildProfileFromData();
+  var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+  AudioEngine.howlSensitivity = haState.howlSensitivity;
+  var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
+  if (!ok) {
+    alert('麦克风权限被拒绝，请检查浏览器设置');
+    // Revert UI
+    isHearingAidOn = false;
+    haState.isRunning = false;
+    updateFabUI(false);
+    var s = document.getElementById('ha-settings');
+    if (s) s.classList.remove('visible');
+    return;
   }
-}
-
-function revertHearingAidUI() {
-  isHearingAidOn = false;
-  haState.isRunning = false;
-  setFabMini(false);
-  releaseWakeLock();
-  updateFabUI(false);
-  var settings = document.getElementById('ha-settings');
-  if (settings) settings.classList.remove('visible');
-  var summary = document.getElementById('hearing-summary-card');
-  if (summary) summary.style.display = '';
-  var retestBtns = document.querySelectorAll('.retest-btn');
-  for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
-  var brand = document.getElementById('home-brand');
-  if (brand) brand.classList.remove('compact');
-  var statusEl = document.getElementById('ha-status');
-  if (statusEl) { statusEl.textContent = '已停止'; statusEl.className = 'ha-status'; }
-  stopDualVizAnimation();
-  var el = document.getElementById('latency-val');
-  var fill = document.getElementById('latency-fill');
-  var note = document.getElementById('latency-note');
-  if (el) el.textContent = '-- ms';
-  if (fill) fill.style.width = '0%';
-  if (note) note.textContent = '开始助听后显示';
-  var banner = document.getElementById('howl-banner');
-  if (banner) banner.classList.remove('show');
-  var nsInfo = document.getElementById('ha-ns-info');
-  if (nsInfo) nsInfo.textContent = '';
+  isHearingAidOn = true;
+  haState.isRunning = true;
+  requestWakeLock();
+  setupAudioKeepAlive();
+  updateNsInfo();
+  var st = document.getElementById('ha-status');
+  if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
+  initDualVisualizer();
+  startDualVizAnimation();
 }
 
 async function autoStopHowl() {
@@ -2700,32 +2539,27 @@ async function onMicChange(mode) {
     desc.textContent = '耳机麦克风 · 靠近耳机喇叭，易啸叫，建议降低音量';
   }
   if (haState.isRunning) {
-    try {
-      await autoDetectMics();
-      var deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
-      if (!deviceId) {
-        alert('未检测到' + (mode === 'phone' ? '手机' : '耳机') + '麦克风，请检查设备连接');
-        haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
-        for (var i = 0; i < btns.length; i++) {
-          btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
-        }
-        return;
+    await autoDetectMics();
+    var deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    if (!deviceId) {
+      alert('未检测到' + (mode === 'phone' ? '手机' : '耳机') + '麦克风，请检查设备连接');
+      haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
       }
-      var profile = buildProfileFromData();
-      AudioEngine.howlSensitivity = haState.howlSensitivity;
-      var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, mode);
-      if (!ok) {
-        alert('切换麦克风失败，请重试');
-        haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
-        for (var i = 0; i < btns.length; i++) {
-          btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
-        }
-        return;
+      return;
+    }
+    // Keep old stream alive while switching - no manual fade-out gap
+    var profile = buildProfileFromData();
+    AudioEngine.howlSensitivity = haState.howlSensitivity;
+    var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, mode);
+    if (!ok) {
+      alert('切换麦克风失败，请重试');
+      haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
       }
-    } catch(e) {
-      console.error('Mic change failed:', e);
-      alert('麦克风切换失败，已自动停止助听。请重新开启。');
-      revertHearingAidUI();
+      return;
     }
   }
 }
@@ -2741,7 +2575,7 @@ function onHowlChange(sens) {
   var sensData = HOWL_SENSITIVITY[sens];
   if (desc) desc.textContent = sensData.desc + ' · ' + (sens === 'low' ? '默认低灵敏度' : '');
   AudioEngine.howlSensitivity = sens;
-  if (haState.isRunning && AudioEngine.ctx) {
+  if (haState.isRunning) {
     AudioEngine.startHowlDetector();
   }
 }
@@ -2756,33 +2590,29 @@ async function onNoiseChange(supp) {
   updateNsInfo();
   var statusEl = document.getElementById('ha-status');
   if (haState.isRunning) {
-    try {
-      if (statusEl) { statusEl.textContent = '切换中...'; statusEl.className = 'ha-status'; }
-      if (AudioEngine.masterGain && AudioEngine.ctx) {
-        AudioEngine.masterGain.gain.setValueAtTime(0, AudioEngine.ctx.currentTime);
-      }
-      var profile = buildProfileFromData();
-      var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
-      AudioEngine.howlSensitivity = haState.howlSensitivity;
-      await AudioEngine.start('both', profile, haState.gainLevel, deviceId, supp, haState.micMode);
-      if (AudioEngine.masterGain && AudioEngine.ctx) {
-        AudioEngine.masterGain.gain.setValueAtTime(AudioEngine.userGain, AudioEngine.ctx.currentTime);
-      }
-      if (AudioEngine.bands && AudioEngine.ctx) {
-        var t = AudioEngine.ctx.currentTime;
-        AudioEngine.bands.forEach(function(ch) {
-          if (ch.agc) {
-            ch.agc.gain.cancelScheduledValues(t);
-            ch.agc.gain.setValueAtTime(0.5, t);
-          }
-        });
-      }
-      if (statusEl) { statusEl.textContent = '助听运行中'; statusEl.className = 'ha-status on'; }
-    } catch(e) {
-      console.error('Noise change failed:', e);
-      alert('降噪切换失败，已自动停止助听。请重新开启。');
-      revertHearingAidUI();
+    if (statusEl) { statusEl.textContent = '切换中...'; statusEl.className = 'ha-status'; }
+    // 干脆切换：直接静音->重启->恢复，不做淡入淡出
+    if (AudioEngine.masterGain && AudioEngine.ctx) {
+      AudioEngine.masterGain.gain.setValueAtTime(0, AudioEngine.ctx.currentTime);
     }
+    var profile = buildProfileFromData();
+    var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    AudioEngine.howlSensitivity = haState.howlSensitivity;
+    await AudioEngine.start('both', profile, haState.gainLevel, deviceId, supp, haState.micMode);
+    // 直接设置到目标音量，跳过软启动爬升
+    if (AudioEngine.masterGain && AudioEngine.ctx) {
+      AudioEngine.masterGain.gain.setValueAtTime(AudioEngine.userGain, AudioEngine.ctx.currentTime);
+    }
+    if (AudioEngine.bands && AudioEngine.ctx) {
+      var t = AudioEngine.ctx.currentTime;
+      AudioEngine.bands.forEach(function(ch) {
+        if (ch.agc) {
+          ch.agc.gain.cancelScheduledValues(t);
+          ch.agc.gain.setValueAtTime(0.5, t);
+        }
+      });
+    }
+    if (statusEl) { statusEl.textContent = '助听运行中'; statusEl.className = 'ha-status on'; }
   } else {
     if (statusEl) { statusEl.textContent = supp === 'auto' ? 'AI降噪: 自动 (下次开启生效)' : 'AI降噪: 关闭 (下次开启生效)'; statusEl.className = 'ha-status'; }
     setTimeout(function() {
@@ -2799,18 +2629,13 @@ function updateNsInfo() {
     return;
   }
   var platform = supportsNoiseSuppression();
-  var isAndroid = navigator.userAgent.toLowerCase().includes('android');
-  var platformLabel;
-  if (platform === 'chrome') {
-    platformLabel = isAndroid ? 'Android ML 降噪' : 'Chrome ML 降噪';
-  } else {
-    platformLabel = {
-      'ios': 'iOS 基础降噪',
-      'firefox': 'Firefox 降噪',
-      'safari': 'Safari 降噪',
-      'basic': '标准降噪'
-    }[platform] || '标准降噪';
-  }
+  var platformLabel = {
+    'chrome': 'Chrome ML 降噪',
+    'ios': 'iOS 基础降噪',
+    'firefox': 'Firefox 降噪',
+    'safari': 'Safari 降噪',
+    'basic': '标准降噪'
+  }[platform] || '标准降噪';
   el.textContent = platformLabel;
 }
 
@@ -2992,74 +2817,6 @@ function stopDualVizAnimation() {
   }
 }
 
-// ====== PWA INSTALL GUIDE ======
-function showPwaGuide() {
-  // Don't show if already dismissed
-  try {
-    if (localStorage.getItem('heardit_pwa_guide_dismissed')) return;
-  } catch(e) {}
-  // Don't show if already in standalone mode (PWA launched from home screen)
-  if (window.matchMedia('(display-mode: standalone)').matches) return;
-  if (navigator.standalone) return;
-
-  var ua = navigator.userAgent.toLowerCase();
-  var isIOS = ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod');
-  var isAndroid = ua.includes('android');
-  var isSafari = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
-  var isChrome = ua.includes('chrome') && !ua.includes('edg');
-  var isEdge = ua.includes('edg');
-  var isFirefox = ua.includes('firefox');
-  var isSamsung = ua.includes('samsung');
-  var isOpera = ua.includes('opera') || ua.includes('opr');
-
-  var stepsEl = document.getElementById('pwa-guide-steps');
-  var stepsHtml = '';
-
-  if (isIOS) {
-    if (isSafari) {
-      stepsHtml = '<span class="step-num">1</span>点击分享按钮（方框 ↑ 箭头）<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
-    } else if (isChrome) {
-      stepsHtml = '<span class="step-num">1</span>点击分享按钮<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
-    } else {
-      stepsHtml = '<span class="step-num">1</span>点击分享按钮<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
-    }
-  } else if (isAndroid) {
-    if (isChrome) {
-      stepsHtml = '<span class="step-num">1</span>点击「<b>⋮</b>」菜单<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」，即可离线使用';
-    } else if (isSamsung) {
-      stepsHtml = '<span class="step-num">1</span>点击「<b>☰</b>」菜单<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加页面到</b>」→「<b>主屏幕</b>」';
-    } else if (isEdge) {
-      stepsHtml = '<span class="step-num">1</span>点击「<b>⋯</b>」菜单<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到手机</b>」';
-    } else if (isFirefox) {
-      stepsHtml = '<span class="step-num">1</span>点击「<b>⋮</b>」菜单<br>' +
-                  '<span class="step-num">2</span>点击「<b>安装</b>」';
-    } else if (isOpera) {
-      stepsHtml = '<span class="step-num">1</span>点击 Opera 图标<br>' +
-                  '<span class="step-num">2</span>点击「<b>添加到主屏幕</b>」';
-    } else {
-      stepsHtml = '您的浏览器不支持添加到桌面。<br>请安装 <b>Chrome 浏览器</b> 后重新打开此页面。';
-    }
-  } else {
-    stepsHtml = '请使用手机浏览器打开此页面，然后添加到主屏幕以获得完整体验';
-  }
-
-  stepsEl.innerHTML = stepsHtml;
-  document.getElementById('pwa-guide').style.display = 'block';
-}
-
-function dismissPwaGuide() {
-  document.getElementById('pwa-guide').style.display = 'none';
-  try {
-    localStorage.setItem('heardit_pwa_guide_dismissed', '1');
-  } catch(e) {}
-}
-
 // ====== INIT ======
 (function init() {
   // Load saved hearing data from localStorage
@@ -3068,7 +2825,6 @@ function dismissPwaGuide() {
     showScreen('home-with-data');
   } else {
     showScreen('home-no-data');
-    showPwaGuide();
   }
   // Initialize slider track color
   updateGain(5);
