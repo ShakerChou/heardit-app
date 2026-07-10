@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.27_麦修_20260709.html | 麦克风识别修复+熄屏自动重启+清理PWA方案 -->
+<!-- heardit_v1.4.43_麦修+统一音量+降噪排版_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -622,10 +622,6 @@ input[type=range]::-moz-range-thumb{
 }
 .ha-status.on{color:#34C759;font-weight:600;}
 .ha-status.warn{color:#FF3B30;font-weight:600;}
-.ha-ns-info{
-  font-size:12px;color:#8E8E93;text-align:center;margin-top:-8px;margin-bottom:4px;
-  min-height:16px;line-height:16px;
-}
 .latency-card{
   width:100%;
   background:#fff;border-radius:20px;padding:16px;
@@ -687,7 +683,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.27</div>
+    <div class="home-no-data-version">HeardIt v1.4.43</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -762,7 +758,6 @@ input[type=range]::-moz-range-thumb{
 
         <!-- Status Text -->
         <div class="ha-status on" id="ha-status">助听运行中</div>
-        <div class="ha-ns-info" id="ha-ns-info"></div>
 
         <!-- Dual Visualizer -->
         <div class="dual-viz" id="dual-viz">
@@ -837,6 +832,7 @@ input[type=range]::-moz-range-thumb{
               <button class="segmented-btn active" data-val="auto" onclick="onNoiseChange('auto')">自动</button>
               <button class="segmented-btn" data-val="off" onclick="onNoiseChange('off')">关闭</button>
             </div>
+            <div class="setting-desc" id="ha-ns-info"></div>
           </div>
         </div>
 
@@ -857,7 +853,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.27</div>
+    <div class="home-version-float" id="home-version-float">HeardIt v1.4.43</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1047,7 +1043,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.27';
+const VERSION = 'v1.4.43';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1290,7 +1286,7 @@ const AudioEngine = {
     if (this.micMode === 'earphone') {
       this.monoMixer.gain.value = MONO_MIXER_GAIN * 2.5;
     } else {
-      this.monoMixer.gain.value = MONO_MIXER_GAIN * 0.45;
+      this.monoMixer.gain.value = MONO_MIXER_GAIN * 2.5;
     }
 
     BAND_CFG.forEach((cfg, i)=>{
