@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.45_停止按钮缩小修复_20260710.html -->
+<!-- heardit_v1.4.46_啸叫保护优化_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -822,11 +822,11 @@ input[type=range]::-moz-range-thumb{
           <div class="setting-row">
             <div class="setting-label">啸叫保护</div>
             <div class="segmented" id="seg-howl">
+              <button class="segmented-btn active" data-val="off" onclick="onHowlChange('off')">关</button>
               <button class="segmented-btn" data-val="high" onclick="onHowlChange('high')">高</button>
-              <button class="segmented-btn active" data-val="medium" onclick="onHowlChange('medium')">中</button>
               <button class="segmented-btn" data-val="low" onclick="onHowlChange('low')">低</button>
             </div>
-            <div class="setting-desc" id="howl-desc">12dB标准灵敏度 · 默认中</div>
+            <div class="setting-desc" id="howl-desc">关闭啸叫保护 · 默认关</div>
           </div>
         </div>
 
@@ -1049,7 +1049,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.45';
+const VERSION = 'v1.4.46';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1089,11 +1089,11 @@ const BAND_CFG = [
 ];
 
 const HOWL_SENSITIVITY = {
-  high:   { energyDb:-42, peakRatio:10, label:'高', desc:'10dB峰值比,啸叫即掐' },
-  medium: { energyDb:-38, peakRatio:12, label:'中', desc:'12dB标准灵敏度' },
-  low:    { energyDb:-34, peakRatio:14, label:'低', desc:'14dB仅强啸叫' }
+  off:    { energyDb:-999, peakRatio:99, label:'关', desc:'关闭啸叫保护' },
+  high:   { energyDb:-30, peakRatio:10, label:'高', desc:'-30dB能量阈值，敏感检测' },
+  low:    { energyDb:-26, peakRatio:14, label:'低', desc:'-26dB能量阈值，仅强啸叫' }
 };
-const HOWL_DEFAULT_SENSITIVITY = 'medium';
+const HOWL_DEFAULT_SENSITIVITY = 'off';
 const HOWL_CHECK_INTERVAL = 10;
 const HOWL_CONFIRM_HITS = 2;
 const HOWL_RECOVER_MS = 1500;
@@ -1409,14 +1409,15 @@ const AudioEngine = {
 
   startHowlDetector(){
     if(this.howlInterval) clearInterval(this.howlInterval);
+    const sensKey = this.howlSensitivity || HOWL_DEFAULT_SENSITIVITY;
+    if(sensKey === 'off') return; // 关闭啸叫保护，不启动检测
+    const sens = HOWL_SENSITIVITY[sensKey];
     const freqData = new Float32Array(this.outputAnalyser.frequencyBinCount);
     const sampleRate = this.ctx.sampleRate;
     const nyquist = sampleRate / 2;
     const binSize = nyquist / freqData.length;
-    const startBin = Math.floor(1000 / binSize);
+    const startBin = Math.floor(2000 / binSize);
     const endBin = Math.floor(5000 / binSize);
-    const sensKey = this.howlSensitivity || HOWL_DEFAULT_SENSITIVITY;
-    const sens = HOWL_SENSITIVITY[sensKey];
     const energyDb = sens.energyDb;
     const peakRatio = sens.peakRatio;
 
@@ -2577,7 +2578,7 @@ function onHowlChange(sens) {
   }
   var desc = document.getElementById('howl-desc');
   var sensData = HOWL_SENSITIVITY[sens];
-  if (desc) desc.textContent = sensData.desc + ' · ' + (sens === 'low' ? '默认低灵敏度' : '');
+  if (desc) desc.textContent = sensData.desc + ' · ' + (sens === 'off' ? '默认关' : '');
   AudioEngine.howlSensitivity = sens;
   if (haState.isRunning) {
     AudioEngine.startHowlDetector();
