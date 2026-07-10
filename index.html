@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.44_iPhone6兼容修复_20260710.html -->
+<!-- heardit_v1.4.45_停止按钮缩小修复_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1049,7 +1049,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.44';
+const VERSION = 'v1.4.45';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2387,9 +2387,9 @@ function onVisibilityChange() {
 async function toggleHearingAid() {
   if (isHearingAidOn) {
     // Stop: update UI immediately, do audio work in background
+    setFabMini(false);
     isHearingAidOn = false;
     haState.isRunning = false;
-    setFabMini(false);
     releaseWakeLock();
     updateFabUI(false);
     var settings = document.getElementById('ha-settings');
