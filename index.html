@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.48_跳过听力测试_20260710.html -->
+<!-- heardit_v1.4.49_麦克风切换修复_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -452,19 +452,17 @@ body{
 
 /* ===== SKIP TEST BUTTON ===== */
 .skip-test-btn{
-  position:absolute;
-  left:20px;
-  bottom:100px;
-  z-index:51;
-  background:rgba(0,0,0,0.08);
-  color:#1C1C1E;
+  color:#007AFF;
+  background:transparent;
   border:none;
-  border-radius:16px;
-  padding:10px 16px;
   font-size:15px;
   font-weight:500;
   cursor:pointer;
   -webkit-appearance:none;appearance:none;
+  padding:8px 0;
+  margin-bottom:120px;
+  z-index:51;
+  position:relative;
 }
 .skip-test-btn:active{opacity:0.7;}
 
@@ -707,7 +705,7 @@ input[type=range]::-moz-range-thumb{
   <!-- ==================== SCREEN 1: HOME NO DATA ==================== -->
   <div class="screen active" id="screen-home-no-data">
     <div class="safe-top"></div>
-    <div class="home-no-data-version">HeardIt v1.4.43</div>
+    <div class="home-no-data-version" id="home-no-data-version">HeardIt</div>
     <div class="home-content">
       <div class="home-logo">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -724,6 +722,7 @@ input[type=range]::-moz-range-thumb{
       <div class="home-app-name title-large text-primary">听到鸟</div>
       <div class="home-subtitle headline text-secondary">HeardIt</div>
       <div class="home-tagline body-text">让普通耳机成为你的助听工具</div>
+      <button class="skip-test-btn" id="skip-test-btn" onclick="skipHearingTest()">跳过听力测试</button>
     </div>
 
     <!-- Start Test: 2/3 circle at bottom -->
@@ -739,7 +738,6 @@ input[type=range]::-moz-range-thumb{
         <div class="start-test-label">开始听力测试</div>
       </div>
     </div>
-    <button class="skip-test-btn" id="skip-test-btn" onclick="skipHearingTest()">跳过听力测试</button>
   </div>
 
   <!-- ==================== SCREEN 2: HOME WITH DATA ==================== -->
@@ -881,7 +879,7 @@ input[type=range]::-moz-range-thumb{
     </div><!-- end home-scroll-area -->
 
     <!-- App name & version: fixed bottom-left -->
-    <div class="home-version-float" id="home-version-float">HeardIt v1.4.43</div>
+    <div class="home-version-float" id="home-version-float">HeardIt</div>
 
     <!-- FAB (Fan-Shape Quarter Circle) -->
     <div class="fab" id="fab">
@@ -1071,7 +1069,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.48';
+const VERSION = 'v1.4.49';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1196,6 +1194,7 @@ const AudioEngine = {
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
+    if (this.ctx.state === 'suspended') { await this.ctx.resume(); }
 
     const nsMode = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser' ? 'basic' : 'off');
     const nsEnabled = nsMode !== 'off';
@@ -1248,7 +1247,7 @@ const AudioEngine = {
           autoGainControl: false,
           latency: 0.001
         }};
-        if(deviceId) constraints.audio.deviceId = {exact: deviceId};
+        // 不指定 deviceId，让系统选择默认设备作为降级
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       }
       catch(e2){ this.stop(); return false; }
@@ -2585,8 +2584,13 @@ async function onMicChange(mode) {
     desc.textContent = '耳机麦克风 · 靠近耳机喇叭，易啸叫，建议降低音量';
   }
   if (haState.isRunning) {
-    await autoDetectMics();
+    // 使用已缓存的设备ID，避免 autoDetectMics 临时流与当前助听流冲突
     var deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    if (!deviceId) {
+      // 首次切换，需要检测设备
+      await autoDetectMics();
+      deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
+    }
     if (!deviceId) {
       alert('未检测到' + (mode === 'phone' ? '手机' : '耳机') + '麦克风，请检查设备连接');
       haState.micMode = mode === 'phone' ? 'earphone' : 'phone';
@@ -2865,6 +2869,11 @@ function stopDualVizAnimation() {
 
 // ====== INIT ======
 (function init() {
+  // Set version numbers in UI
+  var verEl = document.getElementById('home-no-data-version');
+  if (verEl) verEl.textContent = 'HeardIt ' + VERSION;
+  var verFloat = document.getElementById('home-version-float');
+  if (verFloat) verFloat.textContent = 'HeardIt ' + VERSION;
   // Load saved hearing data from localStorage
   if (loadHearingData()) {
     buildHomeSummary();
