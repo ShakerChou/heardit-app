@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.43_麦修+统一音量+降噪排版_20260710.html -->
+<!-- heardit_v1.4.44_iPhone6兼容修复_20260710.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -242,6 +242,12 @@ body{
   padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
   background:#fff;
   border-top:0.5px solid #E5E5EA;
+}
+@media(max-height:700px){
+  .sheet-footer{padding-bottom:56px;}
+  @supports(padding-bottom:env(safe-area-inset-bottom)){
+    .sheet-footer{padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px) + 44px);}
+  }
 }
 
 /* ===== TEST STEPS ===== */
@@ -1043,7 +1049,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.43';
+const VERSION = 'v1.4.44';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1875,6 +1881,7 @@ function playTrialSound() {
     if (!trialAudioCtx) {
       trialAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (trialAudioCtx.state === 'suspended') { trialAudioCtx.resume(); }
     var osc = trialAudioCtx.createOscillator();
     var gain = trialAudioCtx.createGain();
     osc.type = 'sine';
@@ -2006,6 +2013,7 @@ function startRealTestTone() {
   if (!testAudioCtx) {
     testAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  if (testAudioCtx.state === 'suspended') { testAudioCtx.resume(); }
 
   testCurrentDb = -90; // Start very quiet
   testOsc = testAudioCtx.createOscillator();
