@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.54_按钮颜色+麦克风切换+锁屏恢复_20260721.html -->
+<!-- heardit_v1.4.55_麦克风去重+延迟优化+模拟数据标签_20260721.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -441,6 +441,7 @@ body{
   margin-bottom:16px;
 }
 .hs-title{font-size:13px;font-weight:600;color:#8E8E93;margin-bottom:12px;}
+.hs-sim-badge{display:inline-block;font-size:10px;font-weight:500;color:#FF9500;background:rgba(255,149,0,0.12);padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;}
 .hs-bars{display:flex;-webkit-justify-content:space-between;justify-content:space-between;margin-bottom:4px;}
 .hs-bar-group{display:flex;flex-direction:column;align-items:center;-webkit-flex:1;flex:1;}
 .hs-bars-label{font-size:9px;color:#AEAEB2;margin-top:2px;}
@@ -766,13 +767,13 @@ input[type=range]::-moz-range-thumb{
 
       <div class="hearing-summary-card" id="hearing-summary-card">
         <div class="hs-top-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div class="hs-title">听力概览</div>
+          <div class="hs-title">听力概览<span class="hs-sim-badge" id="hs-sim-badge" style="display:none;">模拟数据</span></div>
           <button class="retest-btn" onclick="startHearingTest(true)" style="padding:8px 14px;font-size:14px;border-radius:10px;background:#F2F2F7;color:#007AFF;border:none;font-weight:500;cursor:pointer;">听力测试</button>
         </div>
         <div class="hs-bars" id="hs-bars"></div>
         <div class="hs-result-text" id="hs-result-text"></div>
         <div class="hs-note" id="hs-sim-note" style="margin-top:12px;padding:8px 12px;background:rgba(255,159,0,0.1);border-radius:8px;font-size:13px;color:#FF9500;line-height:1.4;display:none;">
-          以上为模拟数据（左耳轻度、右耳重度），为了更好的针对您的左右耳分别进行不同频率的听力补偿，请进行听力测试。
+          以上为模拟数据（左耳正常、右耳中度），为了更好的针对您的左右耳分别进行不同频率的听力补偿，请进行听力测试。
         </div>
       </div>
 
@@ -1069,7 +1070,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.54';
+const VERSION = 'v1.4.55';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1588,20 +1589,19 @@ const AudioEngine = {
       const fill = document.getElementById('latency-fill');
       const note = document.getElementById('latency-note');
       if(el) el.textContent = roundTripMs + ' ms';
-      const pct = Math.min(100, (roundTripMs / 30) * 100);
+      const pct = Math.min(100, (roundTripMs / 60) * 100);
       if(fill) fill.style.width = pct + '%';
-      // Color by latency: green ≤25ms, orange 26-35ms, red >35ms
+      // Color by latency: green ≤30ms, orange 31-45ms, red >45ms
       var color;
-      if (roundTripMs <= 15) { color = '#34C759'; }
-      else if (roundTripMs <= 25) { color = '#34C759'; }
-      else if (roundTripMs <= 35) { color = '#FF9500'; }
+      if (roundTripMs <= 30) { color = '#34C759'; }
+      else if (roundTripMs <= 45) { color = '#FF9500'; }
       else { color = '#FF3B30'; }
       if(el) el.style.color = color;
       if(fill) fill.style.background = color;
       if(note) note.textContent =
-        roundTripMs <= 15 ? '环回延迟极低，专业录音级' :
-        roundTripMs <= 25 ? '环回延迟优秀，实时通话级' :
-        roundTripMs <= 35 ? '环回延迟良好，可接受' : '环回延迟偏高，影响体验';
+        roundTripMs <= 15 ? '极低延迟，接近硬件级' :
+        roundTripMs <= 30 ? '延迟优秀，实时流畅' :
+        roundTripMs <= 45 ? '延迟良好，基本无感' : '延迟偏高，可能感知';
     }, 1000);
   },
 
@@ -1741,8 +1741,8 @@ var haState = {
 // ====== HEARING TEST DATA ======
 var FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
 var FREQ_TEST_LABELS = ['250', '500', '1k', '2k', '4k', '8k'];
-var FAKE_LEFT = [28, 30, 32, 35, 38, 35];
-var FAKE_RIGHT = [60, 65, 70, 75, 80, 75];
+var FAKE_LEFT = [10, 15, 18, 20, 22, 20];
+var FAKE_RIGHT = [42, 45, 48, 50, 52, 48];
 var trialAudioCtx = null;
 
 // ====== TEST AUDIO STATE ======
@@ -2338,8 +2338,10 @@ function buildHomeSummary() {
   }
   barsContainer.innerHTML = html;
   resultText.innerHTML = '<span style="text-align:left;color:' + leftColor + ';">左耳: ' + classifyHearing(leftAvg) + '</span><span style="text-align:right;color:' + rightColor + ';">右耳: ' + classifyHearing(rightAvg) + '</span>';
-  // Show/hide simulated data hint
+  // Show/hide simulated data hint and badge
   if (simNote) simNote.style.display = AppState.isSimulatedData ? 'block' : 'none';
+  var simBadge = document.getElementById('hs-sim-badge');
+  if (simBadge) simBadge.style.display = AppState.isSimulatedData ? 'inline-block' : 'none';
 }
 
 function getHearingColor(db) {
@@ -2586,6 +2588,8 @@ function stepGain(dir) {
 
 // ====== MIC CHANGE ======
 async function onMicChange(mode) {
+  // 如果当前已是目标麦克风，不重复切换
+  if (mode === haState.micMode) return;
   haState.micMode = mode;
   var btns = document.querySelectorAll('#seg-mic .segmented-btn');
   for (var i = 0; i < btns.length; i++) {
