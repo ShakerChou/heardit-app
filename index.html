@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.52_启动竞态修复v3_20260721.html -->
+<!-- heardit_v1.4.53_模拟数据调整+锁屏恢复优化_20260721.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -772,7 +772,7 @@ input[type=range]::-moz-range-thumb{
         <div class="hs-bars" id="hs-bars"></div>
         <div class="hs-result-text" id="hs-result-text"></div>
         <div class="hs-note" id="hs-sim-note" style="margin-top:12px;padding:8px 12px;background:rgba(255,159,0,0.1);border-radius:8px;font-size:13px;color:#FF9500;line-height:1.4;display:none;">
-          以上为模拟数据，为了更好的针对您的左右耳分别进行不同频率的听力补偿，请进行听力测试。
+          以上为模拟数据（左耳轻度、右耳重度），为了更好的针对您的左右耳分别进行不同频率的听力补偿，请进行听力测试。
         </div>
       </div>
 
@@ -1069,7 +1069,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.52';
+const VERSION = 'v1.4.53';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1741,8 +1741,8 @@ var haState = {
 // ====== HEARING TEST DATA ======
 var FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
 var FREQ_TEST_LABELS = ['250', '500', '1k', '2k', '4k', '8k'];
-var FAKE_LEFT = [15, 22, 32, 42, 52, 60];
-var FAKE_RIGHT = [10, 18, 28, 38, 48, 55];
+var FAKE_LEFT = [28, 30, 32, 35, 38, 35];
+var FAKE_RIGHT = [60, 65, 70, 75, 80, 75];
 var trialAudioCtx = null;
 
 // ====== TEST AUDIO STATE ======
@@ -1963,6 +1963,7 @@ function skipHearingTest() {
   AppState.hearingData.right = FAKE_RIGHT.slice();
   AppState.hasHearingData = true;
   AppState.isSimulatedData = true;
+  saveHearingData();
   buildHomeSummary();
   showScreen('home-with-data');
   // Show simulated data hint
@@ -2415,13 +2416,26 @@ function teardownAudioKeepAlive() {
 function onVisibilityChange() {
   if (document.visibilityState === 'visible') {
     if (wasRunningBeforeSleep && haState.isRunning) {
-      // Screen unlocked, restart hearing aid
+      // 锁屏后系统暂停了 AudioContext，恢复需要用户手势，无法自动恢复
+      // 将 UI 恢复为"开始助听"状态，用户点击一次即可恢复
       var st = document.getElementById('ha-status');
-      if (st) { st.textContent = '恢复中...'; st.className = 'ha-status on'; }
-      AudioEngine.stop().then(function() {
-        haStartGen++;
-        startHearingAidAsync(haStartGen);
-      });
+      if (st) { st.textContent = '已暂停（锁屏），点击开始恢复'; st.className = 'ha-status warn'; }
+      isHearingAidOn = false;
+      haState.isRunning = false;
+      releaseWakeLock();
+      setFabMini(false);
+      updateFabUI(false);
+      var settings = document.getElementById('ha-settings');
+      if (settings) settings.classList.remove('visible');
+      var summary = document.getElementById('hearing-summary-card');
+      if (summary) summary.style.display = '';
+      var retestBtns = document.querySelectorAll('.retest-btn');
+      for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
+      var brand = document.getElementById('home-brand');
+      if (brand) brand.classList.remove('compact');
+      stopDualVizAnimation();
+      teardownAudioKeepAlive();
+      AudioEngine.stop();
     }
     wasRunningBeforeSleep = false;
   } else {
