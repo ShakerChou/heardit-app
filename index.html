@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.51_启动竞态修复v2_20260721.html -->
+<!-- heardit_v1.4.52_启动竞态修复v3_20260721.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1069,7 +1069,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.51';
+const VERSION = 'v1.4.52';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -1194,11 +1194,6 @@ const AudioEngine = {
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     this.ctx = new AudioCtx({latencyHint:0.00001, sampleRate:44100});
-    // 先尝试 resume（此时用户手势可能还可用）
-    if (this.ctx.state === 'suspended') {
-      try { await Promise.race([this.ctx.resume(), new Promise(function(_,r){setTimeout(function(){r();},2000);})]); }
-      catch(e){} // 超时或无用户手势，继续尝试
-    }
 
     const nsMode = noiseSupp === 'auto' ? supportsNoiseSuppression() : (noiseSupp === 'browser' ? 'basic' : 'off');
     const nsEnabled = nsMode !== 'off';
@@ -1256,10 +1251,11 @@ const AudioEngine = {
       }
       catch(e2){ this.stop(); return false; }
     }
-    // 获取麦克风流成功后，再次尝试 resume AudioContext
-    // 此时浏览器已完成权限授予，resume 更可能成功
+    // 获取麦克风流成功后，尝试 resume AudioContext
+    // autoDetectMics 可能已消耗用户手势，此处为尽力尝试
     if (this.ctx && this.ctx.state === 'suspended') {
-      try { await this.ctx.resume(); } catch(e) {}
+      try { await Promise.race([this.ctx.resume(), new Promise(function(_,r){setTimeout(function(){r();},2000);})]); }
+      catch(e){} // 超时或无用户手势，继续（AudioContext suspended 时无声音但不爆音）
     }
     this.source = this.ctx.createMediaStreamSource(this.stream);
 
@@ -2491,11 +2487,10 @@ function toggleHearingAid() {
 }
 
 async function startHearingAidAsync(gen) {
-  // 使用缓存的设备ID，避免 autoDetectMics() 触发权限弹窗消耗用户手势
-  // 用户手势对 AudioContext.resume() 至关重要
-  var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
-  if (gen !== haStartGen) { return; } // 被新操作覆盖
+  await autoDetectMics();
+  if (gen !== haStartGen) { AudioEngine.stop(); return; } // 被新操作覆盖
   var profile = buildProfileFromData();
+  var deviceId = haState.micMode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
   AudioEngine.howlSensitivity = haState.howlSensitivity;
   var ok = await AudioEngine.start('both', profile, haState.gainLevel, deviceId, haState.noiseSupp, haState.micMode);
   if (!ok) {
@@ -2513,8 +2508,6 @@ async function startHearingAidAsync(gen) {
   haState.isRunning = true;
   requestWakeLock();
   setupAudioKeepAlive();
-  // 后台检测麦克风设备，更新缓存供后续使用
-  autoDetectMics();
   updateNsInfo();
   var st = document.getElementById('ha-status');
   if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
