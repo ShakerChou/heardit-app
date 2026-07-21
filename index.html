@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.53_模拟数据调整+锁屏恢复优化_20260721.html -->
+<!-- heardit_v1.4.54_按钮颜色+麦克风切换+锁屏恢复_20260721.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -482,7 +482,7 @@ body{
   bottom:-215px;
   cursor:pointer;
   box-shadow:-4px -4px 20px rgba(0,122,255,0.3);
-  transition:all 400ms cubic-bezier(0.32,0.72,0,1);
+  transition:width 400ms cubic-bezier(0.32,0.72,0,1),height 400ms cubic-bezier(0.32,0.72,0,1),right 400ms cubic-bezier(0.32,0.72,0,1),bottom 400ms cubic-bezier(0.32,0.72,0,1),box-shadow 400ms cubic-bezier(0.32,0.72,0,1);
 }
 .fab-circle:active{opacity:0.85;}
 .fab-icon{
@@ -1069,7 +1069,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.53';
+const VERSION = 'v1.4.54';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2416,26 +2416,13 @@ function teardownAudioKeepAlive() {
 function onVisibilityChange() {
   if (document.visibilityState === 'visible') {
     if (wasRunningBeforeSleep && haState.isRunning) {
-      // 锁屏后系统暂停了 AudioContext，恢复需要用户手势，无法自动恢复
-      // 将 UI 恢复为"开始助听"状态，用户点击一次即可恢复
+      // Screen unlocked, restart hearing aid
       var st = document.getElementById('ha-status');
-      if (st) { st.textContent = '已暂停（锁屏），点击开始恢复'; st.className = 'ha-status warn'; }
-      isHearingAidOn = false;
-      haState.isRunning = false;
-      releaseWakeLock();
-      setFabMini(false);
-      updateFabUI(false);
-      var settings = document.getElementById('ha-settings');
-      if (settings) settings.classList.remove('visible');
-      var summary = document.getElementById('hearing-summary-card');
-      if (summary) summary.style.display = '';
-      var retestBtns = document.querySelectorAll('.retest-btn');
-      for (var i = 0; i < retestBtns.length; i++) { retestBtns[i].style.display = ''; }
-      var brand = document.getElementById('home-brand');
-      if (brand) brand.classList.remove('compact');
-      stopDualVizAnimation();
-      teardownAudioKeepAlive();
-      AudioEngine.stop();
+      if (st) { st.textContent = '恢复中...'; st.className = 'ha-status on'; }
+      AudioEngine.stop().then(function() {
+        haStartGen++;
+        startHearingAidAsync(haStartGen);
+      });
     }
     wasRunningBeforeSleep = false;
   } else {
@@ -2611,6 +2598,9 @@ async function onMicChange(mode) {
     desc.textContent = '耳机麦克风 · 靠近耳机喇叭，易啸叫，建议降低音量';
   }
   if (haState.isRunning) {
+    // 显示切换中状态
+    var st = document.getElementById('ha-status');
+    if (st) { st.textContent = '麦克风切换中...'; st.className = 'ha-status on'; }
     // 使用已缓存的设备ID，避免 autoDetectMics 临时流与当前助听流冲突
     var deviceId = mode === 'phone' ? haState.phoneDeviceId : haState.earphoneDeviceId;
     if (!deviceId) {
@@ -2624,6 +2614,7 @@ async function onMicChange(mode) {
       for (var i = 0; i < btns.length; i++) {
         btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
       }
+      if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
       return;
     }
     // Keep old stream alive while switching - no manual fade-out gap
@@ -2636,8 +2627,11 @@ async function onMicChange(mode) {
       for (var i = 0; i < btns.length; i++) {
         btns[i].classList.toggle('active', btns[i].getAttribute('data-val') === haState.micMode);
       }
+      if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
       return;
     }
+    // 切换完成，恢复状态
+    if (st) { st.textContent = '助听运行中'; st.className = 'ha-status on'; }
   }
 }
 
