@@ -1,4 +1,4 @@
-<!-- heardit_v1.4.55_麦克风去重+延迟优化+模拟数据标签_20260721.html -->
+<!-- heardit_v1.4.56_PWA更新缓存修复_20260721.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1070,7 +1070,7 @@ input[type=range]::-moz-range-thumb{
 */
 
 // ====== VERSION ======
-const VERSION = 'v1.4.55';
+const VERSION = 'v1.4.56';
 
 // ====== AUDIO CONSTANTS (from v1.3.23, UNCHANGED) ======
 const DAMAGED_PROFILE = {
@@ -2913,7 +2913,33 @@ function stopDualVizAnimation() {
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
+  navigator.serviceWorker.register('./sw.js').then(function(reg) {
+    // 检测到新版本 Service Worker 时自动刷新页面
+    if (reg.waiting) {
+      reg.waiting.postMessage({action:'skipWaiting'});
+      window.location.reload();
+    }
+    reg.addEventListener('updatefound', function() {
+      var newWorker = reg.installing;
+      if (newWorker) {
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // 新版本已就绪，通知用户后刷新
+            if (confirm('发现新版本，点击确定更新')) {
+              newWorker.postMessage({action:'skipWaiting'});
+              window.location.reload();
+            }
+          }
+        });
+      }
+    });
+  });
+  // 监听 Service Worker 消息
+  navigator.serviceWorker.addEventListener('message', function(e) {
+    if (e.data && e.data.action === 'reload') {
+      window.location.reload();
+    }
+  });
 }
 </script>
 </body>
