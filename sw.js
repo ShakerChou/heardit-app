@@ -1,4 +1,4 @@
-const CACHE = 'heardit-v1.4.56';
+const CACHE = 'heardit-v1.5.7';
 
 self.addEventListener('install', e => {
   // 跳过等待，立即激活新版本
