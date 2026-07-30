@@ -27,6 +27,19 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column}
 .screen.active{display:flex}
 
+/* ===== SCREEN: PRELOAD ===== */
+#screen-preload{background:#fff;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+#screen-preload.active{display:flex}
+.preload-bird{width:120px;height:auto;opacity:0;animation:preloadFadeIn .6s ease forwards}
+.preload-info{display:flex;flex-direction:column;align-items:center;gap:4px}
+.preload-title{font-size:28px;font-weight:600;color:#1C1C1E}
+.preload-ver{font-size:14px;color:#AEAEB2}
+.preload-bar-wrap{width:260px;display:flex;align-items:center;gap:12px}
+.preload-bar{flex:1;height:12px;background:#E5E5E9;border-radius:6px;overflow:hidden}
+.preload-bar-fill{height:100%;background:#0085FF;border-radius:6px;transition:width .3s;width:0%}
+.preload-percent{font-size:14px;font-weight:500;color:#0085FF;white-space:nowrap;min-width:36px;text-align:right}
+@keyframes preloadFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
 .btn{display:block;width:100%;min-height:50px;padding:14px 24px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;transition:transform .1s,opacity .1s;-webkit-appearance:none;appearance:none;letter-spacing:.3px}
 .btn:active{transform:scale(.97);opacity:.85}
 .btn-primary{background:#0085FF;color:#fff;box-shadow:0 4px 0 0 rgba(0,110,230,1)}
@@ -452,8 +465,21 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 <body>
 <div class="app-container" id="app">
 
+<!-- ===== SCREEN 0: PRELOAD ===== -->
+<div class="screen active" id="screen-preload">
+  <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
+  <div class="preload-info">
+    <span class="preload-title">听到鸟 Heardit</span>
+    <span class="preload-ver" id="preload-ver">v1.5.13</span>
+  </div>
+  <div class="preload-bar-wrap">
+    <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
+    <span class="preload-percent" id="preload-percent">0%</span>
+  </div>
+</div>
+
 <!-- ===== SCREEN 1: HOME NO DATA ===== -->
-<div class="screen active" id="screen-home-no-data">
+<div class="screen" id="screen-home-no-data">
   <div class="home-no-data-inner">
     <div class="home-no-data-logo">
       <img src="assets/union-bird.svg" alt="Heardit" onerror="this.style.display='none'">
@@ -462,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.12</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.13</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -489,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.12</span>
+          <span id="header-ver">v1.5.13</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -907,8 +933,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.12';
-var APP_VERSION = 'v1.5.12';
+const VERSION = 'v1.5.13';
+var APP_VERSION = 'v1.5.13';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -2376,20 +2402,63 @@ function resumeTest(){
 // ====== INIT ======
 (function init(){
   syncVersion();
-  if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
-    buildHomeSummary();
-    showScreen('home-with-data');
-  }else{
-    showScreen('home-no-data');
+  // Preload progress tracking
+  var imgs = document.images;
+  var total = imgs.length;
+  var loaded = 0;
+  var barFill = document.getElementById('preload-bar-fill');
+  var barPercent = document.getElementById('preload-percent');
+  var finished = false;
+  
+  function updateProgress(){
+    if(finished) return;
+    loaded++;
+    var pct = Math.min(Math.round((loaded / total) * 100), 100);
+    if(barFill) barFill.style.width = pct + '%';
+    if(barPercent) barPercent.textContent = pct + '%';
+    if(loaded >= total) finishPreload();
   }
-  preloadSheet();
+  
+  function finishPreload(){
+    if(finished) return;
+    finished = true;
+    if(barFill) barFill.style.width = '100%';
+    if(barPercent) barPercent.textContent = '100%';
+    setTimeout(function(){
+      if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
+        buildHomeSummary();
+        showScreen('home-with-data');
+      }else{
+        showScreen('home-no-data');
+      }
+      preloadSheet();
+    }, 200);
+  }
+  
+  if(total === 0){
+    finishPreload();
+  }else{
+    for(var i = 0; i < imgs.length; i++){
+      if(imgs[i].complete){
+        updateProgress();
+      }else{
+        imgs[i].addEventListener('load', updateProgress);
+        imgs[i].addEventListener('error', updateProgress);
+      }
+    }
+  }
+  
+  // Fallback: max 3 seconds
+  setTimeout(function(){
+    if(!finished) finishPreload();
+  }, 3000);
+  
   window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
 })();
 </script>
 <script>
 if('serviceWorker' in navigator){
-  var pendingUpdateWorker = null;
-  navigator.serviceWorker.addEventListener('controllerchange', function(){
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
     window.location.reload();
   });
   navigator.serviceWorker.register('./sw.js').then(function(reg){
@@ -2398,27 +2467,11 @@ if('serviceWorker' in navigator){
       var newWorker=reg.installing;
       if(newWorker){newWorker.addEventListener('statechange',function(){
         if(newWorker.state==='installed'&&navigator.serviceWorker.controller){
-          if(confirm('发现新版本，点击确定更新')){
-            newWorker.postMessage({action:'skipWaiting'});
-          }else{
-            pendingUpdateWorker = newWorker;
-            var tags = document.querySelectorAll('.beta-tag');
-            for(var i=0;i<tags.length;i++){
-              tags[i].textContent = '更新';
-              tags[i].style.cursor = 'pointer';
-              tags[i].style.background = '#FF9500';
-              tags[i].onclick = function(){
-                if(pendingUpdateWorker){
-                  pendingUpdateWorker.postMessage({action:'skipWaiting'});
-                }
-              };
-            }
-          }
+          newWorker.postMessage({action:'skipWaiting'});
         }
       });}
     });
   });
-  navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.action==='reload'){window.location.reload();}});
 }
 </script>
 </body>
