@@ -116,6 +116,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .ho-freq-labels{display:flex;gap:28px;opacity:.5;padding-left:13px}
 .ho-freq-label{width:24px;text-align:center;font-size:12px;color:#000}
 
+.sim-data-warning{background:#FFF5E5;border:1px solid #EFE6D9;border-radius:16px;padding:16px;margin-bottom:16px;font-size:14px;color:#FF9500;line-height:1.5}
+
 /* ===== FAB ===== */
 .ha-settings{display:none;width:100%}
 .ha-settings.visible{display:block;margin-top:0}
@@ -460,7 +462,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.png" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 HeardIt <span id="no-data-ver">v1.5.8</span></span>
+      <span class="home-no-data-ver-text">听到鸟 HeardIt <span id="no-data-ver">v1.5.9</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -487,7 +489,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.8</span>
+          <span id="header-ver">v1.5.9</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -561,6 +563,9 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
         </div>
         <div class="ts-popup-source">标准来源：WHO（世界卫生组织）</div>
       </div>
+    </div>
+    <div class="sim-data-warning" id="sim-data-warning">
+      提示：<br>以上为模拟数据。为了更好的，有针对性的，给您的左、右耳分别进行不同频率的听力补偿，请点击右上角按钮，完成听力测试。
     </div>
     <!-- HA Settings -->
     <div class="ha-settings" id="ha-settings">
@@ -902,8 +907,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.8';
-var APP_VERSION = 'v1.5.8';
+const VERSION = 'v1.5.9';
+var APP_VERSION = 'v1.5.9';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1438,7 +1443,7 @@ var haStartGen = 0;
 // ====== LOCAL STORAGE ======
 function saveHearingData(){
   try{
-    var data = {left:AppState.hearingData.left,right:AppState.hearingData.right,hasData:true,isSimulated:AppState.isSimulatedData||AppState.isSimulated||false,version:VERSION};
+    var data = {left:AppState.hearingData.left,right:AppState.hearingData.right,hasData:true,isSimulated:AppState.isSimulatedData||AppState.isSimulated||false};
     localStorage.setItem('heardit_hearing',JSON.stringify(data));
   }catch(e){}
 }
@@ -1447,7 +1452,7 @@ function loadHearingData(){
     var raw = localStorage.getItem('heardit_hearing');
     if(raw){
       var data = JSON.parse(raw);
-      if(data&&data.hasData&&data.left&&data.right&&data.version===VERSION){
+      if(data&&data.hasData&&data.left&&data.right){
         AppState.hearingData.left = data.left;
         AppState.hearingData.right = data.right;
         AppState.hasHearingData = true;
@@ -1533,6 +1538,8 @@ function buildHomeSummary(){
   var rightCat = classifyHearing(rightAvg);
   updateBadge('ear-left-badge',leftCat);
   updateBadge('ear-right-badge',rightCat);
+  var warning = document.getElementById('sim-data-warning');
+  if(warning)warning.style.display = (AppState.isSimulated||AppState.isSimulatedData)?'block':'none';
 }
 function updateBadge(id,cat){
   var el = document.getElementById(id);
@@ -1568,6 +1575,7 @@ function toggleHearingAid(){
     var testBtn = document.getElementById('test-btn-pill');
     var overview = document.getElementById('hearing-overview');
     var earCards = document.getElementById('ear-cards-row');
+    var warning = document.getElementById('sim-data-warning');
     fab.classList.remove('fab-red');fab.classList.add('fab-blue');
     fab.classList.remove('fab-mini');
     fabIsMini = false;
@@ -1583,6 +1591,7 @@ function toggleHearingAid(){
     if(testBtn)testBtn.style.display = '';
     if(overview)overview.style.display = 'block';
     if(earCards)earCards.style.display = 'flex';
+    if(warning){if(AppState.isSimulated||AppState.isSimulatedData)warning.style.display='block';else warning.style.display='none';}
     stopDualVizAnimation();
     var el=document.getElementById('latency-value');
     var fill=document.getElementById('latency-bar-fill');
@@ -1617,6 +1626,7 @@ function toggleHearingAid(){
     var testBtn = document.getElementById('test-btn-pill');
     var overview = document.getElementById('hearing-overview');
     var earCards = document.getElementById('ear-cards-row');
+    var warning = document.getElementById('sim-data-warning');
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
     if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.png';}
@@ -1684,6 +1694,7 @@ async function autoStopHowl(){
   var settings = document.getElementById('ha-settings');
   var overview = document.getElementById('hearing-overview');
   var earCards = document.getElementById('ear-cards-row');
+  var warning = document.getElementById('sim-data-warning');
   var testBtn = document.getElementById('test-btn-pill');
   fab.classList.remove('fab-red');fab.classList.add('fab-blue');
   fab.classList.remove('fab-mini');
@@ -1695,6 +1706,7 @@ async function autoStopHowl(){
   settings.classList.remove('visible');
   if(overview)overview.style.display='block';
   if(earCards)earCards.style.display='flex';
+  if(warning){if(AppState.isSimulated||AppState.isSimulatedData)warning.style.display='block';else warning.style.display='none';}
   if(testBtn)testBtn.style.display='';
   var statusEl = document.getElementById('hearing-status');
   if(statusEl){statusEl.textContent='啸叫频繁，已自动关闭';statusEl.style.color='#FF3B30';statusEl.style.display='block';}
@@ -2361,7 +2373,7 @@ function resumeTest(){
 // ====== INIT ======
 (function init(){
   syncVersion();
-  if(loadHearingData()){
+  if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
     buildHomeSummary();
     showScreen('home-with-data');
   }else{
