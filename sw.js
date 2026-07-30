@@ -1,19 +1,62 @@
-const CACHE = 'heardit-v1.5.11';
+const CACHE = 'heardit-v1.5.12';
+const ASSETS = [
+  './index.html',
+  './manifest.json',
+  // SVG icons
+  './assets/close_icon.svg',
+  './assets/gain-minus.svg',
+  './assets/gain-plus.svg',
+  './assets/i_icon.svg',
+  './assets/try.svg',
+  './assets/union-bird.svg',
+  // PWA icons (PNG for compatibility)
+  './assets/app-icon-180.png',
+  './assets/app-icon-192.png',
+  './assets/app-icon-512.png',
+  // WebP images
+  './assets/1_cup.webp',
+  './assets/2_cup.webp',
+  './assets/3_cup.webp',
+  './assets/4_cup.webp',
+  './assets/bird-icon-small.webp',
+  './assets/bird-logo-big.webp',
+  './assets/cetingtu_left.webp',
+  './assets/cetingtu_right.webp',
+  './assets/circle-btn-bg-1afd37.webp',
+  './assets/left ear_cup.webp',
+  './assets/left ear_cup_stop.webp',
+  './assets/level_cup_no.webp',
+  './assets/level_cup_yes.webp',
+  './assets/mic-headset-151ff4.webp',
+  './assets/mic_phone.webp',
+  './assets/right ear_cup.webp',
+  './assets/right ear_cup_stop.webp',
+  './assets/start_cup.webp',
+  './assets/stop_cup.webp',
+  './assets/test ear_illust.webp',
+  './assets/test over cup1.webp',
+  './assets/test over cup2.webp',
+  './assets/test-complete-bird.webp',
+  './assets/test-ear-pause.webp',
+  './assets/test-quiet.webp',
+  './assets/test-tap.webp',
+  './assets/test-volume.webp',
+  './assets/test-wired.webp'
+];
 
 self.addEventListener('install', e => {
-  // 跳过等待，立即激活新版本
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./index.html'])));
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS))
+  );
 });
 
 self.addEventListener('activate', e => {
-  // 清理旧版本缓存
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
   );
-  // 立即接管所有页面
   self.clients.claim();
 });
 
@@ -23,7 +66,6 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// 接收页面消息，支持 skipWaiting 触发
 self.addEventListener('message', e => {
   if (e.data && e.data.action === 'skipWaiting') {
     self.skipWaiting();

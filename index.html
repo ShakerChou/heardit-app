@@ -462,7 +462,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.11</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.12</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -489,7 +489,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.11</span>
+          <span id="header-ver">v1.5.12</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -780,7 +780,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
             <circle class="ts-ring-track" cx="100" cy="100" r="96" fill="none" stroke="#339DFF" stroke-width="8" stroke-linecap="round"/>
             <circle class="ts-ring-progress" cx="100" cy="100" r="96" stroke-dasharray="603.186" stroke-dashoffset="603.186"/>
           </svg>
-          <span class="ts-tap-text">听到声音时<br>「点我」<br>哪怕一点儿</span>
+          <span class="ts-tap-text">听到就<br>「点我」</span>
         </div>
       </div>
       <div class="ts-bottom-bar" id="ts-bottom-bar">
@@ -907,8 +907,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.11';
-var APP_VERSION = 'v1.5.11';
+const VERSION = 'v1.5.12';
+var APP_VERSION = 'v1.5.12';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1610,7 +1610,6 @@ function toggleHearingAid(){
     // Start
     AppState.isHearingAidOn = true;
     isHearingAidOn = true;
-    // Force reset FAB mini state
     fabIsMini = false;
     if(fabScrollTimer){clearTimeout(fabScrollTimer);fabScrollTimer=null;}
     var scrollArea=document.getElementById('home-scroll-area');
@@ -1627,23 +1626,27 @@ function toggleHearingAid(){
     var overview = document.getElementById('hearing-overview');
     var earCards = document.getElementById('ear-cards-row');
     var warning = document.getElementById('sim-data-warning');
+    // Immediate: red color + text, let browser paint first
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
-    if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
-    if(pressWrap)pressWrap.classList.add('pause');
-    if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
-    settings.classList.add('visible');
-    if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
-    if(testBtn)testBtn.style.display='none';
-    if(overview)overview.style.display='none';
-    if(earCards)earCards.style.display='none';
-    if(warning)warning.style.display='none';
-    initDualVisualizer();
-    startDualVizAnimation();
-    initGainCups();
-    updateGainLevelUI();
-    setTimeout(checkFabOverlap,200);
-    startHearingAidAsync(startGen);
+    // Defer heavy work to next frame so red color renders instantly
+    requestAnimationFrame(function(){
+      if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
+      if(pressWrap)pressWrap.classList.add('pause');
+      if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
+      settings.classList.add('visible');
+      if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
+      if(testBtn)testBtn.style.display='none';
+      if(overview)overview.style.display='none';
+      if(earCards)earCards.style.display='none';
+      if(warning)warning.style.display='none';
+      initDualVisualizer();
+      startDualVizAnimation();
+      initGainCups();
+      updateGainLevelUI();
+      setTimeout(checkFabOverlap,200);
+      startHearingAidAsync(startGen);
+    });
   }
 }
 
