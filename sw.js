@@ -1,4 +1,4 @@
-const CACHE = 'heardit-v1.5.13';
+const CACHE = 'heardit-v1.5.14';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -41,7 +41,8 @@ const ASSETS = [
   './assets/test-quiet.webp',
   './assets/test-tap.webp',
   './assets/test-volume.webp',
-  './assets/test-wired.webp'
+  './assets/test-wired.webp',
+  './assets/text_btn_icon.webp'
 ];
 
 self.addEventListener('install', e => {

@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.13</span>
+    <span class="preload-ver" id="preload-ver">v1.5.14</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.13</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.14</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.13</span>
+          <span id="header-ver">v1.5.14</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -933,8 +933,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.13';
-var APP_VERSION = 'v1.5.13';
+const VERSION = 'v1.5.14';
+var APP_VERSION = 'v1.5.14';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -2399,12 +2399,29 @@ function resumeTest(){
   resetRing();startTestFreq();
 }
 
+// ====== PRELOAD ASSETS (all images used in the app) ======
+var PRELOAD_ASSETS = [
+  'assets/union-bird.svg','assets/bird-logo-big.webp','assets/bird-icon-small.webp',
+  'assets/circle-btn-bg-1afd37.webp','assets/start_cup.webp','assets/stop_cup.webp',
+  'assets/1_cup.webp','assets/2_cup.webp','assets/3_cup.webp','assets/4_cup.webp',
+  'assets/cetingtu_left.webp','assets/cetingtu_right.webp',
+  'assets/left ear_cup.webp','assets/left ear_cup_stop.webp',
+  'assets/right ear_cup.webp','assets/right ear_cup_stop.webp',
+  'assets/level_cup_no.webp','assets/level_cup_yes.webp',
+  'assets/mic-headset-151ff4.webp','assets/mic_phone.webp',
+  'assets/test ear_illust.webp','assets/test over cup1.webp','assets/test over cup2.webp',
+  'assets/test-complete-bird.webp','assets/test-ear-pause.webp',
+  'assets/test-quiet.webp','assets/test-tap.webp','assets/test-volume.webp','assets/test-wired.webp',
+  'assets/close_icon.svg','assets/gain-minus.svg','assets/gain-plus.svg',
+  'assets/i_icon.svg','assets/try.svg',
+  'assets/app-icon-180.png','assets/app-icon-192.png','assets/app-icon-512.png',
+  'assets/text_btn_icon.webp'
+];
+
 // ====== INIT ======
 (function init(){
   syncVersion();
-  // Preload progress tracking
-  var imgs = document.images;
-  var total = imgs.length;
+  var total = PRELOAD_ASSETS.length;
   var loaded = 0;
   var barFill = document.getElementById('preload-bar-fill');
   var barPercent = document.getElementById('preload-percent');
@@ -2413,7 +2430,7 @@ function resumeTest(){
   function updateProgress(){
     if(finished) return;
     loaded++;
-    var pct = Math.min(Math.round((loaded / total) * 100), 100);
+    var pct = Math.round((loaded / total) * 100);
     if(barFill) barFill.style.width = pct + '%';
     if(barPercent) barPercent.textContent = pct + '%';
     if(loaded >= total) finishPreload();
@@ -2432,26 +2449,23 @@ function resumeTest(){
         showScreen('home-no-data');
       }
       preloadSheet();
-    }, 200);
+    }, 300);
   }
   
-  if(total === 0){
-    finishPreload();
-  }else{
-    for(var i = 0; i < imgs.length; i++){
-      if(imgs[i].complete){
-        updateProgress();
-      }else{
-        imgs[i].addEventListener('load', updateProgress);
-        imgs[i].addEventListener('error', updateProgress);
-      }
-    }
+  // Preload every image explicitly - new Image() ensures actual download + decode
+  for(var i = 0; i < PRELOAD_ASSETS.length; i++){
+    (function(url){
+      var img = new Image();
+      img.onload = function(){ updateProgress(); };
+      img.onerror = function(){ updateProgress(); }; // count failures too, don't block
+      img.src = url;
+    })(PRELOAD_ASSETS[i]);
   }
   
-  // Fallback: max 3 seconds
+  // Fallback: max 8 seconds for slow networks
   setTimeout(function(){
     if(!finished) finishPreload();
-  }, 3000);
+  }, 8000);
   
   window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
 })();
