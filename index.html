@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/app-icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png">
-<title>HeardIt / 听到鸟</title>
+<title>Heardit / 听到鸟</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
@@ -456,13 +456,13 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 <div class="screen active" id="screen-home-no-data">
   <div class="home-no-data-inner">
     <div class="home-no-data-logo">
-      <img src="assets/union-bird.svg" alt="HeardIt" onerror="this.style.display='none'">
+      <img src="assets/union-bird.svg" alt="Heardit" onerror="this.style.display='none'">
     </div>
     <div class="home-big-bird-logo">
       <img src="assets/bird-logo-big.png" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 HeardIt <span id="no-data-ver">v1.5.9</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.10</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -489,7 +489,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.9</span>
+          <span id="header-ver">v1.5.10</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -663,11 +663,11 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
     <div class="fab-circle" onclick="toggleHearingAid()"></div>
   </div>
   <div class="fab-press-wrap" id="fab-press-wrap"
-       onclick="toggleHearingAid()"
+       onclick="event.stopPropagation();toggleHearingAid()"
        onmousedown="this.classList.add('pressed')"
        onmouseup="fabRelease()" onmouseleave="fabRelease()"
        ontouchstart="this.classList.add('pressed')"
-       ontouchend="fabTap()" ontouchcancel="fabRelease()">
+       ontouchend="event.preventDefault();fabTap()" ontouchcancel="fabRelease()">
     <img src="assets/start_cup.png" class="fab-paper-cup" id="fab-cup" alt="paper cup" onerror="this.style.display='none'">
     <div class="fab-text-area" id="fab-text-area">
       <span class="fab-text" id="fab-text">开始<br>助听</span>
@@ -907,8 +907,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.9';
-var APP_VERSION = 'v1.5.9';
+const VERSION = 'v1.5.10';
+var APP_VERSION = 'v1.5.10';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1373,7 +1373,7 @@ var FREQUENCIES = [250,500,1000,2000,4000,8000];
 var FREQ_LABELS = ['250','500','1k','2k','4k','8k'];
 var FAKE_LEFT = [10,15,18,20,22,20];
 var FAKE_SKIP_LEFT = [10,15,18,20,22,20];
-var FAKE_SKIP_RIGHT = [42,45,48,50,52,48];
+var FAKE_SKIP_RIGHT = [50,54,58,62,64,60];
 var trialAudioCtx = null;
 
 // ====== TEST AUDIO STATE ======
@@ -2386,14 +2386,17 @@ function resumeTest(){
 <script>
 if('serviceWorker' in navigator){
   var pendingUpdateWorker = null;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    window.location.reload();
+  });
   navigator.serviceWorker.register('./sw.js').then(function(reg){
-    if(reg.waiting){reg.waiting.postMessage({action:'skipWaiting'});window.location.reload();}
+    if(reg.waiting){reg.waiting.postMessage({action:'skipWaiting'});return;}
     reg.addEventListener('updatefound',function(){
       var newWorker=reg.installing;
       if(newWorker){newWorker.addEventListener('statechange',function(){
         if(newWorker.state==='installed'&&navigator.serviceWorker.controller){
           if(confirm('发现新版本，点击确定更新')){
-            newWorker.postMessage({action:'skipWaiting'});window.location.reload();
+            newWorker.postMessage({action:'skipWaiting'});
           }else{
             pendingUpdateWorker = newWorker;
             var tags = document.querySelectorAll('.beta-tag');
@@ -2404,7 +2407,6 @@ if('serviceWorker' in navigator){
               tags[i].onclick = function(){
                 if(pendingUpdateWorker){
                   pendingUpdateWorker.postMessage({action:'skipWaiting'});
-                  window.location.reload();
                 }
               };
             }
