@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.19</span>
+    <span class="preload-ver" id="preload-ver">v1.5.20</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.19</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.20</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.19</span>
+          <span id="header-ver">v1.5.20</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -930,6 +930,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 </div>
 </div>
 <script>
+// Enable :active pseudo-class on iOS Safari
+document.addEventListener('touchstart',function(){},{passive:true});
 (function(){
   var h=location.hostname;
   if(h&&h!=='localhost'&&h!=='127.0.0.1'&&h!=='shakerchou.github.io'&&h.indexOf('github.io')===-1){
@@ -938,8 +940,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.19';
-var APP_VERSION = 'v1.5.19';
+const VERSION = 'v1.5.20';
+var APP_VERSION = 'v1.5.20';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1667,17 +1669,19 @@ function toggleHearingAid(){
     var overview = document.getElementById('hearing-overview');
     var earCards = document.getElementById('ear-cards-row');
     var warning = document.getElementById('sim-data-warning');
-    // Immediate: red color + text, disable transition so color changes instantly
+    // Immediate: red color, preload cup image
     var fabCircle = document.getElementById('fab-circle');
     if(fabCircle) fabCircle.style.transition = 'none';
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
     if(fabCircle){ void fabCircle.offsetHeight; fabCircle.style.transition = ''; }
-    // Pre-switch cup image src now so browser decodes it before animation
-    if(fabCup){fabCup.src='assets/stop_cup.webp';fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';}
-    if(pressWrap)pressWrap.classList.add('pause');
-    // Defer animation to next frame so image is decoded
+    preloadImage('assets/stop_cup.webp'); // ensure decoded before animation
+    // Defer all cup animation to RAF so it runs in one paint frame
     requestAnimationFrame(function(){
+      // Step 1: hide cup instantly, change src
+      if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
+      if(pressWrap)pressWrap.classList.add('pause');
+      // Step 2: force layout flush, then animate back
       if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
       settings.classList.add('visible');
       if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
@@ -2454,6 +2458,24 @@ function preloadImage(url){
   });
 }
 
+// Wait for all visible DOM images to finish loading
+function waitForDomImages(){
+  var imgs = document.querySelectorAll('img[src]');
+  var pending = [];
+  for(var i = 0; i < imgs.length; i++){
+    var img = imgs[i];
+    if(img.complete && img.naturalWidth > 0) continue;
+    pending.push(new Promise(function(resolve){
+      var done = false;
+      function finish(){ if(done) return; done = true; resolve(); }
+      img.addEventListener('load', finish, {once: true});
+      img.addEventListener('error', finish, {once: true});
+      setTimeout(finish, 5000);
+    }));
+  }
+  return Promise.all(pending);
+}
+
 // ====== INIT ======
 (function init(){
   syncVersion();
@@ -2492,7 +2514,8 @@ function preloadImage(url){
     sessionStorage.setItem('heardit_preload_done', '1');
     if(barFill) barFill.style.width = '100%';
     if(barPercent) barPercent.textContent = '100%';
-    setTimeout(function(){
+    // Wait for all DOM images to actually render before transitioning
+    waitForDomImages().then(function(){
       if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
         buildHomeSummary();
         showScreen('home-with-data');
@@ -2500,7 +2523,7 @@ function preloadImage(url){
         showScreen('home-no-data');
       }
       preloadSheet();
-    }, 300);
+    });
   }
   
   // Preload via new Image() - ensures browser decodes & caches in rendering pipeline
