@@ -34,6 +34,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 
 .screen{display:none;position:absolute;top:0;left:0;width:100%;height:100%;flex-direction:column}
 .screen.active{display:flex}
+/* Used during preload: screen is rendered above preload overlay at opacity 0 so browser decodes images */
+.screen.render-check{opacity:0!important;z-index:11!important;pointer-events:none!important}
 
 /* ===== SCREEN: PRELOAD ===== */
 #screen-preload{background:#fff;flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:10}
@@ -479,7 +481,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.24</span>
+    <span class="preload-ver" id="preload-ver">v1.5.25</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -497,7 +499,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.24</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.25</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -524,7 +526,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.24</span>
+          <span id="header-ver">v1.5.25</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -960,8 +962,8 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.24';
-var APP_VERSION = 'v1.5.24';
+const VERSION = 'v1.5.25';
+var APP_VERSION = 'v1.5.25';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -2547,43 +2549,71 @@ function waitForContainerImages(container){
     sessionStorage.setItem('heardit_preload_done', '1');
     if(barFill) barFill.style.width = '100%';
     if(barPercent) barPercent.textContent = '100%';
-    
+
     // Determine target screen
     var hasData = loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData;
     var targetName = hasData ? 'home-with-data' : 'home-no-data';
     if(hasData) buildHomeSummary();
-    
-    // Activate target screen behind preload (preload has z-index:10 and stays on top)
+
     var targetEl = document.getElementById('screen-'+targetName);
-    if(targetEl) targetEl.classList.add('active');
-    AppState.currentScreen = targetName;
-    if(SCREEN_THEME_COLORS[targetName]) setThemeColor(SCREEN_THEME_COLORS[targetName]);
-    
-    // Collect images to wait for: target screen + QR section (desktop)
-    var containers = [];
-    if(targetEl) containers.push(targetEl);
     var qrSection = document.querySelector('.qr-section');
-    if(qrSection && window.getComputedStyle(qrSection).display !== 'none'){
-      containers.push(qrSection);
+    var isDesktop = window.matchMedia('(min-width:431px)').matches;
+
+    // Collect first-paint image URLs
+    var firstPaintUrls = [];
+    function collectImgUrls(container){
+      if(!container) return;
+      var imgs = container.querySelectorAll('img[src]');
+      for(var i = 0; i < imgs.length; i++){
+        var src = imgs[i].getAttribute('src');
+        if(src) firstPaintUrls.push(src);
+      }
     }
-    
-    // Force reflow so browser starts loading/decoding visible images
-    document.body.offsetHeight;
-    
-    // Wait for all visible images to be decoded, then hide preload screen
-    var imgPromises = [];
-    for(var c = 0; c < containers.length; c++){
-      imgPromises.push(waitForContainerImages(containers[c]));
+    if(targetEl) collectImgUrls(targetEl);
+    if(qrSection && isDesktop) collectImgUrls(qrSection);
+
+    // Preload + decode all first-paint images before revealing anything
+    var decodedPromises = [];
+    for(var i = 0; i < firstPaintUrls.length; i++){
+      decodedPromises.push(preloadImage(firstPaintUrls[i]));
     }
-    Promise.all(imgPromises).then(function(){
-      // Use double-rAF to ensure browser has painted the target screen
+    // QR code is first in PRELOAD_ASSETS and already in flight; ensure it is decoded first
+    if(qrSection && isDesktop){
+      var qrImg = qrSection.querySelector('img[src]');
+      if(qrImg){
+        decodedPromises.unshift((function(img){ return waitForContainerImages(img.parentNode); })(qrImg));
+      }
+    }
+
+    Promise.all(decodedPromises).then(function(){
+      // Now make target screen active but invisible on top of preload so browser renders it
+      if(targetEl){
+        targetEl.classList.add('active');
+        targetEl.classList.add('render-check');
+      }
+      AppState.currentScreen = targetName;
+      if(SCREEN_THEME_COLORS[targetName]) setThemeColor(SCREEN_THEME_COLORS[targetName]);
+
+      // Force a real layout/paint pass
+      document.body.offsetHeight;
+
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
-          // Hide preload screen - target screen is already visible behind it
-          var preloadEl = document.getElementById('screen-preload');
-          if(preloadEl) preloadEl.classList.remove('active');
-          if(targetName==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);}
-          preloadSheet();
+          // Final safety: decode any newly-attached DOM images
+          var domPromises = [];
+          if(targetEl) domPromises.push(waitForContainerImages(targetEl));
+          if(qrSection && isDesktop) domPromises.push(waitForContainerImages(qrSection));
+          Promise.all(domPromises).then(function(){
+            requestAnimationFrame(function(){
+              requestAnimationFrame(function(){
+                if(targetEl) targetEl.classList.remove('render-check');
+                var preloadEl = document.getElementById('screen-preload');
+                if(preloadEl) preloadEl.classList.remove('active');
+                if(targetName==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);}
+                preloadSheet();
+              });
+            });
+          });
         });
       });
     });
