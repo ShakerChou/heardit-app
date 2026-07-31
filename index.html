@@ -16,7 +16,7 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:#F2F2F7;color:#1C1C1E;font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
 .app-container{width:100%;max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#F2F2F7}
-@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
+@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start;width:100%}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
 /* QR Code - desktop only */
 .qr-section{display:none;position:absolute;flex-direction:column;align-items:center;flex-shrink:0}
 @media(min-width:431px){.qr-section{display:flex;top:40px;left:50%;margin-left:calc(393px/2 + 40px)}}
@@ -471,6 +471,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 </style>
 </head>
 <body>
+<div class="desktop-wrapper">
 <div class="app-container" id="app">
 
 <!-- ===== SCREEN 0: PRELOAD ===== -->
@@ -478,7 +479,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.21</span>
+    <span class="preload-ver" id="preload-ver">v1.5.22</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -496,7 +497,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.21</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.22</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -523,7 +524,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.21</span>
+          <span id="header-ver">v1.5.22</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -936,6 +937,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 
   </div>
 </div>
+</div>
 <!-- QR Code - desktop only -->
 <div class="qr-section">
   <div class="qr-code-wrap">
@@ -945,6 +947,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
     <span class="qr-label-title">移动端App</span>
     <span class="qr-label-sub">（手机相机扫码）</span>
   </div>
+</div>
 </div>
 <script>
 // Enable :active pseudo-class on iOS Safari
@@ -957,8 +960,8 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.21';
-var APP_VERSION = 'v1.5.21';
+const VERSION = 'v1.5.22';
+var APP_VERSION = 'v1.5.22';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
