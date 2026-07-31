@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="听到鸟">
-<meta name="theme-color" content="#007AFF">
+<meta name="theme-color" content="#FFFFFF" id="theme-color-meta">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/app-icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png">
@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.17</span>
+    <span class="preload-ver" id="preload-ver">v1.5.18</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.17</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.18</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.17</span>
+          <span id="header-ver">v1.5.18</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -938,8 +938,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.17';
-var APP_VERSION = 'v1.5.17';
+const VERSION = 'v1.5.18';
+var APP_VERSION = 'v1.5.18';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1506,12 +1506,22 @@ function mapDbToHL(dbFS){var clamped=Math.max(-90,Math.min(-5,dbFS));return Math
 function getHearingClass(db){if(db<=25)return'normal';if(db<=40)return'mild';if(db<=60)return'moderate';return'severe';}
 
 // ====== SCREEN MANAGEMENT ======
+var SCREEN_THEME_COLORS = {
+  'preload':'#FFFFFF',
+  'home-no-data':'#FFFFFF',
+  'home-with-data':'#F3F2F8'
+};
+function setThemeColor(color){
+  var meta = document.getElementById('theme-color-meta');
+  if(meta) meta.setAttribute('content', color);
+}
 function showScreen(name){
   var screens = document.querySelectorAll('.screen');
   for(var i=0;i<screens.length;i++)screens[i].classList.remove('active');
   var target = document.getElementById('screen-'+name);
   if(target)target.classList.add('active');
   AppState.currentScreen = name;
+  if(SCREEN_THEME_COLORS[name]) setThemeColor(SCREEN_THEME_COLORS[name]);
   if(name==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);}
   syncVersion();
 }
@@ -2433,11 +2443,6 @@ var PRELOAD_ASSETS = [
   var barPercent = document.getElementById('preload-percent');
   var finished = false;
   
-  // Create a hidden container in DOM for preloading - ensures browser properly caches images
-  var preloadContainer = document.createElement('div');
-  preloadContainer.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;';
-  document.body.appendChild(preloadContainer);
-  
   function updateProgress(){
     if(finished) return;
     loaded++;
@@ -2452,8 +2457,6 @@ var PRELOAD_ASSETS = [
     finished = true;
     if(barFill) barFill.style.width = '100%';
     if(barPercent) barPercent.textContent = '100%';
-    // Remove preload container
-    if(preloadContainer && preloadContainer.parentNode) preloadContainer.parentNode.removeChild(preloadContainer);
     setTimeout(function(){
       if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
         buildHomeSummary();
@@ -2465,28 +2468,30 @@ var PRELOAD_ASSETS = [
     }, 300);
   }
   
-  // Preload every image as DOM elements - most reliable cross-browser caching
+  // Use fetch() to download every image into browser HTTP cache - most reliable
   for(var i = 0; i < PRELOAD_ASSETS.length; i++){
     (function(url){
-      var img = document.createElement('img');
-      img.src = url;
-      img.onload = function(){ updateProgress(); };
-      img.onerror = function(){ updateProgress(); };
-      preloadContainer.appendChild(img);
+      fetch(url).then(function(r){
+        if(!r.ok) throw new Error(r.status);
+        return r.blob(); // force full download into cache
+      }).then(function(){ updateProgress(); }).catch(function(){ updateProgress(); });
     })(PRELOAD_ASSETS[i]);
   }
   
-  // Fallback: max 8 seconds for slow networks
+  // Fallback: max 30 seconds for very slow networks
   setTimeout(function(){
     if(!finished) finishPreload();
-  }, 8000);
+  }, 30000);
   
   window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
 })();
 </script>
 <script>
 if('serviceWorker' in navigator){
+  var _swFirstInstall = !navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',function(){
+    // Skip reload on first SW install - only reload on actual updates
+    if(_swFirstInstall){_swFirstInstall=false;return;}
     window.location.reload();
   });
   navigator.serviceWorker.register('./sw.js').then(function(reg){
