@@ -16,7 +16,7 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:#F2F2F7;color:#1C1C1E;font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
 .app-container{width:100%;max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#F2F2F7}
-@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
+@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
 /* QR Code - desktop only */
 .qr-section{display:none;position:absolute;flex-direction:column;align-items:center;flex-shrink:0}
 @media(min-width:431px){.qr-section{display:flex;top:40px;left:50%;margin-left:calc(393px/2 + 40px)}}
@@ -281,7 +281,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .ts-instr-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:0;width:100%;height:300px;flex-shrink:0;position:relative}
 .ts-instr-grid::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.08) 12%,rgba(0,0,0,.08) 88%,transparent 100%);z-index:1;pointer-events:none}
 .ts-instr-grid::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(to right,transparent 0%,rgba(0,0,0,.08) 12%,rgba(0,0,0,.08) 88%,transparent 100%);z-index:1;pointer-events:none}
-.ts-instr-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;background:#fff}
+.ts-instr-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;background:transparent}
 .ts-instr-num{position:absolute;top:16px;left:16px;width:28px;height:28px;object-fit:contain}
 .ts-instr-img{height:90px;width:auto;max-width:100px;object-fit:contain}
 .ts-instr-card:nth-child(2) .ts-instr-img{transform:scale(1.24) scaleX(-1)}
@@ -471,7 +471,6 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 </style>
 </head>
 <body>
-<div class="desktop-wrapper">
 <div class="app-container" id="app">
 
 <!-- ===== SCREEN 0: PRELOAD ===== -->
@@ -938,14 +937,13 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   </div>
 </div>
 <!-- QR Code - desktop only -->
-  <div class="qr-section">
-    <div class="qr-code-wrap">
-      <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
-    </div>
-    <div class="qr-label">
-      <span class="qr-label-title">移动端App</span>
-      <span class="qr-label-sub">（手机相机扫码）</span>
-    </div>
+<div class="qr-section">
+  <div class="qr-code-wrap">
+    <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
+  </div>
+  <div class="qr-label">
+    <span class="qr-label-title">移动端App</span>
+    <span class="qr-label-sub">（手机相机扫码）</span>
   </div>
 </div>
 <script>
@@ -2458,7 +2456,7 @@ var PRELOAD_ASSETS = [
   'assets/close_icon.svg','assets/gain-minus.svg','assets/gain-plus.svg',
   'assets/i_icon.svg','assets/try.svg',
   'assets/app-icon-180.png','assets/app-icon-192.png','assets/app-icon-512.png',
-  'assets/text_btn_icon.webp'
+  'assets/text_btn_icon.webp','assets/QR- code.svg'
 ];
 
 // ====== IMAGE PRELOAD POOL ======
