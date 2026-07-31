@@ -1,6 +1,5 @@
 const CACHE = 'heardit-v1.5.17';
 const ASSETS = [
-  './index.html',
   './manifest.json',
   // SVG icons
   './assets/close_icon.svg',
@@ -62,6 +61,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Network-first for HTML (navigation requests) - always get latest version
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(function() {
+        return caches.match(e.request);
+      })
+    );
+    return;
+  }
+  // Cache-first for static assets
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request))
   );
