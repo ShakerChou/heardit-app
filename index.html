@@ -16,11 +16,11 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:#F2F2F7;color:#1C1C1E;font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
 .app-container{width:100%;max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#F2F2F7}
-@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{display:flex;align-items:flex-start;gap:100px}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
+@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
 /* QR Code - desktop only */
-.qr-section{display:none;flex-direction:column;align-items:center;flex-shrink:0}
-@media(min-width:431px){.qr-section{display:flex}}
-.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff}
+.qr-section{display:none;position:absolute;flex-direction:column;align-items:center;flex-shrink:0}
+@media(min-width:431px){.qr-section{display:flex;top:40px;left:50%;margin-left:calc(393px/2 + 40px)}}
+.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px}
 .qr-code-wrap img{width:100%;height:100%;object-fit:contain}
 .qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 40px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .qr-label-title{font-size:24px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
@@ -937,17 +937,16 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 
   </div>
 </div>
-</div>
 <!-- QR Code - desktop only -->
-<div class="qr-section">
-  <div class="qr-code-wrap">
-    <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
+  <div class="qr-section">
+    <div class="qr-code-wrap">
+      <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
+    </div>
+    <div class="qr-label">
+      <span class="qr-label-title">移动端App</span>
+      <span class="qr-label-sub">（手机相机扫码）</span>
+    </div>
   </div>
-  <div class="qr-label">
-    <span class="qr-label-title">移动端App</span>
-    <span class="qr-label-sub">（手机相机扫码）</span>
-  </div>
-</div>
 </div>
 <script>
 // Enable :active pseudo-class on iOS Safari
