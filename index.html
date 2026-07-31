@@ -154,8 +154,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .dual-viz-bar.right .dual-viz-bar-input{background:#007AFF}
 .dual-viz-bar.right .dual-viz-bar-gain{background:#34C759}
 .dual-viz-bar-label{font-size:9px;color:#AEAEB2;margin-top:4px;text-align:center;line-height:1}
-.dual-viz-freqs{display:flex;gap:4px;opacity:.3}
-.dual-viz-freq{width:18px;text-align:center;font-size:11px;color:#000}
+
+
 
 /* Gain Level */
 .gain-level-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;position:relative}
@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.15</span>
+    <span class="preload-ver" id="preload-ver">v1.5.16</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.15</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.16</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.15</span>
+          <span id="header-ver">v1.5.16</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -614,8 +614,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
           </div>
           <div class="dual-viz-bars" id="dual-viz-right"></div>
         </div>
-        <div class="dual-viz-freqs"><span class="dual-viz-freq">250</span><span class="dual-viz-freq">500</span><span class="dual-viz-freq">1k</span><span class="dual-viz-freq">2k</span><span class="dual-viz-freq">4k</span><span class="dual-viz-freq">8k</span></div>
       </div>
+      
       <div class="gain-level-card">
         <span class="gain-level-title">增益等级</span>
         <div class="gain-level-body">
@@ -938,8 +938,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.15';
-var APP_VERSION = 'v1.5.15';
+const VERSION = 'v1.5.16';
+var APP_VERSION = 'v1.5.16';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1997,8 +1997,6 @@ function initFabScrollDetection(){
 }
 function triggerFabMini(){
   if(!AppState.isHearingAidOn)return;
-  var scrollArea=document.querySelector('.home-scroll-area');
-  if(scrollArea&&scrollArea.scrollTop===0)return;
   if(!fabIsMini){fabIsMini=true;setFabMini(true);}
   clearTimeout(fabScrollTimer);
   fabScrollTimer=setTimeout(function(){fabIsMini=false;setFabMini(false);},2000);
@@ -2461,9 +2459,8 @@ var PRELOAD_ASSETS = [
   for(var i = 0; i < PRELOAD_ASSETS.length; i++){
     (function(url){
       var img = new Image();
-      img.onload = function(){ updateProgress(); };
-      img.onerror = function(){ updateProgress(); }; // count failures too, don't block
       img.src = url;
+      img.decode().then(function(){ updateProgress(); }).catch(function(){ updateProgress(); });
     })(PRELOAD_ASSETS[i]);
   }
   

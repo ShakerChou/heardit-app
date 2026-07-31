@@ -1,4 +1,4 @@
-const CACHE = 'heardit-v1.5.15';
+const CACHE = 'heardit-v1.5.16';
 const ASSETS = [
   './index.html',
   './manifest.json',
