@@ -40,10 +40,10 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .preload-percent{font-size:14px;font-weight:500;color:#0085FF;white-space:nowrap;min-width:36px;text-align:right}
 @keyframes preloadFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.btn{display:block;width:100%;min-height:50px;padding:14px 24px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;transition:transform .1s,opacity .1s;-webkit-appearance:none;appearance:none;letter-spacing:.3px}
+.btn{display:block;width:100%;min-height:50px;padding:14px 24px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;-webkit-appearance:none;appearance:none;letter-spacing:.3px}
 .btn:active{transform:scale(.97);opacity:.85}
 .btn-primary{background:#0085FF;color:#fff;box-shadow:0 4px 0 0 rgba(0,110,230,1)}
-.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:4px 16px 4px 14px;height:48px;border-radius:999px;font-size:18px;font-weight:500;background:#0085FF;color:#fff;border:none;cursor:pointer;white-space:nowrap;box-shadow:0 4px 0 0 rgba(0,110,230,1);transition:transform .1s;-webkit-appearance:none;appearance:none;line-height:1}
+.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:4px 16px 4px 14px;height:48px;border-radius:999px;font-size:18px;font-weight:500;background:#0085FF;color:#fff;border:none;cursor:pointer;white-space:nowrap;box-shadow:0 4px 0 0 rgba(0,110,230,1);-webkit-appearance:none;appearance:none;line-height:1}
 .btn-pill:active{transform:scale(.97)}
 
 /* ===== SCREEN: HOME NO DATA (第一次打开app) ===== */
@@ -97,7 +97,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .home-brand-ver .beta-tag{background:#0085FF;color:#fff;font-size:10px;font-weight:500;padding:0 6px;border-radius:2px;line-height:18px}
 .home-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .hearing-status{font-size:18px;font-weight:500;color:#00CA48;white-space:nowrap;display:none;text-align:right}
-.home-scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:104px 16px 0;width:100%}
+.home-scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:104px 16px 0;width:100%;box-sizing:border-box}
 .home-scroll-area::-webkit-scrollbar{display:none}
 .home-scroll-area{-ms-overflow-style:none;scrollbar-width:none}
 
@@ -137,7 +137,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 
 /* Dual Visualizer */
 .dual-viz{display:flex;gap:16px;margin-bottom:16px}
-.dual-viz-ear{flex:1;background:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.dual-viz-ear{flex:1;background:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px;overflow:hidden;min-width:0}
 .dual-viz-ear-header{display:flex;width:100%;justify-content:space-between;align-items:center}
 .dual-viz-ear-label{font-size:18px;font-weight:500;color:#000}
 .dual-viz-legend-inline{display:flex;align-items:center;gap:4px;font-size:12px;color:#000;opacity:1}
@@ -169,7 +169,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .gain-level-cup{width:28px;height:28px;overflow:hidden;border-radius:2px}
 .gain-level-cup img{width:100%;height:100%;object-fit:cover;display:block}
 .gain-level-btns{position:absolute;top:16px;right:16px;bottom:16px;display:flex;flex-direction:column;justify-content:space-between}
-.gain-level-btn{width:64px;height:64px;border:none;background:transparent;cursor:pointer;transition:transform .1s,opacity .2s;-webkit-appearance:none;appearance:none;padding:0;user-select:none;-webkit-user-drag:none;touch-action:manipulation}
+.gain-level-btn{width:64px;height:64px;border:none;background:transparent;cursor:pointer;-webkit-appearance:none;appearance:none;padding:0;user-select:none;-webkit-user-drag:none;touch-action:manipulation}
 .gain-level-btn:disabled{opacity:.3;cursor:not-allowed}
 .gain-level-btn img{width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}
 .gain-level-btn:active:not(:disabled){transform:scale(.9)}
@@ -303,7 +303,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .ts-progress-dots{display:flex;gap:10px;padding:8px 0 12px}
 .ts-dot{width:12px;height:12px;border-radius:50%;background:rgba(0,0,0,.1);flex-shrink:0}.ts-dot.active{background:transparent;border:2px solid #0085FF;width:12px;height:12px;box-sizing:border-box}.ts-dot.done{background:#0085FF}
 /* Tap circle */
-.ts-tap-circle{width:200px;height:200px;border-radius:50%;background:#0085FF;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:8px auto 29px;transition:transform .1s,opacity .3s;box-shadow:0 0 20px 0 rgba(0,133,255,.5),0 8px 0 0 rgba(0,110,230,1);flex-shrink:0;position:relative;align-self:center}
+.ts-tap-circle{width:200px;height:200px;border-radius:50%;background:#0085FF;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:8px auto 29px;box-shadow:0 0 20px 0 rgba(0,133,255,.5),0 8px 0 0 rgba(0,110,230,1);flex-shrink:0;position:relative;align-self:center}
 .ts-tap-circle:active{transform:scale(.95)}
 .ts-tap-circle.disabled{opacity:.3;pointer-events:none}
 .ts-tap-text{font-size:28px;font-weight:500;color:#fff;text-align:center;line-height:1.5;font-family:"PingFang SC",-apple-system,sans-serif;z-index:1;pointer-events:none;user-select:none}
@@ -314,18 +314,18 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .ts-bottom-bar{height:94px;flex-shrink:0;background:transparent;display:flex;align-items:center;justify-content:center;padding-bottom:24px}
 
 /* Pill buttons */
-.ts-pill-btn{display:block;width:100%;height:64px;border:none;border-radius:999px;background:#0085FF;color:#fff;font-size:24px;font-weight:500;cursor:pointer;box-shadow:0 4px 0 0 rgba(0,110,230,1);transition:transform .1s;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif;letter-spacing:.5px}
+.ts-pill-btn{display:block;width:100%;height:64px;border:none;border-radius:999px;background:#0085FF;color:#fff;font-size:24px;font-weight:500;cursor:pointer;box-shadow:0 4px 0 0 rgba(0,110,230,1);-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif;letter-spacing:.5px}
 .ts-pill-btn:active{transform:scale(.98)}
-.ts-pill-btn-outline{display:block;height:48px;padding:4px 20px;border:2px solid #0085FF;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;transition:transform .1s;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
+.ts-pill-btn-outline{display:block;height:48px;padding:4px 20px;border:2px solid #0085FF;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
 .ts-pill-btn-outline:active{transform:scale(.98)}
 
-.ts-pause-test-btn{display:block;width:100%;height:48px;border:none;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;transition:transform .1s;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif;padding:0 20px}
+.ts-pause-test-btn{display:block;width:100%;height:48px;border:none;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif;padding:0 20px}
 .ts-pause-test-btn:active{transform:scale(.98)}
 .ts-bottom-bar-pause{display:none;justify-content:space-between;padding:0 32px;width:100%}
 .ts-bottom-bar-pause.active{display:flex}
-.ts-bottom-bar-pause .ts-pill-btn-outline{width:80px;flex:none;height:48px;padding:4px 10px;border:2px solid #0085FF;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;transition:transform .1s;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
+.ts-bottom-bar-pause .ts-pill-btn-outline{width:80px;flex:none;height:48px;padding:4px 10px;border:2px solid #0085FF;border-radius:999px;background:transparent;color:#0085FF;font-size:18px;font-weight:500;cursor:pointer;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
 .ts-bottom-bar-pause .ts-pill-btn-outline:active{transform:scale(.98)}
-.ts-bottom-bar-pause .ts-pill-btn{width:120px;flex:none;height:48px;box-shadow:none;font-size:18px;border-radius:999px;background:#0085FF;color:#fff;border:none;cursor:pointer;font-weight:500;transition:transform .1s;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
+.ts-bottom-bar-pause .ts-pill-btn{width:120px;flex:none;height:48px;box-shadow:none;font-size:18px;border-radius:999px;background:#0085FF;color:#fff;border:none;cursor:pointer;font-weight:500;-webkit-appearance:none;appearance:none;font-family:"PingFang SC",-apple-system,sans-serif}
 .ts-bottom-bar-pause .ts-pill-btn:active{transform:scale(.98)}
 .ts-step.paused .ts-tap-circle{opacity:.3;pointer-events:none}
 .ts-step.paused .ts-test-status{color:#0085FF}
@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.16</span>
+    <span class="preload-ver" id="preload-ver">v1.5.17</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.16</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.17</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.16</span>
+          <span id="header-ver">v1.5.17</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -687,8 +687,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <!-- FAB -->
   <div class="fab fab-blue" id="fab">
     <div class="fab-circle" id="fab-circle"
-         ontouchstart="event.stopPropagation();_fabTouchInside=true"
-         ontouchend="if(_fabTouchInside){_fabTouchInside=false;toggleHearingAid()}"
+         ontouchstart="event.stopPropagation();_fabTouchStartX=event.touches[0].clientX;_fabTouchStartY=event.touches[0].clientY;_fabTouchInside=true"
+         ontouchend="if(_fabTouchInside&&Math.abs((event.changedTouches[0]||event.touches[0]||{}).clientX-_fabTouchStartX)<10&&Math.abs(((event.changedTouches[0]||event.touches[0]||{}).clientY||0)-_fabTouchStartY)<10){_fabTouchInside=false;toggleHearingAid()}"
          ontouchcancel="_fabTouchInside=false"
          onclick="toggleHearingAid()"></div>
   </div>
@@ -696,8 +696,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
        onclick="event.stopPropagation();toggleHearingAid()"
        onmousedown="this.classList.add('pressed')"
        onmouseup="fabRelease()" onmouseleave="fabRelease()"
-       ontouchstart="event.stopPropagation();_fabTouchInside=true;this.classList.add('pressed')"
-       ontouchend="event.preventDefault();if(_fabTouchInside){_fabTouchInside=false;fabTap()}"
+       ontouchstart="event.stopPropagation();_fabTouchStartX=event.touches[0].clientX;_fabTouchStartY=event.touches[0].clientY;_fabTouchInside=true;this.classList.add('pressed')"
+       ontouchend="event.preventDefault();if(_fabTouchInside&&Math.abs((event.changedTouches[0]||event.touches[0]||{}).clientX-_fabTouchStartX)<10&&Math.abs(((event.changedTouches[0]||event.touches[0]||{}).clientY||0)-_fabTouchStartY)<10){_fabTouchInside=false;fabTap()}"
        ontouchcancel="_fabTouchInside=false;fabRelease()">
     <img src="assets/start_cup.webp" class="fab-paper-cup" id="fab-cup" alt="paper cup" onerror="this.style.display='none'">
     <div class="fab-text-area" id="fab-text-area">
@@ -938,8 +938,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.16';
-var APP_VERSION = 'v1.5.16';
+const VERSION = 'v1.5.17';
+var APP_VERSION = 'v1.5.17';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1657,9 +1657,12 @@ function toggleHearingAid(){
     var overview = document.getElementById('hearing-overview');
     var earCards = document.getElementById('ear-cards-row');
     var warning = document.getElementById('sim-data-warning');
-    // Immediate: red color + text, let browser paint first
+    // Immediate: red color + text, disable transition so color changes instantly
+    var fabCircle = document.getElementById('fab-circle');
+    if(fabCircle) fabCircle.style.transition = 'none';
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
+    if(fabCircle){ void fabCircle.offsetHeight; fabCircle.style.transition = ''; }
     // Defer heavy work to next frame so red color renders instantly
     requestAnimationFrame(function(){
       if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
@@ -2430,6 +2433,11 @@ var PRELOAD_ASSETS = [
   var barPercent = document.getElementById('preload-percent');
   var finished = false;
   
+  // Create a hidden container in DOM for preloading - ensures browser properly caches images
+  var preloadContainer = document.createElement('div');
+  preloadContainer.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;';
+  document.body.appendChild(preloadContainer);
+  
   function updateProgress(){
     if(finished) return;
     loaded++;
@@ -2444,6 +2452,8 @@ var PRELOAD_ASSETS = [
     finished = true;
     if(barFill) barFill.style.width = '100%';
     if(barPercent) barPercent.textContent = '100%';
+    // Remove preload container
+    if(preloadContainer && preloadContainer.parentNode) preloadContainer.parentNode.removeChild(preloadContainer);
     setTimeout(function(){
       if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
         buildHomeSummary();
@@ -2455,12 +2465,14 @@ var PRELOAD_ASSETS = [
     }, 300);
   }
   
-  // Preload every image explicitly - new Image() ensures actual download + decode
+  // Preload every image as DOM elements - most reliable cross-browser caching
   for(var i = 0; i < PRELOAD_ASSETS.length; i++){
     (function(url){
-      var img = new Image();
+      var img = document.createElement('img');
       img.src = url;
-      img.decode().then(function(){ updateProgress(); }).catch(function(){ updateProgress(); });
+      img.onload = function(){ updateProgress(); };
+      img.onerror = function(){ updateProgress(); };
+      preloadContainer.appendChild(img);
     })(PRELOAD_ASSETS[i]);
   }
   
