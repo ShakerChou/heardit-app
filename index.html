@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="听到鸟">
 <meta name="theme-color" content="#FFFFFF" id="theme-color-meta">
 <link rel="manifest" href="manifest.json">
@@ -470,7 +470,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.18</span>
+    <span class="preload-ver" id="preload-ver">v1.5.19</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +488,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.18</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.19</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +515,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.18</span>
+          <span id="header-ver">v1.5.19</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -938,8 +938,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.18';
-var APP_VERSION = 'v1.5.18';
+const VERSION = 'v1.5.19';
+var APP_VERSION = 'v1.5.19';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -1673,10 +1673,11 @@ function toggleHearingAid(){
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
     if(fabCircle){ void fabCircle.offsetHeight; fabCircle.style.transition = ''; }
-    // Defer heavy work to next frame so red color renders instantly
+    // Pre-switch cup image src now so browser decodes it before animation
+    if(fabCup){fabCup.src='assets/stop_cup.webp';fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';}
+    if(pressWrap)pressWrap.classList.add('pause');
+    // Defer animation to next frame so image is decoded
     requestAnimationFrame(function(){
-      if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
-      if(pressWrap)pressWrap.classList.add('pause');
       if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
       settings.classList.add('visible');
       if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
@@ -2096,6 +2097,7 @@ function openTestSheet(){
   testState.step=1;testState.currentEar='left';testState.currentFreqIndex=0;
   testState.results={left:[],right:[]};testState.paused=false;
   showTestStep(1);
+  setThemeColor('#FFFFFF');
   var overlay=document.getElementById('sheet-overlay');
   var sheet=document.getElementById('sheet');
   overlay.classList.add('active');sheet.classList.add('active');
@@ -2105,6 +2107,8 @@ function closeSheet(){
   document.getElementById('sheet-overlay').classList.remove('active');
   document.getElementById('sheet').classList.remove('active');
   testState.step=0;
+  // Restore theme color based on current screen
+  if(SCREEN_THEME_COLORS[AppState.currentScreen]) setThemeColor(SCREEN_THEME_COLORS[AppState.currentScreen]);
 }
 function swapNavForEar(ear){
   var nav=document.getElementById('sheet-nav');
@@ -2434,9 +2438,39 @@ var PRELOAD_ASSETS = [
   'assets/text_btn_icon.webp'
 ];
 
+// ====== IMAGE PRELOAD POOL ======
+// Keep decoded images in memory so DOM <img> tags can use them instantly
+var _imgPool = {};
+function preloadImage(url){
+  return new Promise(function(resolve, reject){
+    if(_imgPool[url]){ resolve(); return; }
+    var img = new Image();
+    img.onload = function(){
+      _imgPool[url] = img;
+      img.decode().then(resolve).catch(resolve);
+    };
+    img.onerror = function(){ reject(); };
+    img.src = url;
+  });
+}
+
 // ====== INIT ======
 (function init(){
   syncVersion();
+  
+  // If preload was already done this session, skip to main screen
+  if(sessionStorage.getItem('heardit_preload_done')){
+    if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
+      buildHomeSummary();
+      showScreen('home-with-data');
+    }else{
+      showScreen('home-no-data');
+    }
+    preloadSheet();
+    window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
+    return;
+  }
+  
   var total = PRELOAD_ASSETS.length;
   var loaded = 0;
   var barFill = document.getElementById('preload-bar-fill');
@@ -2455,6 +2489,7 @@ var PRELOAD_ASSETS = [
   function finishPreload(){
     if(finished) return;
     finished = true;
+    sessionStorage.setItem('heardit_preload_done', '1');
     if(barFill) barFill.style.width = '100%';
     if(barPercent) barPercent.textContent = '100%';
     setTimeout(function(){
@@ -2468,15 +2503,12 @@ var PRELOAD_ASSETS = [
     }, 300);
   }
   
-  // Use fetch() to download every image into browser HTTP cache - most reliable
+  // Preload via new Image() - ensures browser decodes & caches in rendering pipeline
+  var promises = [];
   for(var i = 0; i < PRELOAD_ASSETS.length; i++){
-    (function(url){
-      fetch(url).then(function(r){
-        if(!r.ok) throw new Error(r.status);
-        return r.blob(); // force full download into cache
-      }).then(function(){ updateProgress(); }).catch(function(){ updateProgress(); });
-    })(PRELOAD_ASSETS[i]);
+    promises.push(preloadImage(PRELOAD_ASSETS[i]).then(updateProgress).catch(updateProgress));
   }
+  Promise.allSettled(promises).then(function(){ if(!finished) finishPreload(); });
   
   // Fallback: max 30 seconds for very slow networks
   setTimeout(function(){
