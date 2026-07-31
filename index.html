@@ -479,7 +479,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.23</span>
+    <span class="preload-ver" id="preload-ver">v1.5.24</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -497,7 +497,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.23</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.24</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -524,7 +524,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.23</span>
+          <span id="header-ver">v1.5.24</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -941,7 +941,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 <!-- QR Code - desktop only -->
 <div class="qr-section">
   <div class="qr-code-wrap">
-    <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
+    <img src="assets/QR-code.svg" alt="QR Code" onerror="this.style.display='none'">
   </div>
   <div class="qr-label">
     <span class="qr-label-title">移动端App</span>
@@ -960,8 +960,8 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.23';
-var APP_VERSION = 'v1.5.23';
+const VERSION = 'v1.5.24';
+var APP_VERSION = 'v1.5.24';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -2446,7 +2446,7 @@ function resumeTest(){
 // ====== PRELOAD ASSETS (all images used in the app) ======
 // CRITICAL first: QR code + home screen images (needed for first paint)
 var PRELOAD_ASSETS = [
-  'assets/QR- code.svg',
+  'assets/QR-code.svg',
   'assets/union-bird.svg','assets/bird-logo-big.webp','assets/bird-icon-small.webp',
   'assets/circle-btn-bg-1afd37.webp','assets/text_btn_icon.webp',
   // Secondary: rest of assets
@@ -2489,16 +2489,20 @@ function waitForContainerImages(container){
   for(var i = 0; i < imgs.length; i++){
     (function(img){
       pending.push(new Promise(function(resolve){
-        if(img.complete && img.naturalWidth > 0){ resolve(); return; }
         var done = false;
         function finish(){ if(done) return; done = true; resolve(); }
-        function onLoad(){
+        function decodeAndFinish(){
           if(img.decode){ img.decode().then(finish).catch(finish); }
           else{ finish(); }
         }
-        img.addEventListener('load', onLoad, {once: true});
-        img.addEventListener('error', finish, {once: true});
-        setTimeout(finish, 3000);
+        // Always wait for load+decode, even if cached
+        if(img.complete && img.naturalWidth > 0){
+          decodeAndFinish();
+        }else{
+          img.addEventListener('load', function(){ decodeAndFinish(); }, {once: true});
+          img.addEventListener('error', finish, {once: true});
+        }
+        setTimeout(finish, 5000);
       }));
     })(imgs[i]);
   }
@@ -2552,6 +2556,8 @@ function waitForContainerImages(container){
     // Activate target screen behind preload (preload has z-index:10 and stays on top)
     var targetEl = document.getElementById('screen-'+targetName);
     if(targetEl) targetEl.classList.add('active');
+    AppState.currentScreen = targetName;
+    if(SCREEN_THEME_COLORS[targetName]) setThemeColor(SCREEN_THEME_COLORS[targetName]);
     
     // Collect images to wait for: target screen + QR section (desktop)
     var containers = [];
@@ -2564,15 +2570,22 @@ function waitForContainerImages(container){
     // Force reflow so browser starts loading/decoding visible images
     document.body.offsetHeight;
     
-    // Wait for all visible images to be decoded, then transition
+    // Wait for all visible images to be decoded, then hide preload screen
     var imgPromises = [];
     for(var c = 0; c < containers.length; c++){
       imgPromises.push(waitForContainerImages(containers[c]));
     }
     Promise.all(imgPromises).then(function(){
-      // All first-paint images decoded - now show the home screen
-      showScreen(targetName);
-      preloadSheet();
+      // Use double-rAF to ensure browser has painted the target screen
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          // Hide preload screen - target screen is already visible behind it
+          var preloadEl = document.getElementById('screen-preload');
+          if(preloadEl) preloadEl.classList.remove('active');
+          if(targetName==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);}
+          preloadSheet();
+        });
+      });
     });
   }
   
