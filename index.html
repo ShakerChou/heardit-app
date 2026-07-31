@@ -16,7 +16,15 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:#F2F2F7;color:#1C1C1E;font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
 .app-container{width:100%;max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#F2F2F7}
-@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden}}
+@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{display:flex;align-items:flex-start;gap:100px}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
+/* QR Code - desktop only */
+.qr-section{display:none;flex-direction:column;align-items:center;flex-shrink:0}
+@media(min-width:431px){.qr-section{display:flex}}
+.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff}
+.qr-code-wrap img{width:100%;height:100%;object-fit:contain}
+.qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 40px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.qr-label-title{font-size:24px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
+.qr-label-sub{font-size:16px;font-weight:400;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
 
 .status-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px 8px;flex-shrink:0;height:44px;font-size:16px;font-weight:600;color:#000}
 .status-bar-icons{display:flex;align-items:center;gap:8px}
@@ -121,12 +129,12 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .ho-title{font-size:18px;font-weight:500;color:#000}
 .ho-subtitle{font-size:12px;color:#000;opacity:.5}
 .ho-legend{font-size:12px;color:#000;opacity:.5}
-.ho-bars{display:flex;align-items:flex-end;gap:28px;margin-bottom:8px;padding-left:13px;height:80px}
+.ho-bars{display:flex;align-items:flex-end;justify-content:center;gap:28px;margin-bottom:8px;height:80px}
 .ho-bar-group{display:flex;align-items:flex-end;gap:4px}
 .ho-bar-l,.ho-bar-r{width:10px;border-radius:2px 2px 0 0;border:1px solid rgba(0,0,0,.05);min-height:4px}
 .ho-bar-l{background:#00CA48}
 .ho-bar-r{background:#FF0D19}
-.ho-freq-labels{display:flex;gap:28px;opacity:.5;padding-left:13px}
+.ho-freq-labels{display:flex;justify-content:center;gap:28px;opacity:.5}
 .ho-freq-label{width:24px;text-align:center;font-size:12px;color:#000}
 
 .sim-data-warning{background:#FFF5E5;border:1px solid #EFE6D9;border-radius:16px;padding:16px;margin-bottom:16px;font-size:14px;color:#FF9500;line-height:1.5}
@@ -463,6 +471,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 </style>
 </head>
 <body>
+<div class="desktop-wrapper">
 <div class="app-container" id="app">
 
 <!-- ===== SCREEN 0: PRELOAD ===== -->
@@ -470,7 +479,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.20</span>
+    <span class="preload-ver" id="preload-ver">v1.5.21</span>
   </div>
   <div class="preload-bar-wrap">
     <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
@@ -488,7 +497,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.20</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.21</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -515,7 +524,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.5.20</span>
+          <span id="header-ver">v1.5.21</span>
           <span class="beta-tag">BETA</span>
         </div>
       </div>
@@ -929,6 +938,17 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   </div>
 </div>
 </div>
+<!-- QR Code - desktop only -->
+<div class="qr-section">
+  <div class="qr-code-wrap">
+    <img src="assets/QR-%20code.svg" alt="QR Code" onerror="this.style.display='none'">
+  </div>
+  <div class="qr-label">
+    <span class="qr-label-title">移动端App</span>
+    <span class="qr-label-sub">（手机相机扫码）</span>
+  </div>
+</div>
+</div>
 <script>
 // Enable :active pseudo-class on iOS Safari
 document.addEventListener('touchstart',function(){},{passive:true});
@@ -940,8 +960,8 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.20';
-var APP_VERSION = 'v1.5.20';
+const VERSION = 'v1.5.21';
+var APP_VERSION = 'v1.5.21';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
@@ -2543,14 +2563,8 @@ function waitForDomImages(){
 </script>
 <script>
 if('serviceWorker' in navigator){
-  var _swFirstInstall = !navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange',function(){
-    // Skip reload on first SW install - only reload on actual updates
-    if(_swFirstInstall){_swFirstInstall=false;return;}
-    window.location.reload();
-  });
   navigator.serviceWorker.register('./sw.js').then(function(reg){
-    if(reg.waiting){reg.waiting.postMessage({action:'skipWaiting'});return;}
+    // SW updates silently in background - no page reload to avoid interrupting user
     reg.addEventListener('updatefound',function(){
       var newWorker=reg.installing;
       if(newWorker){newWorker.addEventListener('statechange',function(){

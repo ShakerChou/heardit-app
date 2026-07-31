@@ -1,4 +1,4 @@
-const CACHE = 'heardit-v1.5.20';
+const CACHE = 'heardit-v1.5.21';
 const ASSETS = [
   './manifest.json',
   // SVG icons
