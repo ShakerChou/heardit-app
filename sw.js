@@ -1,5 +1,6 @@
-const CACHE = 'heardit-v1.5.25';
+const CACHE = 'heardit-v1.5.52';
 const ASSETS = [
+  './',
   './manifest.json',
   // SVG icons
   './assets/close_icon.svg',
@@ -8,11 +9,12 @@ const ASSETS = [
   './assets/i_icon.svg',
   './assets/try.svg',
   './assets/union-bird.svg',
-  './assets/QR-code.svg',
+  './assets/QR-code.svg', './assets/QR-code-cf.svg',
   // PWA icons (PNG for compatibility)
   './assets/app-icon-180.png',
   './assets/app-icon-192.png',
   './assets/app-icon-512.png',
+  './assets/QR-code_app_icon.png',
   // WebP images
   './assets/1_cup.webp',
   './assets/2_cup.webp',
@@ -48,7 +50,11 @@ const ASSETS = [
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS))
+    caches.open(CACHE).then(c =>
+      Promise.all(ASSETS.map(url =>
+        c.add(url).catch(function(err){ console.warn('SW cache miss:', url, err); })
+      ))
+    )
   );
 });
 
@@ -62,18 +68,33 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for HTML (navigation requests) - always get latest version
+  // For navigation requests: cache-first, then network fallback
+  // This ensures offline support works even after killing the app
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      fetch(e.request).catch(function() {
-        return caches.match(e.request);
+      caches.match(e.request).then(function(r){
+        return r || fetch(e.request).then(function(resp){
+          // Cache the response for future offline use
+          var respClone = resp.clone();
+          caches.open(CACHE).then(function(c){ c.put(e.request, respClone); });
+          return resp;
+        });
+      }).catch(function(){
+        // Ultimate fallback: try to match any cached HTML
+        return caches.match('./');
       })
     );
     return;
   }
   // Cache-first for static assets
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    caches.match(e.request).then(function(r){
+      return r || fetch(e.request).then(function(resp){
+        var respClone = resp.clone();
+        caches.open(CACHE).then(function(c){ c.put(e.request, respClone); });
+        return resp;
+      });
+    })
   );
 });
 
