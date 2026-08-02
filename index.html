@@ -10,24 +10,18 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/app-icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/app-icon-192.png">
-<!-- DNS prefetch / preconnect for hosting domains -->
-<link rel="dns-prefetch" href="//shakerchou.github.io">
-<link rel="preconnect" href="https://shakerchou.github.io" crossorigin>
-<link rel="dns-prefetch" href="//heardit.pages.dev">
-<link rel="preconnect" href="https://heardit.pages.dev" crossorigin>
 <title>Heardit / 听到鸟</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:#F2F2F7;color:#1C1C1E;font-size:17px;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
 .app-container{width:100%;max-width:430px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#F2F2F7}
-@media(min-width:500px) and (pointer:fine){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start;width:100%}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
+@media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start;width:100%}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
 /* QR Code - desktop only */
 .qr-section{display:none;position:absolute;flex-direction:column;align-items:center;flex-shrink:0}
-@media(min-width:500px) and (pointer:fine){.qr-section{display:flex;top:0;left:50%;margin-left:calc(393px/2 + 100px)}}
-.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px;position:relative}
-.qr-code-wrap img.qr-code-img{width:100%;height:100%;object-fit:contain}
-.qr-app-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;object-fit:contain;border-radius:10px;background:#fff;padding:3px;z-index:2}
+@media(min-width:431px){.qr-section{display:flex;top:40px;left:50%;margin-left:calc(393px/2 + 40px)}}
+.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px}
+.qr-code-wrap img{width:100%;height:100%;object-fit:contain}
 .qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 40px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .qr-label-title{font-size:24px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
 .qr-label-sub{font-size:16px;font-weight:400;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
@@ -50,11 +44,10 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .preload-info{display:flex;flex-direction:column;align-items:center;gap:4px}
 .preload-title{font-size:28px;font-weight:600;color:#1C1C1E}
 .preload-ver{font-size:14px;color:#AEAEB2}
-.preload-progress-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
-.preload-bar-wrap{width:260px;display:flex;align-items:center}
+.preload-bar-wrap{width:260px;display:flex;align-items:center;gap:12px}
 .preload-bar{flex:1;height:12px;background:#E5E5E9;border-radius:6px;overflow:hidden}
 .preload-bar-fill{height:100%;background:#0085FF;border-radius:6px;transition:width .3s;width:0%}
-.preload-status{font-size:14px;color:#8E8E93;text-align:center;white-space:nowrap}
+.preload-percent{font-size:14px;font-weight:500;color:#0085FF;white-space:nowrap;min-width:36px;text-align:right}
 @keyframes preloadFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 .btn{display:block;width:100%;min-height:50px;padding:14px 24px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;-webkit-appearance:none;appearance:none;letter-spacing:.3px}
@@ -97,14 +90,14 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   .home-no-data-ver-text .beta-tag{font-size:9px}
   .skip-test-link{font-size:16px;bottom:250px}
 }
-@media(min-width:500px) and (pointer:fine){
+@media(min-width:431px){
   .start-test-circle{bottom:-399px}
   .skip-test-link{bottom:210px}
 }
 
 /* ===== SCREEN: HOME WITH DATA (首页-做完测试后/跳过听力测试) ===== */
 #screen-home-with-data{overflow:hidden;align-items:center;background:#F3F2F8}
-.home-data-header{width:100%;padding:16px 16px 16px;display:flex;justify-content:space-between;align-items:center;position:absolute;top:0;left:0;right:0;z-index:56;background:rgba(243,242,248,0.60);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.home-data-header{width:100%;padding:32px 16px 16px;display:flex;justify-content:space-between;align-items:center;position:absolute;top:0;left:0;right:0;z-index:56;background:rgba(243,242,248,0.60);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .home-brand-row{display:flex;align-items:center;gap:8px}
 .home-brand-icon{width:64px;height:56px;flex-shrink:0;overflow:hidden;border-radius:12px}
 .home-brand-icon img{width:100%;height:100%;object-fit:cover}
@@ -114,7 +107,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .home-brand-ver .beta-tag{background:#0085FF;color:#fff;font-size:10px;font-weight:500;padding:0 6px;border-radius:2px;line-height:18px}
 .home-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .hearing-status{font-size:18px;font-weight:500;color:#00CA48;white-space:nowrap;display:none;text-align:right}
-.home-scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:88px 16px 0;width:100%;box-sizing:border-box}
+.home-scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:104px 16px 0;width:100%;box-sizing:border-box}
 .home-scroll-area::-webkit-scrollbar{display:none}
 .home-scroll-area{-ms-overflow-style:none;scrollbar-width:none}
 
@@ -263,9 +256,9 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .fab-stop-icon-inner{width:20px;height:20px;background:#fff;border-radius:4px}
 
 /* ===== SCROLL FROST HEADER ===== */
-.frost-header{position:absolute;top:0;left:0;width:100%;height:88px;background:rgba(243,242,248,0.50);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:none;border-left:none;border-right:none;z-index:55;display:none;pointer-events:none;opacity:0;transition:opacity .3s ease}
+.frost-header{position:absolute;top:0;left:0;width:100%;height:104px;background:rgba(243,242,248,0.50);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:none;border-left:none;border-right:none;z-index:55;display:none;pointer-events:none;opacity:0;transition:opacity .3s ease}
 .frost-header.visible{display:block;opacity:1;border-bottom:1px solid rgba(255,255,255,0.20)}
-@media(min-width:500px) and (pointer:fine){.frost-header{height:88px}}
+@media(min-width:431px){.frost-header{height:88px}}
 
 /* ===== BOTTOM SHEET ===== */
 .sheet-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:100;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.32,.72,0,1);will-change:opacity;backface-visibility:hidden}
@@ -472,24 +465,12 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
    .ts-bottom-bar-pause .ts-pill-btn-outline{font-size:16px;height:40px}
 }
 
-@media(min-width:500px) and (pointer:fine){
+@media(min-width:431px){
   .status-bar{display:none}
   .home-no-data-inner{padding-top:16px}
   .home-data-header{padding:16px 16px 16px}
   .home-scroll-area{padding-top:88px}
 }
-
-/* PC headphone detection modal */
-.pc-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
-.pc-modal-overlay.active{display:flex}
-.pc-modal{background:#fff;border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
-.pc-modal-title{font-size:18px;font-weight:600;color:#1C1C1E;margin-bottom:12px}
-.pc-modal-desc{font-size:15px;color:#3C3C43;line-height:1.5;margin-bottom:20px;text-align:left}
-.pc-modal-btns{display:flex;gap:12px}
-.pc-modal-btn{flex:1;height:44px;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;-webkit-appearance:none;appearance:none}
-.pc-modal-btn:active{opacity:.7}
-.pc-modal-btn-cancel{background:#0085FF;color:#fff}
-.pc-modal-btn-confirm{background:#F2F2F7;color:#3C3C43}
 </style>
 </head>
 <body>
@@ -501,13 +482,11 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.5.51</span>
+    <span class="preload-ver" id="preload-ver">v1.6.7</span>
   </div>
-  <div class="preload-progress-wrap">
-    <div class="preload-bar-wrap">
-      <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
-    </div>
-    <div class="preload-status" id="preload-status">加载离线所需数据中...0%</div>
+  <div class="preload-bar-wrap">
+    <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
+    <span class="preload-percent" id="preload-percent">0%</span>
   </div>
 </div>
 
@@ -521,7 +500,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.5.51</span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.6.7</span></span>
       <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
@@ -548,8 +527,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
+          <span id="header-ver">v1.6.7</span>
           <span class="beta-tag">BETA</span>
-          <span id="header-ver">v1.5.51</span>
         </div>
       </div>
     </div>
@@ -582,22 +561,22 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="ts-audiogram-header">
         <div class="ts-audiogram-header-left">
           <span class="ts-audiogram-title">纯音测听图</span>
-          <img class="ts-audiogram-info" src="assets/i_icon.svg" width="20" height="20" alt="信息" draggable="false" onclick="toggleHomeAudiogramPopup(event)" onerror="this.style.display='none'">
+          <img class="ts-audiogram-info" src="assets/i_icon.svg" width="20" height="20" alt="信息" draggable="false" onclick="toggleHoPopup(event)" onerror="this.style.display='none'">
         </div>
         <div class="ts-audiogram-legend">
           <span class="ts-legend-item"><img src="assets/cetingtu_left.webp" width="11" height="11" alt="左" onerror="this.style.display='none'"><span>左</span></span>
           <span class="ts-legend-item"><img src="assets/cetingtu_right.webp" width="12" height="12" alt="右" onerror="this.style.display='none'"><span>右</span></span>
         </div>
       </div>
-      <div class="ts-audiogram-grid" id="home-audiogram-grid">
+      <div class="ts-audiogram-grid" id="ho-audiogram-grid">
         <div class="ts-audiogram-plot-wrap">
-          <div class="ts-audiogram-plot" id="home-audiogram-plot">
+          <div class="ts-audiogram-plot" id="ho-audiogram-plot">
           </div>
-          <div class="ts-audiogram-xaxis" id="home-audiogram-xaxis"></div>
+          <div class="ts-audiogram-xaxis" id="ho-audiogram-xaxis"></div>
         </div>
-        <div class="ts-audiogram-yaxis" id="home-audiogram-yaxis"></div>
+        <div class="ts-audiogram-yaxis" id="ho-audiogram-yaxis"></div>
       </div>
-      <div class="ts-audiogram-popup" id="home-audiogram-popup">
+      <div class="ho-audiogram-popup" id="ho-audiogram-popup">
         <div class="ts-popup-row">
           <div class="ts-popup-label-group">
             <div class="ts-popup-swatch" style="background:#00CA48"></div>
@@ -972,12 +951,11 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 <!-- QR Code - desktop only -->
 <div class="qr-section">
   <div class="qr-code-wrap">
-    <img class="qr-code-img" src="assets/QR-code-cf.svg" alt="QR Code" onerror="this.style.display='none'">
-    <img class="qr-app-icon" src="assets/QR-code_app_icon.png" alt="App Icon" onerror="this.style.display='none'">
+    <img src="assets/QR-code.svg" alt="QR Code" onerror="this.style.display='none'">
   </div>
   <div class="qr-label">
-    <span class="qr-label-title">手机App</span>
-    <span class="qr-label-sub">1.手机相机扫码<br>2.浏览器点分享<br>3.添加到主屏幕</span>
+    <span class="qr-label-title">移动端App</span>
+    <span class="qr-label-sub">（手机相机扫码）</span>
   </div>
 </div>
 </div>
@@ -992,15 +970,15 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.5.52';
-var APP_VERSION = 'v1.5.52';
+const VERSION = 'v1.6.7';
+var APP_VERSION = 'v1.6.7';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
 const NORMAL_PROFILE = {250:0,500:0,1000:0,2000:0,4000:0,8000:0};
 const FREQS = [250,500,1000,2000,4000,8000];
 const FREQ_LABELS_MAP = {250:'250',500:'500',1000:'1k',2000:'2k',4000:'4k',8000:'8k'};
-const GAIN_LEVELS = [-24,-18,-16,-14,-12,-10,-8,-6,-4,-3,-2];
+const GAIN_LEVELS = [0,-18,-16,-14,-12,-10,-8,-6,-4,-3,-2];
 const DEFAULT_LEVEL = 5;
 const SAFETY_HARD_LIMIT = -10;
 const HPFREQ = 400;
@@ -1010,7 +988,6 @@ const POWER_HUM_FREQ = 50;
 const NAL_NL2_WEIGHTS = {250:0.22,500:0.30,1000:0.38,2000:0.35,4000:0.28,8000:0.18};
 const EQ_GAIN_MAX = 12;
 const SPEECH_BOOST = 1;
-const MONO_MIXER_GAIN = 0.40;
 const BAND_CFG = [
   {freq:250,bwQ:1.1,targetDb:-38,maxGain:0.7,minGain:0.2,gateDb:-56,gateAtten:0.10,limiterDb:-12,att:0.5,rel:0.0015},
   {freq:500,bwQ:1.3,targetDb:-36,maxGain:0.75,minGain:0.2,gateDb:-54,gateAtten:0.08,limiterDb:-13,att:0.5,rel:0.0018},
@@ -1066,18 +1043,19 @@ const AudioEngine = {
   ctx:null,stream:null,source:null,
   userGain:1,deviceId:null,noiseSupp:'auto',micMode:'phone',
   howlSensitivity:HOWL_DEFAULT_SENSITIVITY,
-  hpf:null,lpf:null,transientLimiter:null,
+  hpf:null,lpf:null,
   bands:[],monoMixer:null,
   leftEqs:[],rightEqs:[],
-  highShelf:null,masterGain:null,protector:null,adapNotch:null,
+  highShelf:null,masterGain:null,protector:null,
+  feedbackDelay:null,adaptiveNotch:null,
   outputAnalyser:null,inputAnalyser:null,leftAnalyser:null,rightAnalyser:null,
   bgOsc:null,bgGain:null,
   agcInterval:null,latencyInterval:null,fadeInterval:null,
-  howlInterval:null,howlCount:0,howlStartTime:0,howlPeakFreq:0,
+  howlInterval:null,howlCount:0,howlStartTime:0,howlPeakFreq:0,howlNotchFreq:0,
   isMuted:false,isSuppressed:false,
   isRunning:false,mode:null,
 
-  async start(mode,profile,gainLevel,deviceId,noiseSupp,micMode,_preStream){
+  async start(mode,profile,gainLevel,deviceId,noiseSupp,micMode){
     await this.stop();
     this.mode=mode;
     this.deviceId=deviceId;
@@ -1091,30 +1069,63 @@ const AudioEngine = {
     this.isSuppressed=false;
     const AudioCtx=window.AudioContext||window.webkitAudioContext;
     this.ctx=new AudioCtx({latencyHint:0.00001,sampleRate:44100});
-    if(this.ctx.state==='suspended'){await this.ctx.resume();}
-    const isEarphone=this.micMode==='earphone';
-    // 如果传入了预获取的流，直接使用，跳过getUserMedia
-    if(_preStream){
-      this.stream=_preStream;
+    const nsMode=noiseSupp==='auto'?supportsNoiseSuppression():(noiseSupp==='browser'?'basic':'off');
+    const nsEnabled=nsMode!=='off';
+    let constraints;
+    if(nsMode==='chrome'){
+      constraints={audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:false,latency:0.001,noiseSuppressionQuality:4,googNoiseSuppression:true,googNoiseSuppression2:true,googAutoGainControl:false,googEchoCancellation:false}};
+    }else if(nsMode==='ios'){
+      constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
     }else{
-      const nsMode=noiseSupp==='auto'?supportsNoiseSuppression():(noiseSupp==='browser'?'basic':'off');
-      const nsEnabled=nsMode!=='off';
-      let constraints;
-      if(nsMode==='chrome'){
-        constraints={audio:{echoCancellation:isEarphone,noiseSuppression:true,autoGainControl:false,latency:0.001,noiseSuppressionQuality:4,googNoiseSuppression:true,googNoiseSuppression2:true,googAutoGainControl:false,googEchoCancellation:isEarphone}};
-      }else if(nsMode==='ios'){
-        constraints={audio:{echoCancellation:isEarphone,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
-      }else{
-        constraints={audio:{echoCancellation:isEarphone,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
-      }
-      if(deviceId)constraints.audio.deviceId={exact:deviceId};
-      try{this.stream=await navigator.mediaDevices.getUserMedia(constraints);}
-      catch(e){
-        try{
-          constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
-          this.stream=await navigator.mediaDevices.getUserMedia(constraints);
-        }catch(e2){this.stop();return false;}
-      }
+      constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+    }
+    if(deviceId)constraints.audio.deviceId={exact:deviceId};
+    try{this.stream=await navigator.mediaDevices.getUserMedia(constraints);}
+    catch(e){
+      try{
+        constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+        this.stream=await navigator.mediaDevices.getUserMedia(constraints);
+      }catch(e2){this.stop();return false;}
+    }
+    // 监听设备断开/拔插：当音轨结束时表示设备被移除
+    var self = this;
+    if(this.stream){
+      this.stream.getTracks().forEach(function(track){
+        track.addEventListener('ended',function(){
+          if(self.isRunning){
+            self.isRunning = false;
+            haState.isRunning = false;
+            // 清除缓存设备ID，下次切换时重新检测
+            haState.phoneDeviceId = null;
+            haState.earphoneDeviceId = null;
+            // 通知UI设备已断开
+            var st = document.getElementById('hearing-status');
+            if(st){ st.textContent = '设备已断开，请重新开始'; st.style.color = '#FF9500'; }
+            var fab = document.getElementById('fab');
+            var fabText = document.getElementById('fab-text');
+            var fabCup = document.getElementById('fab-cup');
+            var pressWrap = document.getElementById('fab-press-wrap');
+            var settings = document.getElementById('ha-settings');
+            if(fab){ fab.classList.remove('fab-red'); fab.classList.add('fab-blue'); }
+            if(fabText) fabText.innerHTML = '开始<br>助听';
+            if(fabCup){ fabCup.style.transition='none'; fabCup.style.transform='translate(60px,60px)'; fabCup.style.opacity='0'; fabCup.src='assets/start_cup.webp'; }
+            if(pressWrap){ pressWrap.classList.remove('pause'); }
+            if(fabCup){ void fabCup.offsetHeight; fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)'; fabCup.style.transform='translate(0,0)'; fabCup.style.opacity='1'; setTimeout(function(){ fabCup.style.transition=''; fabCup.style.transform=''; fabCup.style.opacity=''; },420); }
+            if(settings) settings.classList.remove('visible');
+            if(!AppState.isSimulated && !AppState.isSimulatedData){
+              var overview = document.getElementById('hearing-overview');
+              var earCards = document.getElementById('ear-cards-row');
+              if(overview) overview.style.display = 'block';
+              if(earCards) earCards.style.display = 'flex';
+            }
+            AppState.isHearingAidOn = false;
+            isHearingAidOn = false;
+            stopDualVizAnimation();
+            releaseWakeLock();
+            teardownAudioKeepAlive();
+          }
+        });
+      });
     }
     if(this.ctx&&this.ctx.state==='suspended'){
       try{await Promise.race([this.ctx.resume(),new Promise(function(_,r){setTimeout(function(){r();},2000);})]);}
@@ -1128,35 +1139,30 @@ const AudioEngine = {
     this.protector.attack.value=0.0005;
     this.protector.release.value=0.02;
     this.masterGain=this.ctx.createGain();
-    this.masterGain.gain.value=this.userGain;
+    this.masterGain.gain.value=this.userGain*0.1;
     this.outputAnalyser=this.ctx.createAnalyser();
-    this.outputAnalyser.fftSize=256;
+    this.outputAnalyser.fftSize=512;
     this.outputAnalyser.smoothingTimeConstant=0.1;
     this.inputAnalyser=this.ctx.createAnalyser();
-    this.inputAnalyser.fftSize=256;
+    this.inputAnalyser.fftSize=512;
     this.inputAnalyser.smoothingTimeConstant=0.3;
     this.hpf=this.ctx.createBiquadFilter();
     this.hpf.type='highpass';this.hpf.frequency.value=HPFREQ;this.hpf.Q.value=0.707;
     this.lpf=this.ctx.createBiquadFilter();
     this.lpf.type='lowpass';this.lpf.frequency.value=LPFREQ;this.lpf.Q.value=0.7;
-    this.transientLimiter=this.ctx.createDynamicsCompressor();
-    this.transientLimiter.threshold.value=-30;this.transientLimiter.knee.value=6;
-    this.transientLimiter.ratio.value=10;this.transientLimiter.attack.value=0.001;this.transientLimiter.release.value=0.04;
     this.source.connect(this.hpf);
     this.source.connect(this.inputAnalyser);
     this.hpf.connect(this.lpf);
-    this.lpf.connect(this.transientLimiter);
     this.bands=[];
     this.monoMixer=this.ctx.createGain();
-    if(this.micMode==='earphone'){this.monoMixer.gain.value=MONO_MIXER_GAIN*1.5;}
-    else{this.monoMixer.gain.value=MONO_MIXER_GAIN*16.0;}
+    this.monoMixer.gain.value=this.micMode==='earphone'?dbToLinear(15):dbToLinear(40);
     BAND_CFG.forEach(function(cfg,i){
       const bp=this.ctx.createBiquadFilter();
       bp.type='bandpass';bp.frequency.value=cfg.freq;bp.Q.value=cfg.bwQ;
       const agc=this.ctx.createGain();agc.gain.value=0.35;
       const analyser=this.ctx.createAnalyser();
-      analyser.fftSize=64;
-      this.transientLimiter.connect(bp);
+      analyser.fftSize=128;
+      this.lpf.connect(bp);
       bp.connect(agc);agc.connect(analyser);analyser.connect(this.monoMixer);
       this.bands.push({cfg:cfg,bp:bp,agc:agc,analyser:analyser,smoothRMS:0,currentGain:0.35,gateOpen:cfg.gateAtten,isElderly:mode!=='normal'});
     }.bind(this));
@@ -1193,21 +1199,18 @@ const AudioEngine = {
     this.highShelf.gain.value=hasLoss?-12:0;
     merger.connect(this.highShelf);
     this.highShelf.connect(this.masterGain);
-    this.masterGain.connect(this.protector);
-    // 耳机模式：自适应陷波滤波器，主动跟踪并抑制反馈频率
-    if(isEarphone){
-      this.adapNotch=this.ctx.createBiquadFilter();
-      this.adapNotch.type='notch';
-      this.adapNotch.frequency.value=3000;
-      this.adapNotch.Q.value=30;
-      this.adapNotch.gain.value=-30;
-      this.protector.connect(this.adapNotch);
-      this.adapNotch.connect(this.ctx.destination);
-      this.adapNotch.connect(this.outputAnalyser);
-    }else{
-      this.protector.connect(this.ctx.destination);
-      this.protector.connect(this.outputAnalyser);
-    }
+    // 反馈延迟打乱啸叫环路（3ms延迟破坏反馈相位）
+    this.feedbackDelay=this.ctx.createDelay(0.01);
+    this.feedbackDelay.delayTime.value=0.003;
+    // 自适应陷波器主动抑制啸叫频率
+    this.adaptiveNotch=this.ctx.createBiquadFilter();
+    this.adaptiveNotch.type='notch';this.adaptiveNotch.frequency.value=4000;this.adaptiveNotch.Q.value=8.0;
+    this.adaptiveNotch.gain.value=-40;
+    this.masterGain.connect(this.feedbackDelay);
+    this.feedbackDelay.connect(this.adaptiveNotch);
+    this.adaptiveNotch.connect(this.protector);
+    this.protector.connect(this.ctx.destination);
+    this.protector.connect(this.outputAnalyser);
     this.startMultiWdrcLoop();
     this.startSoftStart();
     this.startLatencyMonitor();
@@ -1224,21 +1227,15 @@ const AudioEngine = {
   startSoftStart(){
     if(!this.bands.length||!this.ctx)return;
     const t=this.ctx.currentTime;
-    const isEarphone=this.micMode==='earphone';
-    // 耳机模式：极低起始增益，3.5秒渐变到正常，给自适应陷波锁定时间
-    const startGain=isEarphone?0.01:0.2;
-    const targetGain=isEarphone?0.35:0.5;
-    const rampTime=isEarphone?3.5:3.0;
     this.bands.forEach(function(ch){
       ch.agc.gain.cancelScheduledValues(t);
-      ch.agc.gain.setValueAtTime(startGain,t);
-      ch.agc.gain.linearRampToValueAtTime(targetGain,t+rampTime);
+      ch.agc.gain.setValueAtTime(0.01,t);
+      ch.agc.gain.linearRampToValueAtTime(0.5,t+1.0);
     });
-    // 耳机模式：masterGain也做渐变，起始极低
-    if(isEarphone&&this.masterGain){
+    if(this.masterGain){
       this.masterGain.gain.cancelScheduledValues(t);
       this.masterGain.gain.setValueAtTime(this.userGain*0.1,t);
-      this.masterGain.gain.linearRampToValueAtTime(this.userGain,t+3.5);
+      this.masterGain.gain.linearRampToValueAtTime(this.userGain,t+1.0);
     }
   },
 
@@ -1255,7 +1252,6 @@ const AudioEngine = {
     const endBin=Math.floor(5000/binSize);
     const energyDb=sens.energyDb;
     const peakRatio=sens.peakRatio;
-    const softDb=energyDb-6; // 自适应陷波阈值：比主阈值低6dB
     this.howlInterval=setInterval(function(){
       if(!this.outputAnalyser||!this.ctx||this.isSuppressed)return;
       this.outputAnalyser.getFloatFrequencyData(freqData);
@@ -1263,11 +1259,6 @@ const AudioEngine = {
       let peakDb=-Infinity;
       for(let i=startBin;i<endBin;i++){
         if(freqData[i]>peakDb){peakDb=freqData[i];peakBin=i;}
-      }
-      // 自适应陷波：峰值超过软阈值时，平滑跟踪抑制
-      if(this.adapNotch&&peakDb>softDb){
-        const peakFreq=peakBin*binSize;
-        this.adapNotch.frequency.setTargetAtTime(peakFreq,this.ctx.currentTime,0.03);
       }
       if(peakDb<energyDb){this.howlHitCount=0;return;}
       const leftDb=peakBin>startBin?freqData[peakBin-2]:-Infinity;
@@ -1290,14 +1281,16 @@ const AudioEngine = {
     this.isSuppressed=true;
     this.howlCount++;
     this.howlStartTime=0;
-    if(this.masterGain&&this.ctx){
-      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
-      this.masterGain.gain.setValueAtTime(0,this.ctx.currentTime);
+    this.howlNotchFreq=this.howlPeakFreq;
+    // 自适应陷波：将notch频率设置到啸叫峰值频率，主动抑制啸叫
+    if(this.adaptiveNotch&&this.ctx){
+      this.adaptiveNotch.frequency.setTargetAtTime(this.howlPeakFreq,this.ctx.currentTime,0.005);
+      this.adaptiveNotch.gain.setTargetAtTime(-40,this.ctx.currentTime,0.005);
     }
     const banner=document.getElementById('howl-banner');
-    if(banner){banner.style.display='block';banner.textContent='检测到啸叫('+Math.round(this.howlPeakFreq)+'Hz)，已自动静音';}
+    if(banner){banner.style.display='block';banner.textContent='检测到啸叫('+Math.round(this.howlPeakFreq)+'Hz)，已主动抑制';}
     const statusEl=document.getElementById('hearing-status');
-    if(statusEl){statusEl.textContent='啸叫保护中...';statusEl.style.color='#FF3B30';}
+    if(statusEl){statusEl.textContent='啸叫抑制中...';statusEl.style.color='#FF9500';}
     if(this.howlCount>=HOWL_MAX_COUNT){
       setTimeout(async function(){if(this.isRunning){await autoStopHowl();}}.bind(this),500);
       return;
@@ -1306,6 +1299,7 @@ const AudioEngine = {
       setTimeout(async function(){if(this.isRunning){await autoStopHowl();}}.bind(this),300);
       return;
     }
+    // 啸叫减弱后释放陷波器
     setTimeout(function(){
       if(!this.isRunning||!this.isSuppressed)return;
       this.recoverFromHowl();
@@ -1314,11 +1308,9 @@ const AudioEngine = {
 
   recoverFromHowl(){
     this.isSuppressed=false;
-    if(this.masterGain&&this.ctx){
-      const t=this.ctx.currentTime;
-      this.masterGain.gain.cancelScheduledValues(t);
-      this.masterGain.gain.setValueAtTime(0,t);
-      this.masterGain.gain.linearRampToValueAtTime(this.userGain*0.6,t+0.5);
+    // 逐渐释放陷波器
+    if(this.adaptiveNotch&&this.ctx){
+      this.adaptiveNotch.gain.setTargetAtTime(0,this.ctx.currentTime,0.1);
     }
     const banner=document.getElementById('howl-banner');
     if(banner)banner.style.display='none';
@@ -1446,18 +1438,14 @@ const AudioEngine = {
     try{if(this.bgOsc){this.bgOsc.stop();this.bgOsc.disconnect();}}catch(e){}this.bgOsc=null;
     try{if(this.bgGain)this.bgGain.disconnect();}catch(e){}this.bgGain=null;
     if(this.stream){this.stream.getTracks().forEach(function(t){t.stop();});this.stream=null;}
-    const nodes=[this.source,this.hpf,this.lpf,this.transientLimiter,this.monoMixer,this.highShelf,this.masterGain,this.protector,this.adapNotch,this.outputAnalyser,this.inputAnalyser,this.leftAnalyser,this.rightAnalyser];
+    const nodes=[this.source,this.hpf,this.lpf,this.monoMixer,this.highShelf,this.masterGain,this.protector,this.feedbackDelay,this.adaptiveNotch,this.outputAnalyser,this.inputAnalyser,this.leftAnalyser,this.rightAnalyser];
     if(this.bands)this.bands.forEach(function(ch){nodes.push(ch.bp,ch.agc,ch.analyser);});
     [this.leftEqs,this.rightEqs].forEach(function(arr){arr.forEach(function(f){nodes.push(f);});});
     nodes.forEach(function(n){try{if(n)n.disconnect();}catch(e){}});
     this.bands=[];this.leftEqs=[];this.rightEqs=[];
-    this.source=this.hpf=this.lpf=this.transientLimiter=null;
-    this.monoMixer=this.highShelf=this.masterGain=this.protector=this.adapNotch=this.outputAnalyser=this.inputAnalyser=this.leftAnalyser=this.rightAnalyser=null;
-    if(this.ctx){
-      const ctx=this.ctx;
-      try{ctx.close();}catch(e){}
-      this.ctx=null;
-    }
+    this.source=this.hpf=this.lpf=null;
+    this.monoMixer=this.highShelf=this.masterGain=this.protector=this.feedbackDelay=this.adaptiveNotch=this.outputAnalyser=this.inputAnalyser=this.leftAnalyser=this.rightAnalyser=null;
+    if(this.ctx){try{await this.ctx.close();}catch(e){}this.ctx=null;}
   }
 };
 
@@ -1520,11 +1508,7 @@ async function requestWakeLock(){
   try{
     if('wakeLock' in navigator){
       wakeLock = await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release',function(){
-        wakeLock = null;
-        // Auto re-acquire if hearing aid is still running
-        if(haState.isRunning) requestWakeLock();
-      });
+      wakeLock.addEventListener('release',function(){wakeLock = null;});
     }
   }catch(e){wakeLock = null;}
 }
@@ -1547,61 +1531,17 @@ function teardownAudioKeepAlive(){
 }
 function onVisibilityChange(){
   if(document.visibilityState === 'visible'){
-    // Re-acquire wake lock when page becomes visible
-    if(haState.isRunning && !wakeLock) requestWakeLock();
     if(wasRunningBeforeSleep && haState.isRunning){
       var st = document.getElementById('hearing-status');
       if(st){st.textContent = '恢复中...';st.style.color = '#00CA48';st.style.display = 'block';}
-      recoverAfterSleep();
+      AudioEngine.stop().then(function(){
+        haStartGen++;
+        startHearingAidAsync(haStartGen);
+      });
     }
     wasRunningBeforeSleep = false;
   }else{
     if(haState.isRunning){wasRunningBeforeSleep = true;}
-  }
-}
-var _recoveryTimeout = null;
-async function recoverAfterSleep(){
-  // 超时保护：5秒内未恢复则回退到停止状态
-  if(_recoveryTimeout)clearTimeout(_recoveryTimeout);
-  _recoveryTimeout = setTimeout(function(){
-    if(haState.isRunning){
-      // 恢复失败，回退到暂停状态
-      haState.isRunning = false;
-      AppState.isHearingAidOn = false;
-      isHearingAidOn = false;
-      releaseWakeLock();
-      var fab2 = document.getElementById('fab');
-      var fabText2 = document.getElementById('fab-text');
-      var fabCup2 = document.getElementById('fab-cup');
-      var pressWrap2 = document.getElementById('fab-press-wrap');
-      var settings2 = document.getElementById('ha-settings');
-      var overview2 = document.getElementById('hearing-overview');
-      var earCards2 = document.getElementById('ear-cards-row');
-      var testBtn2 = document.getElementById('test-btn-pill');
-      var st2 = document.getElementById('hearing-status');
-      if(st2){st2.textContent='恢复失败，请重试';st2.style.color='#FF3B30';st2.style.display='block';}
-      fab2.classList.remove('fab-red');fab2.classList.add('fab-blue');
-      fab2.classList.remove('fab-mini');fabIsMini = false;
-      if(pressWrap2)pressWrap2.classList.remove('mini-hide','pause');
-      fabText2.innerHTML = '开始<br>助听';
-      if(fabCup2){fabCup2.style.transition='none';fabCup2.style.transform='translate(60px,60px)';fabCup2.style.opacity='0';fabCup2.src='assets/start_cup.webp';}
-      if(fabCup2){void fabCup2.offsetHeight;fabCup2.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup2.style.transform='translate(0,0)';fabCup2.style.opacity='1';setTimeout(function(){fabCup2.style.transition='';fabCup2.style.transform='';fabCup2.style.opacity='';},420);}
-      if(settings2)settings2.classList.remove('visible');
-      if(overview2)overview2.style.display='block';
-      if(earCards2)earCards2.style.display='flex';
-      if(testBtn2)testBtn2.style.display='';
-      stopDualVizAnimation();
-    }
-  },5000);
-  try{
-    await AudioEngine.stop();
-    haStartGen++;
-    await startHearingAidAsync(haStartGen);
-    if(_recoveryTimeout){clearTimeout(_recoveryTimeout);_recoveryTimeout = null;}
-  }catch(e){
-    if(_recoveryTimeout){clearTimeout(_recoveryTimeout);_recoveryTimeout = null;}
-    var st3 = document.getElementById('hearing-status');
-    if(st3){st3.textContent='恢复失败，请重试';st3.style.color='#FF3B30';st3.style.display='block';}
   }
 }
 var haStartGen = 0;
@@ -1630,6 +1570,8 @@ function loadHearingData(){
   }catch(e){}
   return false;
 }
+
+// ====== HA STATE SAVE/LOAD ======
 function saveSettings(){
   try{
     var s = {
@@ -1656,19 +1598,6 @@ function loadSettings(){
       if(s.gainLevel!==undefined)haState.gainLevel=s.gainLevel;
     }
   }catch(e){}
-}
-function updateHowlUI(sens){
-  var btns=document.querySelectorAll('#howl-toggle .howl-toggle-btn');
-  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
-  var sensMap={off:0,low:1,high:2};
-  var idx=sensMap[sens]||0;
-  if(btns[idx])btns[idx].classList.add('active');
-  var footer=document.querySelector('#howl-toggle').parentElement.querySelector('.howl-footer');
-  var sensData=HOWL_SENSITIVITY[sens];
-  if(footer){
-    var modeLabel=haState.micMode==='phone'?'手机':'耳机';
-    footer.textContent=sensData.desc+' · '+modeLabel+'模式默认'+(sens==='off'?'关闭':'低');
-  }
 }
 
 // ====== HELPERS ======
@@ -1697,7 +1626,7 @@ function showScreen(name){
   if(target)target.classList.add('active');
   AppState.currentScreen = name;
   if(SCREEN_THEME_COLORS[name]) setThemeColor(SCREEN_THEME_COLORS[name]);
-  if(name==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);tryDrawHomeAudiogram();}
+  if(name==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);requestAnimationFrame(function(){requestAnimationFrame(function(){drawHomeAudiogram();});});}
   syncVersion();
 }
 
@@ -1745,15 +1674,60 @@ function buildHomeSummary(){
   updateBadge('ear-right-badge',rightCat);
   var warning = document.getElementById('sim-data-warning');
   if(warning)warning.style.display = (AppState.isSimulated||AppState.isSimulatedData)?'block':'none';
-  // Audiogram is drawn after screen is visible (see showScreen)
-  scheduleHomeAudiogram();
 }
-var _homeAudiogramPending = false;
-function scheduleHomeAudiogram(){_homeAudiogramPending = true;}
-function tryDrawHomeAudiogram(){
-  if(!_homeAudiogramPending)return;
-  _homeAudiogramPending = false;
-  requestAnimationFrame(function(){requestAnimationFrame(function(){drawHomeAudiogram();});});
+function drawHomeAudiogram(){
+  var plot=document.getElementById('ho-audiogram-plot');
+  var yaxis=document.getElementById('ho-audiogram-yaxis');
+  var xaxis=document.getElementById('ho-audiogram-xaxis');
+  if(!plot||!yaxis||!xaxis)return;
+  plot.innerHTML='';yaxis.innerHTML='';xaxis.innerHTML='';
+  var plotBorderW=plot.clientWidth;
+  var colW=plotBorderW/8;
+  var rowH=colW*0.6;
+  var contentH=9*rowH;
+  var plotTotalH=contentH+2;
+  plot.style.height=plotTotalH+'px';
+  for(var r=0;r<9;r++){var row=document.createElement('div');row.className='ts-grid-row';plot.appendChild(row);}
+  var dbLabels=[-10,0,10,20,30,40,50,60,70,80];
+  yaxis.style.height=contentH+'px';
+  for(var d=0;d<dbLabels.length;d++){var span=document.createElement('span');span.textContent=dbLabels[d];span.style.top=(d/9*100)+'%';yaxis.appendChild(span);}
+  var hzLabel=document.createElement('span');hzLabel.className='ts-xaxis-hz';hzLabel.textContent='Hz';xaxis.appendChild(hzLabel);
+  var freqLabels=['125','250','500','1k','2k','4k','8k'];
+  var nLines=9;
+  for(var f=0;f<freqLabels.length;f++){var span=document.createElement('span');span.textContent=freqLabels[f];span.style.left=((f+1)/(nLines-1)*100)+'%';xaxis.appendChild(span);}
+  for(var v=1;v<nLines;v++){var line=document.createElement('div');line.className='ts-grid-vline';line.style.left=(v/(nLines-1)*100)+'%';plot.appendChild(line);}
+  var dBMin=-10,dBMax=80;
+  var dbRange=dBMax-dBMin;
+  function dbToY(dbValue){return((dbValue-dBMin)/dbRange)*100;}
+  function lineToX(lineIndex){return(lineIndex/(nLines-1))*100;}
+  var leftData=AppState.hearingData.left;
+  var rightData=AppState.hearingData.right;
+  var leftPoints=[],rightPoints=[];
+  for(var i=0;i<leftData.length;i++){var lineIdx=i+2;var xPct=lineToX(lineIdx);leftPoints.push({x:xPct,y:dbToY(leftData[i])});rightPoints.push({x:xPct,y:dbToY(rightData[i])});}
+  function buildLinePath(points){if(points.length===0)return'';var d='M'+points[0].x+' '+points[0].y;for(var p=1;p<points.length;p++){d+=' L'+points[p].x+' '+points[p].y;}return d;}
+  var svgNS='http://www.w3.org/2000/svg';
+  var svgLeft=document.createElementNS(svgNS,'svg');
+  svgLeft.setAttribute('class','ts-line-svg line-left');
+  svgLeft.setAttribute('viewBox','0 0 100 100');
+  svgLeft.setAttribute('preserveAspectRatio','none');
+  var pathLeft=document.createElementNS(svgNS,'path');
+  pathLeft.setAttribute('d',buildLinePath(leftPoints));
+  pathLeft.setAttribute('stroke','#0085FF');pathLeft.setAttribute('stroke-width','2');pathLeft.setAttribute('fill','none');pathLeft.setAttribute('vector-effect','non-scaling-stroke');
+  svgLeft.appendChild(pathLeft);plot.appendChild(svgLeft);
+  var svgRight=document.createElementNS(svgNS,'svg');
+  svgRight.setAttribute('class','ts-line-svg line-right');
+  svgRight.setAttribute('viewBox','0 0 100 100');
+  svgRight.setAttribute('preserveAspectRatio','none');
+  var pathRight=document.createElementNS(svgNS,'path');
+  pathRight.setAttribute('d',buildLinePath(rightPoints));
+  pathRight.setAttribute('stroke','#FF0D19');pathRight.setAttribute('stroke-width','2');pathRight.setAttribute('fill','none');pathRight.setAttribute('vector-effect','non-scaling-stroke');
+  svgRight.appendChild(pathRight);plot.appendChild(svgRight);
+  function addDataPoint(lineIndex,dbValue,isLeft){var xPercent=lineToX(lineIndex);var yPercent=dbToY(dbValue);var point=document.createElement('div');point.className='ts-data-point '+(isLeft?'left':'right');point.style.left=xPercent+'%';point.style.top=yPercent+'%';var img=document.createElement('img');img.src=isLeft?'assets/cetingtu_left.webp':'assets/cetingtu_right.webp';img.style.width=isLeft?'16px':'18px';img.style.height=isLeft?'16px':'18px';img.onerror=function(){this.style.display='none';};point.appendChild(img);plot.appendChild(point);}
+  for(var i=0;i<rightData.length;i++){addDataPoint(i+2,rightData[i],false);}
+  for(var i=0;i<leftData.length;i++){addDataPoint(i+2,leftData[i],true);}
+  function addEarLabel(lineIndex,dbValue,text,className,marginLeft){var xPct=lineToX(lineIndex);var yPct=dbToY(dbValue);var label=document.createElement('div');label.className='ts-ear-label '+className;label.textContent=text;label.style.left=xPct+'%';label.style.top=yPct+'%';label.style.marginLeft=marginLeft+'px';plot.appendChild(label);}
+  if(leftData.length>0){addEarLabel(2,leftData[0],'左','ear-label-left',-14);}
+  if(rightData.length>0){addEarLabel(7,rightData[rightData.length-1],'右','ear-label-right',15);}
 }
 function updateBadge(id,cat){
   var el = document.getElementById(id);
@@ -1834,73 +1808,44 @@ function toggleHearingAid(){
     var fabText = document.getElementById('fab-text');
     var fabCup = document.getElementById('fab-cup');
     var pressWrap = document.getElementById('fab-press-wrap');
+    var settings = document.getElementById('ha-settings');
+    var hearingStatus = document.getElementById('hearing-status');
+    var testBtn = document.getElementById('test-btn-pill');
+    var overview = document.getElementById('hearing-overview');
+    var earCards = document.getElementById('ear-cards-row');
+    var warning = document.getElementById('sim-data-warning');
     // Immediate: red color, preload cup image
     var fabCircle = document.getElementById('fab-circle');
     if(fabCircle) fabCircle.style.transition = 'none';
     fab.classList.remove('fab-blue');fab.classList.add('fab-red');fab.classList.remove('fab-mini');
     fabText.innerHTML = '暂停';
     if(fabCircle){ void fabCircle.offsetHeight; fabCircle.style.transition = ''; }
-    preloadImage('assets/stop_cup.webp');
-    // Defer cup animation to RAF so it runs in one paint frame
+    preloadImage('assets/stop_cup.webp'); // ensure decoded before animation
+    // Defer all cup animation to RAF so it runs in one paint frame
     requestAnimationFrame(function(){
+      // Step 1: hide cup instantly, change src
       if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(0,60px)';fabCup.style.opacity='0';fabCup.src='assets/stop_cup.webp';}
       if(pressWrap)pressWrap.classList.add('pause');
+      // Step 2: force layout flush, then animate back
       if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
-      // UI changes (overview/earCards hide, settings show) deferred to doStartHearingAid
-      // so PC modal appears on the original paused page
+      settings.classList.add('visible');
+      if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
+      if(testBtn)testBtn.style.display='none';
+      if(overview)overview.style.display='none';
+      if(earCards)earCards.style.display='none';
+      if(warning)warning.style.display='none';
+      initDualVisualizer();
+      startDualVizAnimation();
+      initGainCups();
+      updateGainLevelUI();
+      setTimeout(checkFabOverlap,200);
       startHearingAidAsync(startGen);
     });
   }
 }
 
 async function startHearingAidAsync(gen){
-  // PC端检测：无耳机时阻止启动，提供双按钮弹窗
-  if(isDesktopPC()){
-    var hasHP=await checkHeadphonesPlugged();
-    if(!hasHP){
-      showPcHeadphoneModal(
-        // 仍然开启：继续助听流程
-        function(){ doStartHearingAid(gen); },
-        // 知道了：关闭弹窗，恢复按钮和杯子
-        function(){
-          AppState.isHearingAidOn=false;isHearingAidOn=false;haState.isRunning=false;
-          var fab2=document.getElementById('fab');var fabText2=document.getElementById('fab-text');
-          var fabCup2=document.getElementById('fab-cup');var pressWrap2=document.getElementById('fab-press-wrap');
-          fab2.classList.remove('fab-red');fab2.classList.add('fab-blue');
-          fabText2.innerHTML='开始<br>助听';
-          if(fabCup2){fabCup2.style.transition='none';fabCup2.style.transform='translate(60px,60px)';fabCup2.style.opacity='0';fabCup2.src='assets/start_cup.webp';}
-          if(pressWrap2)pressWrap2.classList.remove('pause');
-          if(fabCup2){void fabCup2.offsetHeight;fabCup2.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup2.style.transform='translate(0,0)';fabCup2.style.opacity='1';setTimeout(function(){fabCup2.style.transition='';fabCup2.style.transform='';fabCup2.style.opacity='';},420);}
-        }
-      );
-      return;
-    }
-  }
-  doStartHearingAid(gen);
-}
-
-async function doStartHearingAid(gen){
-  // Show running UI (deferred from FAB handler so PC modal appears on paused page)
-  var settings = document.getElementById('ha-settings');
-  var hearingStatus = document.getElementById('hearing-status');
-  var testBtn = document.getElementById('test-btn-pill');
-  var overview = document.getElementById('hearing-overview');
-  var earCards = document.getElementById('ear-cards-row');
-  var warning = document.getElementById('sim-data-warning');
-  settings.classList.add('visible');
-  if(hearingStatus){hearingStatus.style.display='block';hearingStatus.textContent='启动中...';hearingStatus.style.color='#00CA48';}
-  if(testBtn)testBtn.style.display='none';
-  if(overview)overview.style.display='none';
-  if(earCards)earCards.style.display='none';
-  if(warning)warning.style.display='none';
-  initDualVisualizer();
-  startDualVizAnimation();
-  initGainCups();
-  updateGainLevelUI();
-  setTimeout(checkFabOverlap,200);
-
-  // 仅在设备ID未缓存时检测，避免每次启动都枚举设备
-  if(!haState.phoneDeviceId&&!haState.earphoneDeviceId){await autoDetectMics();}
+  await autoDetectMics();
   if(gen!==haStartGen){AudioEngine.stop();return;}
   var profile = buildProfileFromData();
   var deviceId = haState.micMode==='phone'?haState.phoneDeviceId:haState.earphoneDeviceId;
@@ -1942,7 +1887,6 @@ async function autoStopHowl(){
   releaseWakeLock();
   var fab = document.getElementById('fab');
   var fabText = document.getElementById('fab-text');
-  var fabCup = document.getElementById('fab-cup');
   var pressWrap = document.getElementById('fab-press-wrap');
   var settings = document.getElementById('ha-settings');
   var overview = document.getElementById('hearing-overview');
@@ -1956,8 +1900,6 @@ async function autoStopHowl(){
   var stopIcon = document.getElementById('fab-stop-icon');
   if(stopIcon)stopIcon.classList.remove('visible');
   fabText.innerHTML = '开始<br>助听';
-  if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(60px,60px)';fabCup.style.opacity='0';fabCup.src='assets/start_cup.webp';}
-  if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
   settings.classList.remove('visible');
   if(overview)overview.style.display='block';
   if(earCards)earCards.style.display='flex';
@@ -2008,51 +1950,6 @@ async function autoDetectMics(){
     haState.earphoneDeviceId=earphoneDev?earphoneDev.deviceId:haState.phoneDeviceId;
     console.log('Mic detect: phone='+(phoneDev?phoneDev.label:'none')+' ('+haState.phoneDeviceId+'), earphone='+(earphoneDev?earphoneDev.label:'none')+' ('+haState.earphoneDeviceId+')');
   }catch(e){haState.phoneDeviceId=undefined;haState.earphoneDeviceId=undefined;}
-}
-
-// ====== PC HEADPHONE DETECTION ======
-function isDesktopPC(){
-  return window.matchMedia('(min-width:500px)').matches && (navigator.maxTouchPoints||0)===0;
-}
-async function checkHeadphonesPlugged(){
-  try{
-    var tmp=await navigator.mediaDevices.getUserMedia({audio:true});
-    tmp.getTracks().forEach(function(t){t.stop();});
-    var devs=await navigator.mediaDevices.enumerateDevices();
-    var hasHeadphone=false;
-    for(var i=0;i<devs.length;i++){
-      if(devs[i].kind==='audiooutput'){
-        var label=(devs[i].label||'').toLowerCase();
-        if(label.includes('headphone')||label.includes('headset')||label.includes('耳机')||label.includes('earphone')||label.includes('earbud')){
-          hasHeadphone=true;break;
-        }
-      }
-    }
-    return hasHeadphone;
-  }catch(e){return true/* if can't detect, allow to proceed */}
-}
-
-// PC headphone detection modal helper
-function showPcHeadphoneModal(onConfirm,onCancel){
-  var overlay=document.getElementById('pc-modal-overlay');
-  var cancelBtn=document.getElementById('pc-modal-cancel');
-  var confirmBtn=document.getElementById('pc-modal-confirm');
-  overlay.classList.add('active');
-  function cleanup(){
-    overlay.classList.remove('active');
-    cancelBtn.removeEventListener('click',onCancelClick);
-    confirmBtn.removeEventListener('click',onConfirmClick);
-  }
-  function onCancelClick(){
-    cleanup();
-    if(onCancel)onCancel();
-  }
-  function onConfirmClick(){
-    cleanup();
-    if(onConfirm)onConfirm();
-  }
-  cancelBtn.addEventListener('click',onCancelClick);
-  confirmBtn.addEventListener('click',onConfirmClick);
 }
 
 // ====== GAIN LEVEL ======
@@ -2142,6 +2039,19 @@ function onHowlChange(sens){
   AudioEngine.howlSensitivity=sens;
   if(haState.isRunning){AudioEngine.startHowlDetector();}
 }
+function updateHowlUI(sens){
+  var btns=document.querySelectorAll('#howl-toggle .howl-toggle-btn');
+  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
+  var sensMap={off:0,low:1,high:2};
+  var idx=sensMap[sens]||0;
+  if(btns[idx])btns[idx].classList.add('active');
+  var footer=document.querySelector('#howl-toggle').parentElement.querySelector('.howl-footer');
+  var sensData=HOWL_SENSITIVITY[sens];
+  if(footer){
+    var modeLabel=haState.micMode==='phone'?'手机':'耳机';
+    footer.textContent=sensData.desc+' · '+modeLabel+'模式默认'+(sens==='off'?'关闭':'低');
+  }
+}
 
 // ====== NOISE CHANGE ======
 async function onNoiseChange(supp){
@@ -2161,8 +2071,8 @@ async function onNoiseChange(supp){
     var deviceId=haState.micMode==='phone'?haState.phoneDeviceId:haState.earphoneDeviceId;
     AudioEngine.howlSensitivity=haState.howlSensitivity;
     await AudioEngine.start('both',profile,haState.gainLevel,deviceId,supp,haState.micMode);
-    if(AudioEngine.masterGain&&AudioEngine.ctx){AudioEngine.masterGain.gain.setValueAtTime(AudioEngine.userGain,AudioEngine.ctx.currentTime);}
-    if(AudioEngine.bands&&AudioEngine.ctx){var t=AudioEngine.ctx.currentTime;AudioEngine.bands.forEach(function(ch){if(ch.agc){ch.agc.gain.cancelScheduledValues(t);ch.agc.gain.setValueAtTime(0.5,t);}});}
+    if(AudioEngine.masterGain&&AudioEngine.ctx){AudioEngine.masterGain.gain.setTargetAtTime(AudioEngine.userGain,AudioEngine.ctx.currentTime,0.5);}
+    if(AudioEngine.bands&&AudioEngine.ctx){var t=AudioEngine.ctx.currentTime;AudioEngine.bands.forEach(function(ch){if(ch.agc){ch.agc.gain.setTargetAtTime(0.5,t,0.5);}});}
     if(statusEl){statusEl.textContent='助听运行中';statusEl.style.color='#00CA48';}
   }else{
     if(statusEl){statusEl.textContent=supp==='auto'?'AI降噪: 自动 (下次开启生效)':'AI降噪: 关闭 (下次开启生效)';statusEl.style.color='#8E8E93';statusEl.style.display='block';}
@@ -2295,7 +2205,7 @@ function checkFrost(){
   var firstCard=document.querySelector('.ha-settings.visible')||document.getElementById('ear-cards-row');
   if(!firstCard||firstCard.style.display==='none'){frost.classList.remove('visible');return;}
   var cardRect=firstCard.getBoundingClientRect();
-  var headerBottom=88;
+  var headerBottom=104;
   if(cardRect.top<headerBottom){frost.classList.add('visible');}else{frost.classList.remove('visible');}
   checkByShaker();
 }
@@ -2376,9 +2286,6 @@ function openTestSheet(){
 }
 function closeSheet(){
   stopTestTone();stopRingProgress();
-  // Clean up test audio contexts to release resources
-  if(testAudioCtx){try{testAudioCtx.close();}catch(e){}testAudioCtx=null;}
-  if(trialAudioCtx){try{trialAudioCtx.close();}catch(e){}trialAudioCtx=null;}
   document.getElementById('sheet-overlay').classList.remove('active');
   document.getElementById('sheet').classList.remove('active');
   testState.step=0;
@@ -2426,46 +2333,38 @@ async function playTrialSound(){
   var s2Label=document.getElementById('trial-label-2');
   if(s2Btn){s2Btn.classList.add('playing');s2Btn.disabled=true;}
   if(s2Label)s2Label.textContent='正在播放';
-  try{
-    if(!trialAudioCtx){trialAudioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-    if(trialAudioCtx.state==='suspended'){await trialAudioCtx.resume();}
-  }catch(e){if(s2Label)s2Label.textContent='点击试听';testState.trialPlaying=false;if(s2Btn){s2Btn.classList.remove('playing');s2Btn.disabled=false;}return;}
-  var osc, gain;
-  try{
-    osc=trialAudioCtx.createOscillator();
-    gain=trialAudioCtx.createGain();
-    osc.type='sine';osc.frequency.value=1000;
-    osc.connect(gain);gain.connect(trialAudioCtx.destination);
-    var t=trialAudioCtx.currentTime+0.05;
-    osc.start(t);
-    gain.gain.setValueAtTime(dbToLinear(-42),t);
-    gain.gain.setValueAtTime(0,t+0.35);
-    gain.gain.setValueAtTime(dbToLinear(-34),t+0.55);
-    gain.gain.setValueAtTime(0,t+0.9);
-    gain.gain.setValueAtTime(dbToLinear(-26),t+1.1);
-    gain.gain.setValueAtTime(0,t+1.5);
-  }catch(e){testState.trialPlaying=false;if(s2Btn){s2Btn.classList.remove('playing');s2Btn.disabled=false;}if(s2Label)s2Label.textContent='点击试听';return;}
+  await initAudio();
+  var osc=testState.audioCtx.createOscillator();
+  var gain=testState.audioCtx.createGain();
+  osc.type='sine';osc.frequency.value=1000;
+  osc.connect(gain);gain.connect(testState.audioCtx.destination);
+  var t=testState.audioCtx.currentTime;
+  osc.start(t);
+  // 3 beeps, gradually increasing volume (weak -> medium -> strong)
+  gain.gain.setValueAtTime(dbToLinear(-42),t);
+  gain.gain.setValueAtTime(0,t+0.3);
+  gain.gain.setValueAtTime(dbToLinear(-34),t+0.5);
+  gain.gain.setValueAtTime(0,t+0.8);
+  gain.gain.setValueAtTime(dbToLinear(-26),t+1.0);
+  gain.gain.setValueAtTime(0,t+1.4);
   setTimeout(function(){
     try{osc.stop();}catch(e){}
     testState.trialPlaying=false;
     if(s2Btn){s2Btn.classList.remove('playing');s2Btn.disabled=false;}
     if(s2Label)s2Label.textContent='点击试听';
-  },1800);
+  },1600);
 }
 function beginFullTest(){
   testState.currentEar='left';testState.currentFreqIndex=0;
   testState.results={left:[],right:[]};
   showTestStep(3);startTestFreq();
 }
-function initTestAudioCtx(){
-  try{
-    if(!testAudioCtx){testAudioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-    if(testAudioCtx.state==='suspended'){testAudioCtx.resume();}
-    return true;
-  }catch(e){return false;}
+async function initAudio(){
+  if(!testState.audioCtx){testState.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+  if(testState.audioCtx.state==='suspended')await testState.audioCtx.resume();
 }
-function startTestFreq(){
-  if(!initTestAudioCtx()){document.getElementById('test-status-text').textContent='音频初始化失败';return;}
+async function startTestFreq(){
+  await initAudio();
   var freq=FREQUENCIES[testState.currentFreqIndex];
   document.getElementById('test-freq-value').textContent=freq+' Hz';
   var freqEl=document.getElementById('test-freq-value');
@@ -2481,23 +2380,18 @@ function startTestFreq(){
   updateTestDots();resetRing();startRingProgress();
   playTestTone(freq);
 }
-function playTestTone(freq){
-  stopTestTone();
-  if(!initTestAudioCtx()){document.getElementById('test-status-text').textContent='音频初始化失败';return;}
-  try{
-    var osc=testAudioCtx.createOscillator();
-    var gain=testAudioCtx.createGain();
-    var panner=testAudioCtx.createStereoPanner();
-    panner.pan.value=testState.currentEar==='left'?-1:1;
-    osc.type='sine';osc.frequency.value=freq;
-    gain.gain.value=dbToLinearSafe(testState.currentDbLevel);
-    osc.connect(gain);gain.connect(panner);panner.connect(testAudioCtx.destination);
-    osc.start();
-    testState.oscillator=osc;testState.gainNode=gain;testState.panner=panner;testState.testPlaying=true;
-    testState.testTimeout=setTimeout(function(){advanceDbLevel();},1000);
-  }catch(e){
-    document.getElementById('test-status-text').textContent='音频播放失败';
-  }
+async function playTestTone(freq){
+  stopTestTone();await initAudio();
+  var osc=testState.audioCtx.createOscillator();
+  var gain=testState.audioCtx.createGain();
+  var panner=testState.audioCtx.createStereoPanner();
+  panner.pan.value=testState.currentEar==='left'?-1:1;
+  osc.type='sine';osc.frequency.value=freq;
+  gain.gain.value=dbToLinearSafe(testState.currentDbLevel);
+  osc.connect(gain);gain.connect(panner);panner.connect(testState.audioCtx.destination);
+  osc.start();
+  testState.oscillator=osc;testState.gainNode=gain;testState.panner=panner;testState.testPlaying=true;
+  testState.testTimeout=setTimeout(function(){advanceDbLevel();},1000);
 }
 function stopTestTone(){
   if(testState.testTimeout){clearTimeout(testState.testTimeout);testState.testTimeout=null;}
@@ -2661,66 +2555,13 @@ function drawAudiogram(){
   if(testState.results.left.length>0){addEarLabel(2,testState.results.left[0],'左','ear-label-left',-14);}
   if(testState.results.right.length>0){addEarLabel(7,testState.results.right[testState.results.right.length-1],'右','ear-label-right',15);}
 }
-function drawHomeAudiogram(){
-  var plot=document.getElementById('home-audiogram-plot');
-  var yaxis=document.getElementById('home-audiogram-yaxis');
-  var xaxis=document.getElementById('home-audiogram-xaxis');
-  if(!plot||!yaxis||!xaxis)return;
-  plot.innerHTML='';yaxis.innerHTML='';xaxis.innerHTML='';
-  var plotBorderW=plot.clientWidth;
-  var colW=plotBorderW/8;
-  var rowH=colW*0.6;
-  var contentH=9*rowH;
-  var plotTotalH=contentH+2;
-  plot.style.height=plotTotalH+'px';
-  for(var r=0;r<9;r++){var row=document.createElement('div');row.className='ts-grid-row';plot.appendChild(row);}
-  var dbLabels=[-10,0,10,20,30,40,50,60,70,80];
-  yaxis.style.height=contentH+'px';
-  for(var d=0;d<dbLabels.length;d++){var span=document.createElement('span');span.textContent=dbLabels[d];span.style.top=(d/9*100)+'%';yaxis.appendChild(span);}
-  var hzLabel=document.createElement('span');hzLabel.className='ts-xaxis-hz';hzLabel.textContent='Hz';xaxis.appendChild(hzLabel);
-  var freqLabels=['125','250','500','1k','2k','4k','8k'];
-  var nLines=9;
-  for(var f=0;f<freqLabels.length;f++){var span=document.createElement('span');span.textContent=freqLabels[f];span.style.left=((f+1)/(nLines-1)*100)+'%';xaxis.appendChild(span);}
-  for(var v=1;v<nLines;v++){var line=document.createElement('div');line.className='ts-grid-vline';line.style.left=(v/(nLines-1)*100)+'%';plot.appendChild(line);}
-  var dBMin=-10,dBMax=80;
-  var dbRange=dBMax-dBMin;
-  function dbToY(dbValue){return((dbValue-dBMin)/dbRange)*100;}
-  function lineToX(lineIndex){return(lineIndex/(nLines-1))*100;}
-  var data=AppState.hearingData;
-  var leftPoints=[],rightPoints=[];
-  for(var i=0;i<data.left.length;i++){var lineIdx=i+2;var xPct=lineToX(lineIdx);leftPoints.push({x:xPct,y:dbToY(data.left[i])});rightPoints.push({x:xPct,y:dbToY(data.right[i])});}
-  function buildLinePath(points){if(points.length===0)return'';var d='M'+points[0].x+' '+points[0].y;for(var p=1;p<points.length;p++){d+=' L'+points[p].x+' '+points[p].y;}return d;}
-  var svgNS='http://www.w3.org/2000/svg';
-  var svgLeft=document.createElementNS(svgNS,'svg');
-  svgLeft.setAttribute('class','ts-line-svg line-left');
-  svgLeft.setAttribute('viewBox','0 0 100 100');
-  svgLeft.setAttribute('preserveAspectRatio','none');
-  var pathLeft=document.createElementNS(svgNS,'path');
-  pathLeft.setAttribute('d',buildLinePath(leftPoints));
-  pathLeft.setAttribute('stroke','#0085FF');pathLeft.setAttribute('stroke-width','2');pathLeft.setAttribute('fill','none');pathLeft.setAttribute('vector-effect','non-scaling-stroke');
-  svgLeft.appendChild(pathLeft);plot.appendChild(svgLeft);
-  var svgRight=document.createElementNS(svgNS,'svg');
-  svgRight.setAttribute('class','ts-line-svg line-right');
-  svgRight.setAttribute('viewBox','0 0 100 100');
-  svgRight.setAttribute('preserveAspectRatio','none');
-  var pathRight=document.createElementNS(svgNS,'path');
-  pathRight.setAttribute('d',buildLinePath(rightPoints));
-  pathRight.setAttribute('stroke','#FF0D19');pathRight.setAttribute('stroke-width','2');pathRight.setAttribute('fill','none');pathRight.setAttribute('vector-effect','non-scaling-stroke');
-  svgRight.appendChild(pathRight);plot.appendChild(svgRight);
-  function addDataPoint(lineIndex,dbValue,isLeft){var xPercent=lineToX(lineIndex);var yPercent=dbToY(dbValue);var point=document.createElement('div');point.className='ts-data-point '+(isLeft?'left':'right');point.style.left=xPercent+'%';point.style.top=yPercent+'%';var img=document.createElement('img');img.src=isLeft?'assets/cetingtu_left.webp':'assets/cetingtu_right.webp';img.style.width=isLeft?'16px':'18px';img.style.height=isLeft?'16px':'18px';img.onerror=function(){this.style.display='none';};point.appendChild(img);plot.appendChild(point);}
-  for(var i=0;i<data.right.length;i++){addDataPoint(i+2,data.right[i],false);}
-  for(var i=0;i<data.left.length;i++){addDataPoint(i+2,data.left[i],true);}
-  function addEarLabel(lineIndex,dbValue,text,className,marginLeft){var xPct=lineToX(lineIndex);var yPct=dbToY(dbValue);var label=document.createElement('div');label.className='ts-ear-label '+className;label.textContent=text;label.style.left=xPct+'%';label.style.top=yPct+'%';label.style.marginLeft=marginLeft+'px';plot.appendChild(label);}
-  if(data.left.length>0){addEarLabel(2,data.left[0],'左','ear-label-left',-14);}
-  if(data.right.length>0){addEarLabel(7,data.right[data.right.length-1],'右','ear-label-right',15);}
-}
 function toggleAudiogramPopup(e){if(e)e.stopPropagation();var popup=document.getElementById('audiogram-popup');if(popup)popup.classList.toggle('active');}
-function toggleHomeAudiogramPopup(e){if(e)e.stopPropagation();var popup=document.getElementById('home-audiogram-popup');if(popup)popup.classList.toggle('active');}
+function toggleHoPopup(e){if(e)e.stopPropagation();var popup=document.getElementById('ho-audiogram-popup');if(popup)popup.classList.toggle('active');}
 document.addEventListener('click',function(e){
   var popup=document.getElementById('audiogram-popup');
   if(popup&&popup.classList.contains('active')&&!popup.contains(e.target)&&e.target.className!=='ts-audiogram-info'){popup.classList.remove('active');}
-  var homePopup=document.getElementById('home-audiogram-popup');
-  if(homePopup&&homePopup.classList.contains('active')&&!homePopup.contains(e.target)&&e.target.className!=='ts-audiogram-info'){homePopup.classList.remove('active');}
+  var hoPopup=document.getElementById('ho-audiogram-popup');
+  if(hoPopup&&hoPopup.classList.contains('active')&&!hoPopup.contains(e.target)&&e.target.className!=='ts-audiogram-info'){hoPopup.classList.remove('active');}
 });
 function finishTest(){
   AppState.hearingData.left=testState.results.left.slice();
@@ -2761,27 +2602,22 @@ function resumeTest(){
 }
 
 // ====== PRELOAD ASSETS (all images used in the app) ======
-// Priority order: big cup → bird logo → pause page & test prompts → QR code → others
+// CRITICAL first: QR code + home screen images (needed for first paint)
 var PRELOAD_ASSETS = [
-  // Priority 1: Home big cup (most visible, most important)
-  'assets/bird-logo-big.webp',
-  // Priority 2: Bird logo
-  'assets/bird-icon-small.webp','assets/union-bird.svg',
-  // Priority 3: Pause page + hearing test first page prompts
-  'assets/start_cup.webp','assets/stop_cup.webp',
-  'assets/test-quiet.webp','assets/test-tap.webp','assets/test-volume.webp','assets/test-wired.webp',
-  'assets/test ear_illust.webp','assets/test over cup1.webp','assets/test over cup2.webp',
-  // Priority 4: QR code
-  'assets/QR-code-cf.svg','assets/QR-code_app_icon.png',
-  // Priority 5: Everything else
+  'assets/QR-code.svg',
+  'assets/union-bird.svg','assets/bird-logo-big.webp','assets/bird-icon-small.webp',
   'assets/circle-btn-bg-1afd37.webp','assets/text_btn_icon.webp',
+  // Secondary: rest of assets
+  'assets/start_cup.webp','assets/stop_cup.webp',
   'assets/1_cup.webp','assets/2_cup.webp','assets/3_cup.webp','assets/4_cup.webp',
   'assets/cetingtu_left.webp','assets/cetingtu_right.webp',
   'assets/left ear_cup.webp','assets/left ear_cup_stop.webp',
   'assets/right ear_cup.webp','assets/right ear_cup_stop.webp',
   'assets/level_cup_no.webp','assets/level_cup_yes.webp',
   'assets/mic-headset-151ff4.webp','assets/mic_phone.webp',
+  'assets/test ear_illust.webp','assets/test over cup1.webp','assets/test over cup2.webp',
   'assets/test-complete-bird.webp','assets/test-ear-pause.webp',
+  'assets/test-quiet.webp','assets/test-tap.webp','assets/test-volume.webp','assets/test-wired.webp',
   'assets/close_icon.svg','assets/gain-minus.svg','assets/gain-plus.svg',
   'assets/i_icon.svg','assets/try.svg',
   'assets/app-icon-180.png','assets/app-icon-192.png','assets/app-icon-512.png'
@@ -2794,16 +2630,12 @@ function preloadImage(url){
   return new Promise(function(resolve, reject){
     if(_imgPool[url]){ resolve(); return; }
     var img = new Image();
-    var settled = false;
     img.onload = function(){
-      if(settled) return; settled = true;
       _imgPool[url] = img;
       img.decode().then(resolve).catch(resolve);
     };
-    img.onerror = function(){ if(settled) return; settled = true; resolve(); };
+    img.onerror = function(){ reject(); };
     img.src = url;
-    // Timeout: resolve anyway after 15s so Promise.all never hangs
-    setTimeout(function(){ if(!settled){ settled = true; resolve(); } }, 15000);
   });
 }
 
@@ -2836,62 +2668,45 @@ function waitForContainerImages(container){
 }
 
 // ====== INIT ======
-// SW readiness tracking — must be ready before marking preload-complete
-var _swReady = false;
-var _swReadyPromise = null;
-function ensureSWReady(){
-  if(_swReady) return Promise.resolve();
-  if(_swReadyPromise) return _swReadyPromise;
-  _swReadyPromise = new Promise(function(resolve){
-    if(!('serviceWorker' in navigator)){ _swReady = true; resolve(); return; }
-    // Check if already controlling the page
-    if(navigator.serviceWorker.controller){
-      _swReady = true; resolve(); return;
-    }
-    navigator.serviceWorker.register('./sw.js').then(function(reg){
-      if(reg.active){
-        _swReady = true; resolve();
-      }else{
-        var w = reg.installing || reg.waiting;
-        if(w){
-          w.addEventListener('statechange',function(){
-            if(w.state === 'activated'){ _swReady = true; resolve(); }
-          });
-          if(w.state === 'activated'){ _swReady = true; resolve(); }
-        }
-        // Still not ready after 10s — proceed anyway
-        setTimeout(function(){ if(!_swReady){ _swReady = true; resolve(); } },10000);
-      }
-    }).catch(function(){ _swReady = true; resolve(); });
-  });
-  return _swReadyPromise;
-}
-// Register SW early (before preload) so it can cache assets during preload
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js').then(function(reg){
-    reg.addEventListener('updatefound',function(){
-      var newWorker = reg.installing;
-      if(newWorker){newWorker.addEventListener('statechange',function(){
-        if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-          newWorker.postMessage({action:'skipWaiting'});
-        }
-      });}
-    });
-  });
-}
-
 (function init(){
+  // Register Service Worker FIRST for offline support
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      reg.addEventListener('updatefound',function(){
+        var newWorker=reg.installing;
+        if(newWorker){newWorker.addEventListener('statechange',function(){
+          if(newWorker.state==='installed'&&navigator.serviceWorker.controller){
+            newWorker.postMessage({action:'skipWaiting'});
+          }
+        });}
+      });
+    });
+  }
   syncVersion();
   loadSettings();
-  // 根据加载的设置初始化麦克风和啸叫保护UI
-  if(haState.micMode==='earphone'){
-    var p=document.getElementById('mic-phone'),h=document.getElementById('mic-headset');
-    if(p)p.classList.remove('selected');if(h)h.classList.add('selected');
-  }
+  // 确保当前啸叫设置与mic模式一致
+  haState.howlSensitivity = haState.micMode==='phone'?haState.howlSensitivityPhone:haState.howlSensitivityEarphone;
   updateHowlUI(haState.howlSensitivity);
+  // 同步麦克风UI选中状态
+  var phoneEl = document.getElementById('mic-phone');
+  var headsetEl = document.getElementById('mic-headset');
+  if(haState.micMode === 'phone'){
+    if(phoneEl) phoneEl.classList.add('selected');
+    if(headsetEl) headsetEl.classList.remove('selected');
+  } else {
+    if(headsetEl) headsetEl.classList.add('selected');
+    if(phoneEl) phoneEl.classList.remove('selected');
+  }
+  // 监听设备拔插：清除缓存设备ID，下次切换时重新检测
+  if(navigator.mediaDevices && navigator.mediaDevices.addEventListener){
+    navigator.mediaDevices.addEventListener('devicechange',function(){
+      haState.phoneDeviceId = null;
+      haState.earphoneDeviceId = null;
+    });
+  }
   
-  // If preload was already done for this version, skip to main screen (works offline)
-  if(localStorage.getItem('heardit_preload_done_'+VERSION)){
+  // If preload was already done this session, skip to main screen
+  if(localStorage.getItem('heardit_preload_done')){
     if(loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData){
       buildHomeSummary();
       showScreen('home-with-data');
@@ -2900,82 +2715,50 @@ if('serviceWorker' in navigator){
     }
     preloadSheet();
     window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
-    // Ensure SW is still ready (re-validates on re-entry)
-    ensureSWReady();
     return;
   }
   
   var total = PRELOAD_ASSETS.length;
   var loaded = 0;
   var barFill = document.getElementById('preload-bar-fill');
-  var preloadStatus = document.getElementById('preload-status');
+  var barPercent = document.getElementById('preload-percent');
   var finished = false;
-  var fakeProgress = 0;        // 0..98 driven by animation frame
-  var realProgress = 0;        // 0..100 driven by actual asset loading
-  var fakeProgressId = null;
-  var MIN_FAKE_MS = 3000;      // minimum time the fake bar must be visible
-  var FAKE_DURATION = 60000;   // 1 minute slow ease-out, caps at 98%
-  var fakeStartTime = Date.now();
-
-  function setBar(pct){
-    if(barFill) barFill.style.width = pct + '%';
-  }
-
-  function setStatus(pct){
-    if(preloadStatus) preloadStatus.textContent = '加载离线所需数据中...' + pct + '%';
-  }
-
-  function updateDisplay(){
-    var display = Math.min(98, Math.max(fakeProgress, realProgress));
-    setBar(display);
-    setStatus(display);
-  }
-
-  updateDisplay();
-
-  // Fake progress: moves slowly over 60s, caps at 98% and never reaches 100% by itself
-  function tickFakeProgress(){
-    if(finished) return;
-    var elapsed = Date.now() - fakeStartTime;
-    var t = Math.min(elapsed / FAKE_DURATION, 1);
-    fakeProgress = Math.min(98, Math.round(98 * (1 - Math.pow(1 - t, 3))));
-    updateDisplay();
-    if(fakeProgress < 98){
-      fakeProgressId = requestAnimationFrame(tickFakeProgress);
-    }
-  }
-  fakeProgressId = requestAnimationFrame(tickFakeProgress);
-
+  
   function updateProgress(){
     if(finished) return;
     loaded++;
-    realProgress = Math.round((loaded / total) * 100);
-    updateDisplay();
-    if(loaded >= total) maybeFinish();
+    var pct = Math.round((loaded / total) * 100);
+    if(barFill) barFill.style.width = pct + '%';
+    if(barPercent) barPercent.textContent = pct + '%';
+    if(loaded >= total) finishPreload();
   }
-
-  function maybeFinish(){
-    if(finished) return;
-    var elapsed = Date.now() - fakeStartTime;
-    if(elapsed >= MIN_FAKE_MS){
-      finishPreload();
-    }else{
-      setTimeout(maybeFinish, MIN_FAKE_MS - elapsed);
-    }
-  }
-
+  
   function finishPreload(){
     if(finished) return;
     finished = true;
-    if(fakeProgressId) cancelAnimationFrame(fakeProgressId);
+    localStorage.setItem('heardit_preload_done', '1');
 
+    // Cache all preloaded assets + the HTML page itself for offline use
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.ready.then(function(reg){
+        if(reg.active){
+          reg.active.postMessage({
+            type: 'CACHE_ALL',
+            assets: PRELOAD_ASSETS,
+            page: location.href
+          });
+        }
+      });
+    }
+
+    // Determine target screen
     var hasData = loadHearingData() && !AppState.isSimulated && !AppState.isSimulatedData;
     var targetName = hasData ? 'home-with-data' : 'home-no-data';
     if(hasData) buildHomeSummary();
 
     var targetEl = document.getElementById('screen-'+targetName);
     var qrSection = document.querySelector('.qr-section');
-    var isDesktop = window.matchMedia('(min-width:500px)').matches && (navigator.maxTouchPoints||0)===0;
+    var isDesktop = window.matchMedia('(min-width:431px)').matches;
 
     // Collect first-paint image URLs
     var firstPaintUrls = [];
@@ -2992,18 +2775,22 @@ if('serviceWorker' in navigator){
 
     // Preload + decode all first-paint images before revealing anything
     var decodedPromises = [];
-    if(qrSection && isDesktop){
-      decodedPromises.push(waitForContainerImages(qrSection));
-    }
     for(var i = 0; i < firstPaintUrls.length; i++){
       decodedPromises.push(preloadImage(firstPaintUrls[i]));
     }
+    // QR code is first in PRELOAD_ASSETS and already in flight; ensure it is decoded first
+    if(qrSection && isDesktop){
+      var qrImg = qrSection.querySelector('img[src]');
+      if(qrImg){
+        decodedPromises.unshift((function(img){ return waitForContainerImages(img.parentNode); })(qrImg));
+      }
+    }
 
-    // Race: if decode takes too long (slow CN network), proceed anyway after 12s
-    var decodeTimeout = new Promise(function(resolve){ setTimeout(resolve, 12000); });
-
-    Promise.race([Promise.all(decodedPromises), decodeTimeout]).then(function(){
-      // Make target screen active but invisible on top of preload so browser renders it
+    Promise.all(decodedPromises).then(function(){
+      // All images decoded — show 100% and enter immediately
+      if(barFill) barFill.style.width = '100%';
+      if(barPercent) barPercent.textContent = '100%';
+      // Now make target screen active but invisible on top of preload so browser renders it
       if(targetEl){
         targetEl.classList.add('active');
         targetEl.classList.add('render-check');
@@ -3014,58 +2801,36 @@ if('serviceWorker' in navigator){
       // Force a real layout/paint pass
       document.body.offsetHeight;
 
-      // Give browser 3 rAF to start loading DOM images, then reveal
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
-          requestAnimationFrame(function(){
-            // Snap to 100% and reveal immediately
-            setBar(100);
-            setStatus(100);
-            if(targetEl) targetEl.classList.remove('render-check');
-            var preloadEl = document.getElementById('screen-preload');
-            if(preloadEl) preloadEl.classList.remove('active');
-            // Explicitly cache all assets in SW cache for offline use
-            if('caches' in window){
-              var cacheName = 'heardit-'+VERSION;
-              caches.open(cacheName).then(function(cache){
-                PRELOAD_ASSETS.forEach(function(url){
-                  fetch(url,{cache:'no-cache'}).then(function(resp){
-                    if(resp.ok) cache.put(url,resp);
-                  }).catch(function(){});
-                });
+          // Final safety: decode any newly-attached DOM images
+          var domPromises = [];
+          if(targetEl) domPromises.push(waitForContainerImages(targetEl));
+          if(qrSection && isDesktop) domPromises.push(waitForContainerImages(qrSection));
+          Promise.all(domPromises).then(function(){
+            requestAnimationFrame(function(){
+              requestAnimationFrame(function(){
+                if(targetEl) targetEl.classList.remove('render-check');
+                var preloadEl = document.getElementById('screen-preload');
+                if(preloadEl) preloadEl.classList.remove('active');
+                if(targetName==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);}
+                preloadSheet();
               });
-            }
-            // Wait for SW to be ready, then mark preload done
-            ensureSWReady().then(function(){
-              localStorage.setItem('heardit_preload_done_'+VERSION, '1');
             });
-            if(targetName==='home-with-data'){initFabScrollDetection();setTimeout(checkFrost,100);setTimeout(checkFabOverlap,200);tryDrawHomeAudiogram();}
-            preloadSheet();
           });
         });
       });
     });
   }
-
+  
   // Preload via new Image() - ensures browser decodes & caches in rendering pipeline
   // QR code and home images are FIRST in array for highest priority
   var promises = [];
-  // Limit concurrent downloads to improve reliability on slow/intermittent networks
-  var CONCURRENCY = 4;
-  var queue = PRELOAD_ASSETS.slice();
-  var running = 0;
-  function nextInQueue(){
-    if(running >= CONCURRENCY || queue.length === 0) return;
-    running++;
-    var url = queue.shift();
-    preloadImage(url).then(function(){ updateProgress(); }).catch(function(){ updateProgress(); }).then(function(){
-      running--;
-      nextInQueue();
-    });
-    nextInQueue();
+  for(var i = 0; i < PRELOAD_ASSETS.length; i++){
+    promises.push(preloadImage(PRELOAD_ASSETS[i]).then(updateProgress).catch(updateProgress));
   }
-  nextInQueue();
-
+  Promise.allSettled(promises).then(function(){ if(!finished) finishPreload(); });
+  
   // Fallback: max 30 seconds for very slow networks
   setTimeout(function(){
     if(!finished) finishPreload();
@@ -3074,17 +2839,5 @@ if('serviceWorker' in navigator){
   window.addEventListener('resize',function(){setTimeout(checkFabOverlap,100);});
 })();
 </script>
-
-<!-- PC headphone detection modal -->
-<div class="pc-modal-overlay" id="pc-modal-overlay">
-  <div class="pc-modal">
-    <div class="pc-modal-title">提示</div>
-    <div class="pc-modal-desc">请使用有线耳机。PC端的喇叭距离麦克风太近，会有啸叫声</div>
-    <div class="pc-modal-btns">
-      <button class="pc-modal-btn pc-modal-btn-cancel" id="pc-modal-cancel">知道了</button>
-      <button class="pc-modal-btn pc-modal-btn-confirm" id="pc-modal-confirm">仍然开启</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
