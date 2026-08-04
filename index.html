@@ -19,12 +19,13 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 @media(min-width:431px){body{background:#E5E5EA;display:flex;align-items:center;justify-content:center;min-height:100vh}.desktop-wrapper{position:relative;display:flex;justify-content:center;align-items:flex-start;width:100%}.app-container{width:393px;aspect-ratio:393/852;max-height:calc(100vh - 40px);border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;flex-shrink:0}}
 /* QR Code - desktop only */
 .qr-section{display:none;position:absolute;flex-direction:column;align-items:center;flex-shrink:0}
-@media(min-width:431px){.qr-section{display:flex;top:40px;left:50%;margin-left:calc(393px/2 + 40px)}}
-.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px}
-.qr-code-wrap img{width:100%;height:100%;object-fit:contain}
-.qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 40px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.qr-label-title{font-size:24px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
-.qr-label-sub{font-size:16px;font-weight:400;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center}
+@media(min-width:431px){.qr-section{display:flex;top:0;left:50%;margin-left:calc(393px/2 + 100px)}}
+.qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px;position:relative}
+.qr-code-wrap img.qr-main{width:100%;height:100%;object-fit:contain}
+.qr-code-wrap .qr-app-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border-radius:10px;object-fit:contain}
+.qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.qr-label-title{font-size:20px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center;line-height:1.5}
+.qr-label-line{font-size:14px;font-weight:400;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center;line-height:1.5}
 
 .status-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px 8px;flex-shrink:0;height:44px;font-size:16px;font-weight:600;color:#000}
 .status-bar-icons{display:flex;align-items:center;gap:8px}
@@ -47,7 +48,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 .preload-bar-wrap{width:260px;display:flex;align-items:center;gap:12px}
 .preload-bar{flex:1;height:12px;background:#E5E5E9;border-radius:6px;overflow:hidden}
 .preload-bar-fill{height:100%;background:#0085FF;border-radius:6px;transition:width .3s;width:0%}
-.preload-percent{font-size:14px;font-weight:500;color:#0085FF;white-space:nowrap;min-width:36px;text-align:right}
+.preload-loading-text{width:260px;display:flex;justify-content:space-between;font-size:13px;color:#000}
+.preload-progress-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;width:260px}
 @keyframes preloadFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 .btn{display:block;width:100%;min-height:50px;padding:14px 24px;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;text-align:center;-webkit-appearance:none;appearance:none;letter-spacing:.3px}
@@ -471,6 +473,17 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   .home-data-header{padding:16px 16px 16px}
   .home-scroll-area{padding-top:88px}
 }
+/* PC headphone detection modal */
+.pc-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+.pc-modal-overlay.active{display:flex}
+.pc-modal{background:#fff;border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
+.pc-modal-title{font-size:18px;font-weight:600;color:#1C1C1E;margin-bottom:12px}
+.pc-modal-desc{font-size:15px;color:#3C3C43;line-height:1.5;margin-bottom:20px;text-align:left}
+.pc-modal-btns{display:flex;gap:12px}
+.pc-modal-btn{flex:1;height:44px;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;-webkit-appearance:none;appearance:none}
+.pc-modal-btn:active{opacity:.7}
+.pc-modal-btn-cancel{background:#0085FF;color:#fff}
+.pc-modal-btn-confirm{background:#F2F2F7;color:#3C3C43}
 </style>
 </head>
 <body>
@@ -482,11 +495,13 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.6.7</span>
+    <span class="preload-ver" id="preload-ver">v1.6.19</span>
   </div>
-  <div class="preload-bar-wrap">
-    <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
-    <span class="preload-percent" id="preload-percent">0%</span>
+  <div class="preload-progress-wrap">
+    <div class="preload-bar-wrap">
+      <div class="preload-bar"><div class="preload-bar-fill" id="preload-bar-fill"></div></div>
+    </div>
+    <div class="preload-loading-text" id="preload-loading-text"><span style="color:#000">加载离线数据中...</span><span id="preload-pct" style="color:#0085FF"></span></div>
   </div>
 </div>
 
@@ -500,11 +515,14 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <img src="assets/bird-logo-big.webp" alt="Bird Logo" onerror="this.style.display='none'">
     </div>
     <div class="home-no-data-ver">
-      <span class="home-no-data-ver-text">听到鸟 Heardit <span id="no-data-ver">v1.6.7</span></span>
-      <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span class="beta-tag">BETA</span></span></span>
+      <span class="home-no-data-ver-text">听到鸟 Heardit <span class="beta-tag">BETA</span></span>
+      <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span id="no-data-ver">v1.6.19</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
-      <img src="assets/circle-btn-bg-1afd37.webp" alt="Start">
+      <picture>
+        <source srcset="assets/circle-btn-bg-1afd37.webp" media="(min-width:431px)">
+        <img src="assets/circle-btn-bg-1afd37-mobile.webp" alt="Start" style="width:100%;height:100%;object-fit:fill;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none">
+      </picture>
       <div class="start-test-label">开始<br>听力测试</div>
     </div>
     <div class="skip-test-link" onclick="skipTest()">
@@ -518,6 +536,17 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <div class="frost-header" id="frost-header"></div>
   <!-- 啸叫横幅 (hidden) -->
   <div id="howl-banner" style="display:none;position:fixed;top:44px;left:0;right:0;background:#FF3B30;color:#fff;padding:8px 16px;font-size:14px;text-align:center;z-index:200;"></div>
+  <!-- PC headphone detection modal -->
+  <div class="pc-modal-overlay" id="pc-modal-overlay">
+    <div class="pc-modal">
+      <div class="pc-modal-title">提示</div>
+      <div class="pc-modal-desc">请使用有线耳机。PC端的喇叭距离麦克风太近，会有啸叫声</div>
+      <div class="pc-modal-btns">
+        <button class="pc-modal-btn pc-modal-btn-cancel" id="pc-modal-cancel">知道了</button>
+        <button class="pc-modal-btn pc-modal-btn-confirm" id="pc-modal-confirm">仍然开启</button>
+      </div>
+    </div>
+  </div>
 
   <div class="home-data-header">
     <div class="home-brand-row">
@@ -527,8 +556,8 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
       <div class="home-brand-text">
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
-          <span id="header-ver">v1.6.7</span>
           <span class="beta-tag">BETA</span>
+          <span id="header-ver">v1.6.19</span>
         </div>
       </div>
     </div>
@@ -951,11 +980,14 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 <!-- QR Code - desktop only -->
 <div class="qr-section">
   <div class="qr-code-wrap">
-    <img src="assets/QR-code.svg" alt="QR Code" onerror="this.style.display='none'">
+    <img class="qr-main" src="assets/QR-code-cf.svg" alt="QR Code" onerror="this.style.display='none'">
+    <img class="qr-app-icon" src="assets/QR-code_app_icon.png" alt="App Icon">
   </div>
   <div class="qr-label">
     <span class="qr-label-title">移动端App</span>
-    <span class="qr-label-sub">（手机相机扫码）</span>
+    <span class="qr-label-line">1.手机相机扫码</span>
+    <span class="qr-label-line">2.浏览器点分享</span>
+    <span class="qr-label-line">3.添加到主屏幕</span>
   </div>
 </div>
 </div>
@@ -970,15 +1002,15 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.6.7';
-var APP_VERSION = 'v1.6.7';
+const VERSION = 'v1.6.19';
+var APP_VERSION = 'v1.6.19';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
 const NORMAL_PROFILE = {250:0,500:0,1000:0,2000:0,4000:0,8000:0};
 const FREQS = [250,500,1000,2000,4000,8000];
 const FREQ_LABELS_MAP = {250:'250',500:'500',1000:'1k',2000:'2k',4000:'4k',8000:'8k'};
-const GAIN_LEVELS = [0,-18,-16,-14,-12,-10,-8,-6,-4,-3,-2];
+const GAIN_LEVELS = [-10,-18,-16,-14,-12,-10,-8,-6,-4,-3,-2];
 const DEFAULT_LEVEL = 5;
 const SAFETY_HARD_LIMIT = -10;
 const HPFREQ = 400;
@@ -1043,7 +1075,7 @@ const AudioEngine = {
   ctx:null,stream:null,source:null,
   userGain:1,deviceId:null,noiseSupp:'auto',micMode:'phone',
   howlSensitivity:HOWL_DEFAULT_SENSITIVITY,
-  hpf:null,lpf:null,
+  hpf:null,hpf2:null,lpf:null,
   bands:[],monoMixer:null,
   leftEqs:[],rightEqs:[],
   highShelf:null,masterGain:null,protector:null,
@@ -1053,10 +1085,12 @@ const AudioEngine = {
   agcInterval:null,latencyInterval:null,fadeInterval:null,
   howlInterval:null,howlCount:0,howlStartTime:0,howlPeakFreq:0,howlNotchFreq:0,
   isMuted:false,isSuppressed:false,
-  isRunning:false,mode:null,
+  isRunning:false,mode:null,_gen:0,
 
-  async start(mode,profile,gainLevel,deviceId,noiseSupp,micMode){
+  async start(mode,profile,gainLevel,deviceId,noiseSupp,micMode,_preStream){
     await this.stop();
+    this._gen++;
+    var currentGen = this._gen;
     this.mode=mode;
     this.deviceId=deviceId;
     this.noiseSupp=noiseSupp;
@@ -1069,60 +1103,72 @@ const AudioEngine = {
     this.isSuppressed=false;
     const AudioCtx=window.AudioContext||window.webkitAudioContext;
     this.ctx=new AudioCtx({latencyHint:0.00001,sampleRate:44100});
-    const nsMode=noiseSupp==='auto'?supportsNoiseSuppression():(noiseSupp==='browser'?'basic':'off');
-    const nsEnabled=nsMode!=='off';
-    let constraints;
-    if(nsMode==='chrome'){
-      constraints={audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:false,latency:0.001,noiseSuppressionQuality:4,googNoiseSuppression:true,googNoiseSuppression2:true,googAutoGainControl:false,googEchoCancellation:false}};
-    }else if(nsMode==='ios'){
-      constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+    // 使用预取流（如果有），跳过getUserMedia
+    if(_preStream){
+      this.stream=_preStream;
     }else{
-      constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
-    }
-    if(deviceId)constraints.audio.deviceId={exact:deviceId};
-    try{this.stream=await navigator.mediaDevices.getUserMedia(constraints);}
-    catch(e){
-      try{
+      const nsMode=noiseSupp==='auto'?supportsNoiseSuppression():(noiseSupp==='browser'?'basic':'off');
+      const nsEnabled=nsMode!=='off';
+      let constraints;
+      if(nsMode==='chrome'){
+        constraints={audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:false,latency:0.001,noiseSuppressionQuality:4,googNoiseSuppression:true,googNoiseSuppression2:true,googAutoGainControl:false,googEchoCancellation:false}};
+      }else if(nsMode==='ios'){
         constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
-        this.stream=await navigator.mediaDevices.getUserMedia(constraints);
-      }catch(e2){this.stop();return false;}
+      }else{
+        constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+      }
+      if(deviceId)constraints.audio.deviceId={exact:deviceId};
+      try{this.stream=await navigator.mediaDevices.getUserMedia(constraints);}
+      catch(e){
+        try{
+          constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+          this.stream=await navigator.mediaDevices.getUserMedia(constraints);
+        }catch(e2){this.stop();return false;}
+      }
     }
     // 监听设备断开/拔插：当音轨结束时表示设备被移除
     var self = this;
     if(this.stream){
       this.stream.getTracks().forEach(function(track){
         track.addEventListener('ended',function(){
-          if(self.isRunning){
+          if(self._gen !== currentGen) return;
+          if(self.isRunning && !self._intentionalStop){
             self.isRunning = false;
             haState.isRunning = false;
             // 清除缓存设备ID，下次切换时重新检测
             haState.phoneDeviceId = null;
             haState.earphoneDeviceId = null;
-            // 通知UI设备已断开
-            var st = document.getElementById('hearing-status');
-            if(st){ st.textContent = '设备已断开，请重新开始'; st.style.color = '#FF9500'; }
+            // 自动切到暂停页面（正常停止状态）
             var fab = document.getElementById('fab');
             var fabText = document.getElementById('fab-text');
             var fabCup = document.getElementById('fab-cup');
             var pressWrap = document.getElementById('fab-press-wrap');
             var settings = document.getElementById('ha-settings');
-            if(fab){ fab.classList.remove('fab-red'); fab.classList.add('fab-blue'); }
-            if(fabText) fabText.innerHTML = '开始<br>助听';
-            if(fabCup){ fabCup.style.transition='none'; fabCup.style.transform='translate(60px,60px)'; fabCup.style.opacity='0'; fabCup.src='assets/start_cup.webp'; }
-            if(pressWrap){ pressWrap.classList.remove('pause'); }
-            if(fabCup){ void fabCup.offsetHeight; fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)'; fabCup.style.transform='translate(0,0)'; fabCup.style.opacity='1'; setTimeout(function(){ fabCup.style.transition=''; fabCup.style.transform=''; fabCup.style.opacity=''; },420); }
-            if(settings) settings.classList.remove('visible');
-            if(!AppState.isSimulated && !AppState.isSimulatedData){
-              var overview = document.getElementById('hearing-overview');
-              var earCards = document.getElementById('ear-cards-row');
-              if(overview) overview.style.display = 'block';
-              if(earCards) earCards.style.display = 'flex';
-            }
+            var hearingStatus = document.getElementById('hearing-status');
+            var testBtn = document.getElementById('test-btn-pill');
+            var overview = document.getElementById('hearing-overview');
+            var earCards = document.getElementById('ear-cards-row');
+            setFabMini(false);
+            fab.classList.remove('fab-red');fab.classList.add('fab-blue');
+            fab.classList.remove('fab-mini');
+            fabIsMini = false;
+            if(pressWrap)pressWrap.classList.remove('pause');
+            if(pressWrap)pressWrap.classList.remove('mini-hide');
+            fabText.innerHTML = '开始<br>助听';
+            if(fabCup){fabCup.style.transition='none';fabCup.style.transform='translate(60px,60px)';fabCup.style.opacity='0';fabCup.src='assets/start_cup.webp';}
+            if(fabCup){void fabCup.offsetHeight;fabCup.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup.style.transform='translate(0,0)';fabCup.style.opacity='1';setTimeout(function(){fabCup.style.transition='';fabCup.style.transform='';fabCup.style.opacity='';},420);}
+            if(settings)settings.classList.remove('visible');
+            if(hearingStatus)hearingStatus.style.display='none';
+            if(testBtn)testBtn.style.display='';
+            if(overview)overview.style.display='block';
+            if(earCards)earCards.style.display='flex';
             AppState.isHearingAidOn = false;
             isHearingAidOn = false;
             stopDualVizAnimation();
             releaseWakeLock();
             teardownAudioKeepAlive();
+            var banner=document.getElementById('howl-banner');
+            if(banner)banner.style.display='none';
           }
         });
       });
@@ -1147,15 +1193,18 @@ const AudioEngine = {
     this.inputAnalyser.fftSize=512;
     this.inputAnalyser.smoothingTimeConstant=0.3;
     this.hpf=this.ctx.createBiquadFilter();
-    this.hpf.type='highpass';this.hpf.frequency.value=HPFREQ;this.hpf.Q.value=0.707;
+    this.hpf.type='highpass';this.hpf.frequency.value=this.micMode==='phone'?500:300;this.hpf.Q.value=0.707;
+    this.hpf2=this.ctx.createBiquadFilter();
+    this.hpf2.type='highpass';this.hpf2.frequency.value=this.micMode==='phone'?300:300;this.hpf2.Q.value=0.707;
     this.lpf=this.ctx.createBiquadFilter();
     this.lpf.type='lowpass';this.lpf.frequency.value=LPFREQ;this.lpf.Q.value=0.7;
     this.source.connect(this.hpf);
     this.source.connect(this.inputAnalyser);
-    this.hpf.connect(this.lpf);
+    this.hpf.connect(this.hpf2);
+    this.hpf2.connect(this.lpf);
     this.bands=[];
     this.monoMixer=this.ctx.createGain();
-    this.monoMixer.gain.value=this.micMode==='earphone'?dbToLinear(15):dbToLinear(40);
+    this.monoMixer.gain.value=this.micMode==='earphone'?dbToLinear(15):dbToLinear(35);
     BAND_CFG.forEach(function(cfg,i){
       const bp=this.ctx.createBiquadFilter();
       bp.type='bandpass';bp.frequency.value=cfg.freq;bp.Q.value=cfg.bwQ;
@@ -1227,6 +1276,7 @@ const AudioEngine = {
   startSoftStart(){
     if(!this.bands.length||!this.ctx)return;
     const t=this.ctx.currentTime;
+    const isPhone=this.micMode==='phone';
     this.bands.forEach(function(ch){
       ch.agc.gain.cancelScheduledValues(t);
       ch.agc.gain.setValueAtTime(0.01,t);
@@ -1234,7 +1284,7 @@ const AudioEngine = {
     });
     if(this.masterGain){
       this.masterGain.gain.cancelScheduledValues(t);
-      this.masterGain.gain.setValueAtTime(this.userGain*0.1,t);
+      this.masterGain.gain.setValueAtTime(this.userGain*(isPhone?0.01:0.1),t);
       this.masterGain.gain.linearRampToValueAtTime(this.userGain,t+1.0);
     }
   },
@@ -1432,6 +1482,7 @@ const AudioEngine = {
   },
 
   async stop(){
+    this._intentionalStop = true;
     this.isRunning=false;
     this.isSuppressed=false;
     this.stopAgcLoop();
@@ -1445,7 +1496,8 @@ const AudioEngine = {
     this.bands=[];this.leftEqs=[];this.rightEqs=[];
     this.source=this.hpf=this.lpf=null;
     this.monoMixer=this.highShelf=this.masterGain=this.protector=this.feedbackDelay=this.adaptiveNotch=this.outputAnalyser=this.inputAnalyser=this.leftAnalyser=this.rightAnalyser=null;
-    if(this.ctx){try{await this.ctx.close();}catch(e){}this.ctx=null;}
+    if(this.ctx){var oldCtx=this.ctx;this.ctx=null;oldCtx.close().catch(function(){});}
+    this._intentionalStop = false;
   }
 };
 
@@ -1844,7 +1896,83 @@ function toggleHearingAid(){
   }
 }
 
+// ====== PC HEADPHONE DETECTION ======
+function isDesktopPC(){
+  return window.matchMedia('(min-width:500px)').matches && (navigator.maxTouchPoints||0)===0;
+}
+async function checkHeadphonesPlugged(){
+  try{
+    var tmp=await navigator.mediaDevices.getUserMedia({audio:true});
+    tmp.getTracks().forEach(function(t){t.stop();});
+    var devs=await navigator.mediaDevices.enumerateDevices();
+    var hasHeadphone=false;
+    for(var i=0;i<devs.length;i++){
+      if(devs[i].kind==='audiooutput'){
+        var label=(devs[i].label||'').toLowerCase();
+        if(label.includes('headphone')||label.includes('headset')||label.includes('耳机')||label.includes('earphone')||label.includes('earbud')){
+          hasHeadphone=true;break;
+        }
+      }
+    }
+    return hasHeadphone;
+  }catch(e){return true/* if can't detect, allow to proceed */}
+}
+function showPcHeadphoneModal(onConfirm,onCancel){
+  var overlay=document.getElementById('pc-modal-overlay');
+  var cancelBtn=document.getElementById('pc-modal-cancel');
+  var confirmBtn=document.getElementById('pc-modal-confirm');
+  overlay.classList.add('active');
+  function cleanup(){
+    overlay.classList.remove('active');
+    cancelBtn.removeEventListener('click',onCancelClick);
+    confirmBtn.removeEventListener('click',onConfirmClick);
+  }
+  function onCancelClick(){
+    cleanup();
+    if(onCancel)onCancel();
+  }
+  function onConfirmClick(){
+    cleanup();
+    if(onConfirm)onConfirm();
+  }
+  cancelBtn.addEventListener('click',onCancelClick);
+  confirmBtn.addEventListener('click',onConfirmClick);
+}
+
 async function startHearingAidAsync(gen){
+  // PC端检测：无耳机时阻止启动，提供双按钮弹窗
+  if(isDesktopPC()){
+    var hasHP=await checkHeadphonesPlugged();
+    if(!hasHP){
+      showPcHeadphoneModal(
+        function(){ doStartHearingAid(gen); },
+        function(){
+          AppState.isHearingAidOn=false;isHearingAidOn=false;haState.isRunning=false;
+          var fab2=document.getElementById('fab');var fabText2=document.getElementById('fab-text');
+          var fabCup2=document.getElementById('fab-cup');var pressWrap2=document.getElementById('fab-press-wrap');
+          fab2.classList.remove('fab-red');fab2.classList.add('fab-blue');
+          fabText2.innerHTML='开始<br>助听';
+          if(fabCup2){fabCup2.style.transition='none';fabCup2.style.transform='translate(60px,60px)';fabCup2.style.opacity='0';fabCup2.src='assets/start_cup.webp';}
+          if(pressWrap2)pressWrap2.classList.remove('pause');
+          if(fabCup2){void fabCup2.offsetHeight;fabCup2.style.transition='all .4s cubic-bezier(.32,.72,0,1)';fabCup2.style.transform='translate(0,0)';fabCup2.style.opacity='1';setTimeout(function(){fabCup2.style.transition='';fabCup2.style.transform='';fabCup2.style.opacity='';},420);}
+          if(pressWrap2)pressWrap2.classList.remove('mini-hide');
+          var settings2=document.getElementById('ha-settings');if(settings2)settings2.classList.remove('visible');
+          var hearingStatus2=document.getElementById('hearing-status');if(hearingStatus2)hearingStatus2.style.display='none';
+          var testBtn2=document.getElementById('test-btn-pill');if(testBtn2)testBtn2.style.display='';
+          var overview2=document.getElementById('hearing-overview');if(overview2)overview2.style.display='block';
+          var earCards2=document.getElementById('ear-cards-row');if(earCards2)earCards2.style.display='flex';
+          stopDualVizAnimation();
+          releaseWakeLock();
+          teardownAudioKeepAlive();
+        }
+      );
+      return;
+    }
+  }
+  doStartHearingAid(gen);
+}
+
+async function doStartHearingAid(gen){
   await autoDetectMics();
   if(gen!==haStartGen){AudioEngine.stop();return;}
   var profile = buildProfileFromData();
@@ -1929,12 +2057,13 @@ async function autoDetectMics(){
   try{
     var tmp = await navigator.mediaDevices.getUserMedia({audio:true});
     tmp.getTracks().forEach(function(t){t.stop();});
+    // 等待设备列表更新（插拔耳机后需要时间）
+    await new Promise(function(r){setTimeout(r,100);});
     var devs = await getAudioDevices();
     if(devs.length===0){haState.phoneDeviceId=undefined;haState.earphoneDeviceId=undefined;return;}
-    // Strategy: identify built-in mic first, then classify remaining devices
     var phoneDev=null,earphoneDev=null;
-    var builtinKw=['internal','built-in','内建','内置','default','communications'];
-    var earphoneKw=['headset','earphone','earbud','耳机','有线','外接','external','usb','bluetooth','line','mic'];
+    var builtinKw=['internal','built-in','内建','内置','default','communications','麦克风阵列','microphone array'];
+    var earphoneKw=['headset','earphone','earbud','耳机','有线','外接','external','usb','bluetooth','thunderbolt','usb-c','type-c','line','jack','3.5mm','audio device','usb audio','realtek'];
     for(var i=0;i<devs.length;i++){
       var label=(devs[i].label||'').toLowerCase();
       var isBuiltin=false,isEarphone=false;
@@ -1943,11 +2072,15 @@ async function autoDetectMics(){
       if(isEarphone){earphoneDev=devs[i];}
       else if(isBuiltin){phoneDev=devs[i];}
       else if(!phoneDev){phoneDev=devs[i];}
-      else{earphoneDev=devs[i];}
+      else if(!earphoneDev){earphoneDev=devs[i];}
     }
+    // 如果只有一个设备且不是内置麦克风，优先作为耳麦
+    if(!phoneDev&&!earphoneDev&&devs.length===1){earphoneDev=devs[0];}
+    if(!phoneDev&&earphoneDev){phoneDev=devs[0]===earphoneDev?null:devs[0];}
     if(!phoneDev&&!earphoneDev){phoneDev=devs[0];}
     haState.phoneDeviceId=phoneDev?phoneDev.deviceId:(devs[0]?devs[0].deviceId:undefined);
-    haState.earphoneDeviceId=earphoneDev?earphoneDev.deviceId:haState.phoneDeviceId;
+    // 不再将耳麦设备ID回退到手机设备ID，避免耳机模式下使用手机麦克风
+    haState.earphoneDeviceId=earphoneDev?earphoneDev.deviceId:undefined;
     console.log('Mic detect: phone='+(phoneDev?phoneDev.label:'none')+' ('+haState.phoneDeviceId+'), earphone='+(earphoneDev?earphoneDev.label:'none')+' ('+haState.earphoneDeviceId+')');
   }catch(e){haState.phoneDeviceId=undefined;haState.earphoneDeviceId=undefined;}
 }
@@ -2016,7 +2149,16 @@ async function onMicChange(mode){
     if(!deviceId){alert('未检测到'+(mode==='phone'?'手机':'耳机')+'麦克风，请检查设备连接');haState.micMode=mode==='phone'?'earphone':'phone';if(mode==='phone'){phone.classList.remove('selected');headset.classList.add('selected');}else{headset.classList.remove('selected');phone.classList.add('selected');}if(st){st.textContent='助听运行中';st.style.color='#00CA48';}return;}
     var profile=buildProfileFromData();
     AudioEngine.howlSensitivity=haState.howlSensitivity;
-    var ok=await AudioEngine.start('both',profile,haState.gainLevel,deviceId,haState.noiseSupp,mode);
+    // 切换前先静音，避免杂音
+    if(AudioEngine.masterGain&&AudioEngine.ctx){AudioEngine.masterGain.gain.setValueAtTime(0,AudioEngine.ctx.currentTime);}
+    // 预取新设备流，并行于旧设备停止
+    var preStream=null;
+    var nsMode=haState.noiseSupp==='auto'?supportsNoiseSuppression():(haState.noiseSupp==='browser'?'basic':'off');
+    var nsEnabled=nsMode!=='off';
+    var constraints={audio:{echoCancellation:false,noiseSuppression:nsEnabled,autoGainControl:false,latency:0.001}};
+    if(deviceId)constraints.audio.deviceId={exact:deviceId};
+    try{preStream=await navigator.mediaDevices.getUserMedia(constraints);}catch(e){}
+    var ok=await AudioEngine.start('both',profile,haState.gainLevel,deviceId,haState.noiseSupp,mode,preStream);
     // 如果缓存设备ID已失效，自动检测后重试一次
     if(!ok){
       await autoDetectMics();
@@ -2069,6 +2211,7 @@ async function onNoiseChange(supp){
     if(AudioEngine.masterGain&&AudioEngine.ctx){AudioEngine.masterGain.gain.setValueAtTime(0,AudioEngine.ctx.currentTime);}
     var profile=buildProfileFromData();
     var deviceId=haState.micMode==='phone'?haState.phoneDeviceId:haState.earphoneDeviceId;
+    if(!deviceId){await autoDetectMics();deviceId=haState.micMode==='phone'?haState.phoneDeviceId:haState.earphoneDeviceId;}
     AudioEngine.howlSensitivity=haState.howlSensitivity;
     await AudioEngine.start('both',profile,haState.gainLevel,deviceId,supp,haState.micMode);
     if(AudioEngine.masterGain&&AudioEngine.ctx){AudioEngine.masterGain.gain.setTargetAtTime(AudioEngine.userGain,AudioEngine.ctx.currentTime,0.5);}
@@ -2604,9 +2747,9 @@ function resumeTest(){
 // ====== PRELOAD ASSETS (all images used in the app) ======
 // CRITICAL first: QR code + home screen images (needed for first paint)
 var PRELOAD_ASSETS = [
-  'assets/QR-code.svg',
+  'assets/QR-code-cf.svg','assets/QR-code_app_icon.png',
   'assets/union-bird.svg','assets/bird-logo-big.webp','assets/bird-icon-small.webp',
-  'assets/circle-btn-bg-1afd37.webp','assets/text_btn_icon.webp',
+  'assets/circle-btn-bg-1afd37.webp','assets/circle-btn-bg-1afd37-mobile.webp','assets/text_btn_icon.webp',
   // Secondary: rest of assets
   'assets/start_cup.webp','assets/stop_cup.webp',
   'assets/1_cup.webp','assets/2_cup.webp','assets/3_cup.webp','assets/4_cup.webp',
@@ -2721,21 +2864,34 @@ function waitForContainerImages(container){
   var total = PRELOAD_ASSETS.length;
   var loaded = 0;
   var barFill = document.getElementById('preload-bar-fill');
-  var barPercent = document.getElementById('preload-percent');
   var finished = false;
+  var fakeProgress = 0;
+  var fakeTimer = null;
+  
+  function updateFakeProgress(){
+    if(finished) return;
+    var remaining = 98 - fakeProgress;
+    fakeProgress = Math.min(98, fakeProgress + Math.max(0.5, remaining * 0.06));
+    var displayPct = Math.round(fakeProgress);
+    if(barFill) barFill.style.width = displayPct + '%';
+    var pctEl = document.getElementById('preload-pct');
+    if(pctEl) pctEl.textContent = displayPct + '%';
+  }
+  fakeTimer = setInterval(updateFakeProgress, 500);
   
   function updateProgress(){
     if(finished) return;
     loaded++;
-    var pct = Math.round((loaded / total) * 100);
-    if(barFill) barFill.style.width = pct + '%';
-    if(barPercent) barPercent.textContent = pct + '%';
     if(loaded >= total) finishPreload();
   }
   
   function finishPreload(){
     if(finished) return;
     finished = true;
+    if(fakeTimer){clearInterval(fakeTimer);fakeTimer=null;}
+    if(barFill){barFill.style.width = '100%';}
+    var pctEl = document.getElementById('preload-pct');
+    if(pctEl) pctEl.textContent = '100%';
     localStorage.setItem('heardit_preload_done', '1');
 
     // Cache all preloaded assets + the HTML page itself for offline use
@@ -2789,7 +2945,6 @@ function waitForContainerImages(container){
     Promise.all(decodedPromises).then(function(){
       // All images decoded — show 100% and enter immediately
       if(barFill) barFill.style.width = '100%';
-      if(barPercent) barPercent.textContent = '100%';
       // Now make target screen active but invisible on top of preload so browser renders it
       if(targetEl){
         targetEl.classList.add('active');

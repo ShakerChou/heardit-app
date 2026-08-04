@@ -1,4 +1,4 @@
-const CACHE = 'heardit-v1.6.7';
+const CACHE = 'heardit-v1.6.19';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
