@@ -22,7 +22,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
 @media(min-width:431px){.qr-section{display:flex;top:0;left:50%;margin-left:calc(393px/2 + 100px)}}
 .qr-code-wrap{width:200px;height:200px;border:2px solid #0085FF;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;background:#fff;padding:16px;position:relative}
 .qr-code-wrap img.qr-main{width:100%;height:100%;object-fit:contain}
-.qr-code-wrap .qr-app-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border-radius:10px;object-fit:contain}
+.qr-code-wrap .qr-app-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:8px;object-fit:contain}
 .qr-label{width:200px;background:#0085FF;border-radius:0 0 20px 20px;padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:2px}
 .qr-label-title{font-size:20px;font-weight:500;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center;line-height:1.5}
 .qr-label-line{font-size:14px;font-weight:400;color:#fff;font-family:"PingFang SC",-apple-system,sans-serif;text-align:center;line-height:1.5}
@@ -495,7 +495,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
   <img class="preload-bird" src="assets/bird-icon-small.webp" alt="Heardit" onerror="this.style.display='none'">
   <div class="preload-info">
     <span class="preload-title">听到鸟 Heardit</span>
-    <span class="preload-ver" id="preload-ver">v1.6.19</span>
+    <span class="preload-ver" id="preload-ver">v1.6.22</span>
   </div>
   <div class="preload-progress-wrap">
     <div class="preload-bar-wrap">
@@ -516,7 +516,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
     </div>
     <div class="home-no-data-ver">
       <span class="home-no-data-ver-text">听到鸟 Heardit <span class="beta-tag">BETA</span></span>
-      <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span id="no-data-ver">v1.6.19</span></span></span>
+      <span class="home-no-data-ver-tag"><span class="home-no-data-ver-text"><span id="no-data-ver">v1.6.22</span></span></span>
     </div>
     <div class="start-test-circle" id="start-test-circle">
       <picture>
@@ -557,7 +557,7 @@ body{font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"SF Pro Display"
         <div class="home-brand-name">听到鸟</div>
         <div class="home-brand-ver">
           <span class="beta-tag">BETA</span>
-          <span id="header-ver">v1.6.19</span>
+          <span id="header-ver">v1.6.22</span>
         </div>
       </div>
     </div>
@@ -1002,8 +1002,8 @@ document.addEventListener('touchstart',function(){},{passive:true});
   }
 })();
 // ====== VERSION ======
-const VERSION = 'v1.6.19';
-var APP_VERSION = 'v1.6.19';
+const VERSION = 'v1.6.22';
+var APP_VERSION = 'v1.6.22';
 
 // ====== AUDIO CONSTANTS ======
 const DAMAGED_PROFILE = {250:15,500:22,1000:32,2000:42,4000:52,8000:60};
